@@ -20,7 +20,7 @@ articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 REGEX_PDF_PATH = re.compile(r'/pdf.*\.pdf$')
 collections_acronym = [i.code for i in articlemeta.collections()]
-
+DAYLY_GRANULARITY = False
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -96,7 +96,7 @@ def eligible_match_keys(document):
 
     return keys
 
-def join_accesses(unique_id, accesses):
+def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
     """
     Esse metodo recebe 1 ou mais chaves para um documento em específico para que
     os acessos sejam recuperados no Ratchet e consolidados em um unico id.
@@ -108,41 +108,46 @@ def join_accesses(unique_id, accesses):
     servidor ex: /pdf/rsp/v12n10/v12n10.pdf
     """
 
-    joined_data = {unique_id: {}}
+    joined_data = {}
     listed_data = []
-    def joining(joined_data, atype, data):
-        joined_data.setdefault(atype, {})
+    def joining_monthly(joined_data, atype, data):
+        del(data['total'])
+        for year, months in data.items():
+            del(months['total'])
+            for month in months:
+                dt = '%s-%s' % (year[1:], month[1:])
+                joined_data.setdefault(dt, {})
+                joined_data[dt].setdefault(atype, 0)
+                joined_data[dt][atype] += data[year][month]['total']
+
+        return joined_data
+
+    def joining_dayly(joined_data, atype, data):
 
         del(data['total'])
-
         for year, months in data.items():
             del(months['total'])
             for month, days in months.items():
                 del(days['total'])
                 for day in days:
                     dt = '%s-%s-%s' % (year[1:], month[1:], day[1:])
-                    joined_data[atype].setdefault(dt, 0)
-                    joined_data[atype][dt] += data[year][month][day]
+                    joined_data.setdefault(dt, {})
+                    joined_data[dt].setdefault(atype, 0)
+                    joined_data[dt][atype] += data[year][month][day]
 
         return joined_data
 
+    joining = joining_monthly
+    if dayly_granularity:
+        joining = joining_dayly
+
     for data in accesses:
         for key, value in data.items():
-            if not key in ['abstract', 'html', 'pdf']:
+            if not key in ['abstract', 'html', 'pdf', 'epdf']:
                 continue
             joined_data = joining(joined_data, key, value)
 
-    for atype, adates in joined_data.items():
-        for adate, total in adates.items():
-            line_data = [
-                atype,
-                adate,
-                str(total)
-            ]
-
-            listed_data.append(line_data)
-
-    return listed_data
+    return joined_data
 
 def country(country):
     if country in choices.ISO_3166:
@@ -151,14 +156,14 @@ def country(country):
         return choices.ISO_3166_COUNTRY_AS_KEY[country]
     return 'undefined'
 
-def join_metadata_with_accesses(document, accesses):
+def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data = {}
     data['id'] = '_'.join([document.collection_acronym, document.publisher_id])
     data['pid'] = document.publisher_id
     data['issn'] = document.journal.scielo_issn
     data['journal_title'] = document.journal.title
-    data['issue'] = '_'.join([document.collection_acronym, document.publisher_id[0:18]])
+    data['issue'] = document.publisher_id[0:18]
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
     data['subject_areas'] = [i for i in document.journal.subject_areas]
@@ -168,15 +173,20 @@ def join_metadata_with_accesses(document, accesses):
     data['aff_countries'] = ['undefined']
     if document.mixed_affiliations:
         data['aff_countries'] = list(set([country(aff.get('country', 'undefined')) for aff in document.mixed_affiliations]))
-    data['access_type'] = accesses[0]
-    data['access_date'] = accesses[1]
-    data['access_total'] = int(accesses[2])
+    data['access_date'] = accesses_date
+    data['access_year'] = accesses_date[:4]
+    data['access_month'] = accesses_date[5:7]
+    data['access_day'] = accesses_date[8:]
+    data['access_abstract'] = accesses.get('abstract', 0)
+    data['access_html'] = accesses.get('html', 0)
+    data['access_pdf'] = accesses.get('pdf', 0)
+    data['access_epdf'] = accesses.get('epdf', 0)
+    data['access_total'] = sum([v for i, v in accesses.items()])
 
     return data
 
-def get_accesses(collection, issns=None):
-
-    for document in articlemeta.documents(collection=collection, issns=issns):
+def get_accesses(collection, issn=None, dayly_granularity=DAYLY_GRANULARITY):
+    for document in articlemeta.documents(collection=collection, issn=issn):
         accesses = []
         keys = eligible_match_keys(document)
         for key in keys:
@@ -184,10 +194,10 @@ def get_accesses(collection, issns=None):
             jdata = json.loads(data)
             if 'objects' in jdata and len(jdata['objects']) > 0:
                 accesses.append(jdata['objects'][0])
-        joined_accesses = join_accesses(document.publisher_id, accesses)
+        joined_accesses = join_accesses(document.publisher_id, accesses, dayly_granularity=dayly_granularity)
 
-        for item in joined_accesses:
-            yield join_metadata_with_accesses(document, item)
+        for adate, adata in joined_accesses.items():
+            yield join_metadata_with_accesses(document, adate, adata)
 
 def fmt_json(data):
     return json.dumps(data)
@@ -195,36 +205,45 @@ def fmt_json(data):
 def fmt_csv(data):
 
     line = [
-        data['id'],
+        data['collection'],
         data['pid'],
         data['issn'],
-        data['journal_title'],
         data['issue'],
+        data['journal_title'],
         data['publication_date'],
         data['publication_year'],
-        ', '.join(data['subject_areas']),
-        data['collection'],
         data['document_type'],
+        ', '.join(data['subject_areas']),
         ', '.join(data['languages']),
         ', '.join(data['aff_countries']),
-        data['access_type'],
         data['access_date'],
+        data['access_date'][:4],
+        data['access_date'][5:7],
+        data['access_date'][8:],
+        data.get('access_abstract', 0),
+        data.get('access_html', 0),
+        data.get('access_pdf', 0),
+        data.get('access_epdf', 0),
         data['access_total']
     ]
 
     return ';'.join(['"%s"' % i for i in line])
 
-def run(collection, issns=None, fmt=fmt_csv, output_file=None):
+def run(collection, issns=None, dayly_granularity=False, fmt=fmt_csv, output_file=None):
+
+    if not issns:
+        issns = [None]
 
     if not output_file:
-        for data in get_accesses(collection, issns=None):
-            print(fmt(data))
-
+        for issn in issns:
+            for data in get_accesses(collection, issn=issn, dayly_granularity=dayly_granularity):
+                print(fmt(data))
         exit()
 
     with open(output_file, 'w') as f:
-        for data in get_accesses(collection, issns=None):
-            f.write(fmt(data))
+        for issn in issns:
+            for data in get_accesses(collection, issn=issn, dayly_granularity=dayly_granularity):
+                f.write('%s\r\n' % fmt(data))
 
 def main():
     parser = argparse.ArgumentParser(
@@ -245,6 +264,13 @@ def main():
     )
 
     parser.add_argument(
+        '--dayly_granularity',
+        '-d',
+        action='store_true',
+        help='Accesses granularity default will be monthly if not specified'
+    )
+
+    parser.add_argument(
         '--output_format',
         '-f',
         choices=['json', 'csv'],
@@ -254,7 +280,7 @@ def main():
 
     parser.add_argument(
         '--output_file',
-        '-d',
+        '-r',
         help='File to receive the dumped data'
     )
 
@@ -284,4 +310,4 @@ def main():
     if args.output_format == 'json':
         output_format = fmt_json
 
-    run(args.collection, issns, output_format, args.output_file)
+    run(args.collection, issns, args.dayly_granularity, output_format, args.output_file)

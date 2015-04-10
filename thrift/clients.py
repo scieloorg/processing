@@ -54,17 +54,14 @@ class ArticleMeta(object):
     def client(self):
         return self._client
 
-    def documents(self, collection, issns=None):
-
+    def documents(self, collection=None, issn=None):
         offset = 0
         while True:
-            identifiers = self._client.get_article_identifiers(collection=collection, limit=LIMIT, offset=offset)
+            identifiers = self._client.get_article_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
             if len(identifiers) == 0:
                 raise StopIteration
 
             for identifier in identifiers:
-                if issns and not identifier.code[1:10] in issns:
-                    continue
                 article = self._client.get_article(
                     code=identifier.code, collection=identifier.collection)
 

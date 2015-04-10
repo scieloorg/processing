@@ -2,8 +2,8 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'thriftpy',
-    'xylose'
+    'thriftpy>=0.2.0',
+    'xylose>=0.5b'
 ]
 
 tests_require = []
@@ -32,6 +32,6 @@ setup(
     install_requires=install_requires,
     entry_points="""
     [console_scripts]
-    accesses=accesses.dumpdata:main
+    processing_accesses_dumpdata=accesses.dumpdata:main
     """
 )
