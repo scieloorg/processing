@@ -1,0 +1,2 @@
+thriftpy==0.2.0
+-e git+https://github.com/scieloorg/xylose@v0.5b#egg=xylose
