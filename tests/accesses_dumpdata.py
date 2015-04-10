@@ -374,7 +374,7 @@ class DumpData(unittest.TestCase):
                 'pid': 'S0102-67202009000300001',
                 'collection': 'scl',
                 'publication_year': '2009',
-                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (São Paulo)',
+                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\u00e3o Paulo)',
                 'publication_date': '2009-09',
                 'issue': 'S0102-672020090003'
             }

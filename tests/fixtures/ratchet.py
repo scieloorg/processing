@@ -1,9 +1,9 @@
 record_1 = {
     "meta": {
         "limit": 20,
-        "next": null,
+        "next": None,
         "offset": 0,
-        "previous": null,
+        "previous": None,
         "total": 1
     },
     "objects": [
@@ -1565,9 +1565,9 @@ record_1 = {
 record_2 = {
     "meta": {
         "limit": 20,
-        "next": null,
+        "next": None,
         "offset": 0,
-        "previous": null,
+        "previous": None,
         "total": 1
     },
     "objects": [

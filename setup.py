@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'thriftpy>=0.2.0',
-    'xylose>=0.5b'
+    'xylose'
 ]
 
 tests_require = []
 
 setup(
     name="processing-scielo",
-    version="0.1",
+    version="0.1.1",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -23,9 +23,10 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+ssh://git@github.com/scieloorg/xylose.git#egg=xylose"
+        "git+ssh://git@github.com/scieloorg/xylose.git@v0.5b#egg=xylose"
     ],
     tests_require=tests_require,
     test_suite='tests',

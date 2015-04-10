@@ -1,4 +1,4 @@
-# conding: utf-8
+# coding: utf-8
 """
 Esse processamento condença os metadados de documentos com os dados de acessos.
 """
@@ -7,6 +7,7 @@ import argparse
 import logging
 import re
 import json
+import codecs
 
 from thrift import clients
 import choices
@@ -240,10 +241,10 @@ def run(collection, issns=None, dayly_granularity=False, fmt=fmt_csv, output_fil
                 print(fmt(data))
         exit()
 
-    with open(output_file, 'w') as f:
+    with codecs.open(output_file, 'w', encoding='utf-8') as f:
         for issn in issns:
             for data in get_accesses(collection, issn=issn, dayly_granularity=dayly_granularity):
-                f.write('%s\r\n' % fmt(data))
+                f.write(u'%s\r\n' % fmt(data))
 
 def main():
     parser = argparse.ArgumentParser(
