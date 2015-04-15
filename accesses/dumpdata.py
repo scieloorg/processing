@@ -16,7 +16,7 @@ __version__ = 0.1
 
 logger = logging.getLogger(__name__)
 
-ratchet = clients.Ratchet('ratchet.scielo.org', 11630)
+ratchet = clients.Ratchet('ratchet.scielo.org', 11631)
 articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 REGEX_PDF_PATH = re.compile(r'/pdf.*\.pdf$')
@@ -108,11 +108,14 @@ def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
     Path PDF: Quando o acesso é feito diretamente para o arquivo PDF no FS do
     servidor ex: /pdf/rsp/v12n10/v12n10.pdf
     """
-
+    logger.debug('joining accesses for: %s' % unique_id)
     joined_data = {}
     listed_data = []
     def joining_monthly(joined_data, atype, data):
-        del(data['total'])
+
+        if 'total' in data:
+            del(data['total'])
+
         for year, months in data.items():
             del(months['total'])
             for month in months:
@@ -125,7 +128,9 @@ def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
 
     def joining_dayly(joined_data, atype, data):
 
-        del(data['total'])
+        if 'total' in data:
+            del(data['total'])
+
         for year, months in data.items():
             del(months['total'])
             for month, days in months.items():
@@ -190,6 +195,7 @@ def get_accesses(collection, issn=None, dayly_granularity=DAYLY_GRANULARITY):
     for document in articlemeta.documents(collection=collection, issn=issn):
         accesses = []
         keys = eligible_match_keys(document)
+        logger.debug('keys to join for %s: %s' % (document.publisher_id, str(keys)))
         for key in keys:
             data = ratchet.document(key)
             jdata = json.loads(data)
