@@ -1,0 +1,3 @@
+[app:main]
+articlemeta_thriftserver = 127.0.0.1:11720
+ratchet_thriftserver = 127.0.0.1:11630

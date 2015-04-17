@@ -6,6 +6,6 @@ install:
 script:
   - python setup.py test
 before_script:
-  - cp ./config.ini.template ./config.ini
+  - cp ./config.ini-TEMPLATE ./config.ini
 env:
   - PROCESSING_SETTINGS_FILE = ./config.ini
