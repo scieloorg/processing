@@ -17,14 +17,13 @@ __version__ = 0.1
 
 logger = logging.getLogger(__name__)
 
-ratchet = clients.Ratchet('ratchet.scielo.org', 11631)
-articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 REGEX_PDF_PATH = re.compile(r'/pdf.*\.pdf$')
 FROM = '1500-01-01'
 UNTIL = datetime.datetime.now().isoformat()[0:10]
-collections_acronym = [i.code for i in articlemeta.collections()]
 DAYLY_GRANULARITY = False
+OUTPUT_FORMAT = 'csv'
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -52,6 +51,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
     return logger
 
+
 def ckeck_given_issns(issns):
     valid_issns = []
 
@@ -62,6 +62,7 @@ def ckeck_given_issns(issns):
         valid_issns.append(issn)
 
     return valid_issns
+
 
 def pdf_keys(fulltexts):
 
@@ -77,6 +78,7 @@ def pdf_keys(fulltexts):
 
     return keys
 
+
 def fbpe_key(code):
     """
     input:
@@ -91,6 +93,7 @@ def fbpe_key(code):
 
     return '%s(%s)%s' % (begin, year, end)
 
+
 def eligible_match_keys(document):
     keys = []
 
@@ -100,69 +103,6 @@ def eligible_match_keys(document):
 
     return keys
 
-def join_accesses(unique_id, accesses, from_date=FROM, until_date=UNTIL,
-    dayly_granularity=DAYLY_GRANULARITY):
-    """
-    Esse metodo recebe 1 ou mais chaves para um documento em específico para que
-    os acessos sejam recuperados no Ratchet e consolidados em um unico id.
-    Esse processo é necessário pois os acessos de um documento podem ser registrados
-    para os seguintes ID's (PID, PID FBPE, Path PDF).
-    PID: Id original do SciELO ex: S0102-67202009000300001
-    PID FBPE: Id antigo do SciELO ex: S0102-6720(09)000300001
-    Path PDF: Quando o acesso é feito diretamente para o arquivo PDF no FS do
-    servidor ex: /pdf/rsp/v12n10/v12n10.pdf
-    """
-    logger.debug('joining accesses for: %s' % unique_id)
-    joined_data = {}
-    listed_data = []
-    def joining_monthly(joined_data, atype, data):
-
-        if 'total' in data:
-            del(data['total'])
-
-        for year, months in data.items():
-            del(months['total'])
-            for month in months:
-
-                dt = '%s-%s' % (year[1:], month[1:])
-                if not dt >= from_date[:7] or not dt <= until_date[:7]:
-                    continue
-                joined_data.setdefault(dt, {})
-                joined_data[dt].setdefault(atype, 0)
-                joined_data[dt][atype] += data[year][month]['total']
-
-        return joined_data
-
-    def joining_dayly(joined_data, atype, data):
-
-        if 'total' in data:
-            del(data['total'])
-
-        for year, months in data.items():
-            del(months['total'])
-            for month, days in months.items():
-                del(days['total'])
-                for day in days:
-                    dt = '%s-%s-%s' % (year[1:], month[1:], day[1:])
-                    if not dt >= from_date or not dt <= until_date:
-                        continue
-                    joined_data.setdefault(dt, {})
-                    joined_data[dt].setdefault(atype, 0)
-                    joined_data[dt][atype] += data[year][month][day]
-
-        return joined_data
-
-    joining = joining_monthly
-    if dayly_granularity:
-        joining = joining_dayly
-
-    for data in accesses:
-        for key, value in data.items():
-            if not key in ['abstract', 'html', 'pdf', 'epdf']:
-                continue
-            joined_data = joining(joined_data, key, value)
-
-    return joined_data
 
 def country(country):
     if country in choices.ISO_3166:
@@ -170,6 +110,7 @@ def country(country):
     if country in choices.ISO_3166_COUNTRY_AS_KEY:
         return choices.ISO_3166_COUNTRY_AS_KEY[country]
     return 'undefined'
+
 
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
@@ -200,73 +141,6 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
 
     return data
 
-def get_accesses(collection, issn=None, from_date=FROM, until_date=UNTIL,
-    dayly_granularity=DAYLY_GRANULARITY):
-
-    for document in articlemeta.documents(collection=collection, issn=issn):
-        accesses = []
-        keys = eligible_match_keys(document)
-        logger.debug('keys to join for %s: %s' % (document.publisher_id, str(keys)))
-        for key in keys:
-            data = ratchet.document(key)
-            jdata = json.loads(data)
-            if 'objects' in jdata and len(jdata['objects']) > 0:
-                accesses.append(jdata['objects'][0])
-        joined_accesses = join_accesses(document.publisher_id, accesses, 
-            from_date=from_date, until_date=until_date,
-            dayly_granularity=dayly_granularity)
-
-        for adate, adata in joined_accesses.items():
-            yield join_metadata_with_accesses(document, adate, adata)
-
-def fmt_json(data):
-    return json.dumps(data)
-
-def fmt_csv(data):
-
-    line = [
-        data['collection'],
-        data['pid'],
-        data['issn'],
-        data['issue'],
-        data['journal_title'],
-        data['publication_date'],
-        data['publication_year'],
-        data['document_type'],
-        ', '.join(data['subject_areas']),
-        ', '.join(data['languages']),
-        ', '.join(data['aff_countries']),
-        data['access_date'],
-        data['access_date'][:4],
-        data['access_date'][5:7],
-        data['access_date'][8:],
-        data.get('access_abstract', 0),
-        data.get('access_html', 0),
-        data.get('access_pdf', 0),
-        data.get('access_epdf', 0),
-        data['access_total']
-    ]
-
-    return ';'.join(['"%s"' % i for i in line])
-
-def run(collection, issns=None, from_date=FROM, until_date=UNTIL,
-    dayly_granularity=False, fmt=fmt_csv, output_file=None):
-
-    if not issns:
-        issns = [None]
-
-    if not output_file:
-        for issn in issns:
-            for data in get_accesses(collection, issn=issn, from_date=from_date, 
-                until_date=until_date, dayly_granularity=dayly_granularity):
-                print(fmt(data))
-        exit()
-
-    with codecs.open(output_file, 'w', encoding='utf-8') as f:
-        for issn in issns:
-            for data in get_accesses(collection, issn=issn, from_date=from_date,
-                until_date=until_date, dayly_granularity=dayly_granularity):
-                f.write(u'%s\r\n' % fmt(data))
 
 def is_valid_date(value):
 
@@ -279,6 +153,153 @@ def is_valid_date(value):
             return False
 
     return True
+
+
+class Dumper(object):
+
+    def __init__(self, collection, issns=None, from_date=FROM, until_date=UNTIL,
+        dayly_granularity=DAYLY_GRANULARITY, fmt=OUTPUT_FORMAT, output_file=None):
+
+        self._ratchet = clients.Ratchet('ratchet.scielo.org', 11631)
+        self._articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
+        self.from_date = from_date
+        self.until_date = until_date
+        self.dayly_granularity = dayly_granularity
+        self.output_file=output_file
+        self.issns = issns
+        self.collection = collection
+
+        self.fmt = self.fmt_csv
+        if fmt == 'json':
+            self.fmt = self.fmt_json
+
+
+    def join_accesses(self, unique_id, accesses):
+        """
+        Esse metodo recebe 1 ou mais chaves para um documento em específico para que
+        os acessos sejam recuperados no Ratchet e consolidados em um unico id.
+        Esse processo é necessário pois os acessos de um documento podem ser registrados
+        para os seguintes ID's (PID, PID FBPE, Path PDF).
+        PID: Id original do SciELO ex: S0102-67202009000300001
+        PID FBPE: Id antigo do SciELO ex: S0102-6720(09)000300001
+        Path PDF: Quando o acesso é feito diretamente para o arquivo PDF no FS do
+        servidor ex: /pdf/rsp/v12n10/v12n10.pdf
+        """
+        logger.debug('joining accesses for: %s' % unique_id)
+        joined_data = {}
+        listed_data = []
+        def joining_monthly(joined_data, atype, data):
+
+            if 'total' in data:
+                del(data['total'])
+
+            for year, months in data.items():
+                del(months['total'])
+                for month in months:
+
+                    dt = '%s-%s' % (year[1:], month[1:])
+                    if not dt >= self.from_date[:7] or not dt <= self.until_date[:7]:
+                        continue
+                    joined_data.setdefault(dt, {})
+                    joined_data[dt].setdefault(atype, 0)
+                    joined_data[dt][atype] += data[year][month]['total']
+
+            return joined_data
+
+        def joining_dayly(joined_data, atype, data):
+
+            if 'total' in data:
+                del(data['total'])
+
+            for year, months in data.items():
+                del(months['total'])
+                for month, days in months.items():
+                    del(days['total'])
+                    for day in days:
+                        dt = '%s-%s-%s' % (year[1:], month[1:], day[1:])
+                        if not dt >= self.from_date or not dt <= self.until_date:
+                            continue
+                        joined_data.setdefault(dt, {})
+                        joined_data[dt].setdefault(atype, 0)
+                        joined_data[dt][atype] += data[year][month][day]
+
+            return joined_data
+
+        joining = joining_monthly
+        if self.dayly_granularity:
+            joining = joining_dayly
+
+        for data in accesses:
+            for key, value in data.items():
+                if not key in ['abstract', 'html', 'pdf', 'epdf']:
+                    continue
+                joined_data = joining(joined_data, key, value)
+
+        return joined_data
+
+
+    def get_accesses(self, issn):
+
+        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+            accesses = []
+            keys = eligible_match_keys(document)
+            logger.debug('keys to join for %s: %s' % (document.publisher_id, str(keys)))
+            for key in keys:
+                data = self._ratchet.document(key)
+                jdata = json.loads(data)
+                if 'objects' in jdata and len(jdata['objects']) > 0:
+                    accesses.append(jdata['objects'][0])
+            joined_accesses = self.join_accesses(document.publisher_id, accesses)
+
+            for adate, adata in joined_accesses.items():
+                yield join_metadata_with_accesses(document, adate, adata)
+
+    def fmt_json(self, data):
+        return json.dumps(data)
+
+    def fmt_csv(self, data):
+
+        line = [
+            data['collection'],
+            data['pid'],
+            data['issn'],
+            data['issue'],
+            data['journal_title'],
+            data['publication_date'],
+            data['publication_year'],
+            data['document_type'],
+            ', '.join(data['subject_areas']),
+            ', '.join(data['languages']),
+            ', '.join(data['aff_countries']),
+            data['access_date'],
+            data['access_date'][:4],
+            data['access_date'][5:7],
+            data['access_date'][8:],
+            data.get('access_abstract', 0),
+            data.get('access_html', 0),
+            data.get('access_pdf', 0),
+            data.get('access_epdf', 0),
+            data['access_total']
+        ]
+
+        return ';'.join(['"%s"' % i for i in line])
+
+    def run(self):
+
+        if not self.issns:
+            issns = [None]
+
+        if not self.output_file:
+            for issn in self.issns:
+                for data in self.get_accesses(issn=issn):
+                    print(self.fmt(data))
+            exit()
+
+        with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
+            for issn in self.issns:
+                for data in self.get_accesses(issn=issn):
+                    f.write(u'%s\r\n' % self.fmt(data))
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -294,7 +315,6 @@ def main():
     parser.add_argument(
         '--collection',
         '-c',
-        choices=collections_acronym,
         help='Collection Acronym'
     )
 
@@ -323,7 +343,7 @@ def main():
         '--output_format',
         '-f',
         choices=['json', 'csv'],
-        default='csv',
+        default=OUTPUT_FORMAT,
         help='Output format'
     )
 
@@ -355,10 +375,6 @@ def main():
     if len(args.issns) > 0:
         issns = ckeck_given_issns(args.issns)
 
-    output_format = fmt_csv
-    if args.output_format == 'json':
-        output_format = fmt_json
-
     if not is_valid_date(args.from_date):
         logger.error('Invalid from date: %s' % args.from_date)
         exit()
@@ -367,5 +383,7 @@ def main():
         logger.error('Invalid until date: %s' % args.until_date)
         exit()
 
-    run(args.collection, issns, args.from_date, args.until_date,
-        args.dayly_granularity, output_format, args.output_file)
+    dumper = Dumper(args.collection, issns, args.from_date, args.until_date,
+        args.dayly_granularity, args.output_format, args.output_file)
+
+    dumper.run()
