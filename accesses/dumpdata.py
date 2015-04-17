@@ -8,6 +8,7 @@ import logging
 import re
 import json
 import codecs
+import datetime
 
 from thrift import clients
 import choices
@@ -20,6 +21,8 @@ ratchet = clients.Ratchet('ratchet.scielo.org', 11631)
 articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 REGEX_PDF_PATH = re.compile(r'/pdf.*\.pdf$')
+FROM = '1500-01-01'
+UNTIL = datetime.datetime.now().isoformat()[0:10]
 collections_acronym = [i.code for i in articlemeta.collections()]
 DAYLY_GRANULARITY = False
 
@@ -97,7 +100,8 @@ def eligible_match_keys(document):
 
     return keys
 
-def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
+def join_accesses(unique_id, accesses, from_date=FROM, until_date=UNTIL,
+    dayly_granularity=DAYLY_GRANULARITY):
     """
     Esse metodo recebe 1 ou mais chaves para um documento em específico para que
     os acessos sejam recuperados no Ratchet e consolidados em um unico id.
@@ -119,7 +123,10 @@ def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
         for year, months in data.items():
             del(months['total'])
             for month in months:
+
                 dt = '%s-%s' % (year[1:], month[1:])
+                if not dt >= from_date[:7] or not dt <= until_date[:7]:
+                    continue
                 joined_data.setdefault(dt, {})
                 joined_data[dt].setdefault(atype, 0)
                 joined_data[dt][atype] += data[year][month]['total']
@@ -137,6 +144,8 @@ def join_accesses(unique_id, accesses, dayly_granularity=DAYLY_GRANULARITY):
                 del(days['total'])
                 for day in days:
                     dt = '%s-%s-%s' % (year[1:], month[1:], day[1:])
+                    if not dt >= from_date or not dt <= until_date:
+                        continue
                     joined_data.setdefault(dt, {})
                     joined_data[dt].setdefault(atype, 0)
                     joined_data[dt][atype] += data[year][month][day]
@@ -191,7 +200,9 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
 
     return data
 
-def get_accesses(collection, issn=None, dayly_granularity=DAYLY_GRANULARITY):
+def get_accesses(collection, issn=None, from_date=FROM, until_date=UNTIL,
+    dayly_granularity=DAYLY_GRANULARITY):
+
     for document in articlemeta.documents(collection=collection, issn=issn):
         accesses = []
         keys = eligible_match_keys(document)
@@ -201,7 +212,9 @@ def get_accesses(collection, issn=None, dayly_granularity=DAYLY_GRANULARITY):
             jdata = json.loads(data)
             if 'objects' in jdata and len(jdata['objects']) > 0:
                 accesses.append(jdata['objects'][0])
-        joined_accesses = join_accesses(document.publisher_id, accesses, dayly_granularity=dayly_granularity)
+        joined_accesses = join_accesses(document.publisher_id, accesses, 
+            from_date=from_date, until_date=until_date,
+            dayly_granularity=dayly_granularity)
 
         for adate, adata in joined_accesses.items():
             yield join_metadata_with_accesses(document, adate, adata)
@@ -236,21 +249,36 @@ def fmt_csv(data):
 
     return ';'.join(['"%s"' % i for i in line])
 
-def run(collection, issns=None, dayly_granularity=False, fmt=fmt_csv, output_file=None):
+def run(collection, issns=None, from_date=FROM, until_date=UNTIL,
+    dayly_granularity=False, fmt=fmt_csv, output_file=None):
 
     if not issns:
         issns = [None]
 
     if not output_file:
         for issn in issns:
-            for data in get_accesses(collection, issn=issn, dayly_granularity=dayly_granularity):
+            for data in get_accesses(collection, issn=issn, from_date=from_date, 
+                until_date=until_date, dayly_granularity=dayly_granularity):
                 print(fmt(data))
         exit()
 
     with codecs.open(output_file, 'w', encoding='utf-8') as f:
         for issn in issns:
-            for data in get_accesses(collection, issn=issn, dayly_granularity=dayly_granularity):
+            for data in get_accesses(collection, issn=issn, from_date=from_date,
+                until_date=until_date, dayly_granularity=dayly_granularity):
                 f.write(u'%s\r\n' % fmt(data))
+
+def is_valid_date(value):
+
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%d')
+    except:
+        try:
+            datetime.datetime.strptime(value, '%Y-%m')
+        except:
+            return False
+
+    return True
 
 def main():
     parser = argparse.ArgumentParser(
@@ -274,6 +302,20 @@ def main():
         '--dayly_granularity',
         '-d',
         action='store_true',
+        help='Accesses granularity default will be monthly if not specified'
+    )
+
+    parser.add_argument(
+        '--from_date',
+        '-b',
+        default=FROM,
+        help='Accesses granularity default will be monthly if not specified'
+    )
+
+    parser.add_argument(
+        '--until_date',
+        '-u',
+        default=UNTIL,
         help='Accesses granularity default will be monthly if not specified'
     )
 
@@ -317,4 +359,13 @@ def main():
     if args.output_format == 'json':
         output_format = fmt_json
 
-    run(args.collection, issns, args.dayly_granularity, output_format, args.output_file)
+    if not is_valid_date(args.from_date):
+        logger.error('Invalid from date: %s' % args.from_date)
+        exit()
+
+    if not is_valid_date(args.until_date):
+        logger.error('Invalid until date: %s' % args.until_date)
+        exit()
+
+    run(args.collection, issns, args.from_date, args.until_date,
+        args.dayly_granularity, output_format, args.output_file)
