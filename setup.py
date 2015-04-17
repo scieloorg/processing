@@ -26,7 +26,7 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+ssh://git@github.com/scieloorg/xylose.git@v0.5b#egg=xylose"
+        "git+https://git@github.com/scieloorg/xylose.git@v0.5b#egg=xylose"
     ],
     tests_require=tests_require,
     test_suite='tests',
