@@ -10,7 +10,7 @@ tests_require = []
 
 setup(
     name="processing-scielo",
-    version="0.1.3",
+    version="0.1.4",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",

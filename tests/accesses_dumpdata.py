@@ -60,7 +60,6 @@ class DumpData(unittest.TestCase):
 
         self.assertEqual(result, 'S0102-6720(09)000300001')
 
-    @unittest.skip('refactory')
     def test_join_accesses(self):
         record_1 = {
             "abstract": {
@@ -177,7 +176,7 @@ class DumpData(unittest.TestCase):
 
         data = [record_1, record_2]
 
-        result = dumpdata.join_accesses('S0102-67202009000300001', data)
+        result = dumpdata.join_accesses('S0102-67202009000300001', data, '1500-01-01', '2014-01-01', False)
 
         expected = {
             '2012-01': {
@@ -202,7 +201,6 @@ class DumpData(unittest.TestCase):
         self.assertEqual(sorted(result), sorted(expected))
 
 
-    @unittest.skip('refactory')
     def test_join_accesses_dayly(self):
         record_1 = {
             "abstract": {
@@ -319,7 +317,7 @@ class DumpData(unittest.TestCase):
 
         data = [record_1, record_2]
 
-        result = dumpdata.join_accesses('S0102-67202009000300001', data, dayly_granularity=True)
+        result = dumpdata.join_accesses('S0102-67202009000300001', data, '1500-01-01', '2014-01-01', True)
 
         expected = {
             '2012-01-08': {
