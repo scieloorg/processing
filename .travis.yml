@@ -2,11 +2,11 @@ language: python
 python:
   - 2.7
   - 3.4
+env:
+  - PROCESSING_SETTINGS_FILE=./config.ini
 install: 
   - python setup.py install
 script:
   - python setup.py test
 before_script:
   - cp ./config.ini-TEMPLATE ./config.ini
-env:
-  - PROCESSING_SETTINGS_FILE = ./config.ini
