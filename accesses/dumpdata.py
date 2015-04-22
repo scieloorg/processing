@@ -13,6 +13,8 @@ import datetime
 from thrift import clients
 import choices
 
+import utils
+
 __version__ = 0.1
 
 logger = logging.getLogger(__name__)
@@ -24,6 +26,8 @@ UNTIL = datetime.datetime.now().isoformat()[0:10]
 DAYLY_GRANULARITY = False
 OUTPUT_FORMAT = 'csv'
 
+config = utils.Configuration.from_env()
+settings = dict(config.items())
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -219,13 +223,37 @@ def join_accesses(unique_id, accesses, from_date, until_date, dayly_granularity)
     return joined_data
 
 
+def ratchet_server():
+    try:
+        server = settings['app:main']['ratchet_thriftserver'].split(':')
+        host = server[0]
+        port = int(server[1])
+    except:
+        logger.warning('Error defining Ratchet thrift server, assuming default server ratchet.scielo.org:11630')
+        host = 'ratchet.scielo.org'
+        port = 11630
+
+    return clients.Ratchet(host, port)
+
+def articlemeta_server():
+    try:
+        server = settings['app:main']['articlemeta_thriftserver'].split(':')
+        host = server[0]
+        port = int(server[1])
+    except:
+        logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11720')
+        host = 'articlemeta.scielo.org'
+        port = 11720
+
+    return clients.ArticleMeta('articlemeta.scielo.org', 11720)
+
 class Dumper(object):
 
     def __init__(self, collection, issns=None, from_date=FROM, until_date=UNTIL,
         dayly_granularity=DAYLY_GRANULARITY, fmt=OUTPUT_FORMAT, output_file=None):
 
-        self._ratchet = clients.Ratchet('ratchet.scielo.org', 11631)
-        self._articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
+        self._ratchet = ratchet_server()
+        self._articlemeta = articlemeta_server()
         self.from_date = from_date
         self.until_date = until_date
         self.dayly_granularity = dayly_granularity
@@ -249,7 +277,7 @@ class Dumper(object):
                 jdata = json.loads(data)
                 if 'objects' in jdata and len(jdata['objects']) > 0:
                     accesses.append(jdata['objects'][0])
-            joined_accesses = self.join_accesses(document.publisher_id,
+            joined_accesses = join_accesses(document.publisher_id,
                 accesses, self.from_date, self.until_date,
                 self.dayly_granularity)
 
