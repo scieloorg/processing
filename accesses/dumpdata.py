@@ -317,7 +317,7 @@ class Dumper(object):
     def run(self):
 
         if not self.issns:
-            issns = [None]
+            self.issns = [None]
 
         if not self.output_file:
             for issn in self.issns:
