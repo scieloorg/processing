@@ -2,8 +2,10 @@
 import os
 import weakref
 
-from configparser import ConfigParser
-
+try:
+    from configparser import ConfigParser
+except:
+    from ConfigParser import ConfigParser
 
 class SingletonMixin(object):
     """
@@ -38,7 +40,10 @@ class Configuration(SingletonMixin):
     def __init__(self, fp, parser_dep=ConfigParser):
         self.conf = parser_dep()
 
-        self.conf.read_file(fp)
+        try:
+            self.conf.read_file(fp)
+        except AttributeError:
+            self.conf.readfp(fp)
 
     @classmethod
     def from_env(cls):
