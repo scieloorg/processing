@@ -4,26 +4,7 @@ import unittest
 from accesses import dumpdata
 from xylose.scielodocument import Article
 
-class DumpData(unittest.TestCase):
-
-    def test_ckeck_given_issns(self):
-
-        result = dumpdata.ckeck_given_issns(['1234-4321', '1244-333x'])
-
-        self.assertEqual(sorted(result), sorted(['1234-4321', '1244-333x']))
-
-    def test_ckeck_given_issns_with_invalid_issn(self):
-
-        result = dumpdata.ckeck_given_issns(['1234-432a', '1244-333x'])
-
-        self.assertEqual(result, ['1244-333x'])
-
-    def test_ckeck_given_issns_empty(self):
-
-        result = dumpdata.ckeck_given_issns([])
-
-        self.assertEqual(result, [])
-
+class DumpDataTest(unittest.TestCase):
 
     def test_pdf_keys(self):
         data = {
