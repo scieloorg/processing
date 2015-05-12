@@ -35,5 +35,6 @@ setup(
     [console_scripts]
     processing_accesses_dumpdata=accesses.dumpdata:main
     processing_publication_languages=publication.languages:main
+    processing_publication_affiliations=publication.affiliations:main
     """
 )

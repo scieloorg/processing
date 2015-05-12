@@ -6,10 +6,10 @@ Formato de saída:
 "document id","issn","journal","publication date","document type","PT","ES","EN","OTHER","PT-ES","PT-EN","ES-EN","Exclusivo Nacional","Exclusivo Estrangeiro","Nacional + Estrangeiro"
 """
 import argparse
-import utils
 import logging
 import codecs
-import json
+
+import utils
 
 logger = logging.getLogger(__name__)
 
@@ -52,16 +52,20 @@ class Dumper(object):
 
     def run(self):
 
+        header = u'PID,ISSN,título,ano de publicação,tipo de documento,idiomas,pt,es,en,other,pt-es,pt-en,en-es,exclusivo nacional,exclusivo estrangeiro,nacional + estrangeiro'
+
         if not self.issns:
             self.issns = [None]
 
         if not self.output_file:
+            print(header)
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
                     print(self.fmt_csv(data))
             exit()
 
         with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
+            f.write(u'%s\r\n' % header)
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
                     f.write(u'%s\r\n' % self.fmt_csv(data))
@@ -75,6 +79,7 @@ class Dumper(object):
         line.append(data.journal.title)
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
+        line.append(', '.join(languages))
         line.append('X' if 'pt' in languages else '')  # PT
         line.append('X' if 'es' in languages else '')  # ES
         line.append('X' if 'en' in languages else '')  # EN
@@ -89,11 +94,7 @@ class Dumper(object):
         return ','.join(['"%s"' % i for i in line])
 
     def get_data(self, issn):
-
-        i = 0
-        lines = []
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-
             yield document
 
 
@@ -141,7 +142,7 @@ def main():
 
     issns = None
     if len(args.issns) > 0:
-        issns = ckeck_given_issns(args.issns)
+        issns = utils.ckeck_given_issns(args.issns)
 
     dumper = Dumper(args.collection, issns, args.output_file)
 
