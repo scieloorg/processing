@@ -1,9 +1,9 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de idiomas de publicação de cada artigo
-da coleção SciELO.
+Este processamento gera uma tabulação de país de afiliação de cada artigo da
+coleção SciELO.
 Formato de saída:
-"PID","ISSN","título","ano de publicação","tipo de documento","idiomas","pt","es","en","other","pt-es","pt-en","en-es","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
+"PID","issn","título","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
 """
 import argparse
 import logging
@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'PID,ISSN,título,ano de publicação,tipo de documento,idiomas,pt,es,en,other,pt-es,pt-en,en-es,exclusivo nacional,exclusivo estrangeiro,nacional + estrangeiro'
+        header = u'PID,ISSN,título,ano de publicação,tipo de documento,paises de afiliação,exclusivo nacional,exclusivo estrangeiro,nacional + estrangeiro'
 
         if not self.issns:
             self.issns = [None]
@@ -71,30 +71,28 @@ class Dumper(object):
                     f.write(u'%s\r\n' % self.fmt_csv(data))
         
     def fmt_csv(self, data):
-        know_languages = set(['pt', 'es', 'en'])
-        languages = set(data.languages())
-        line = []
-        line.append(data.publisher_id)
-        line.append(data.journal.scielo_issn)
-        line.append(data.journal.title)
-        line.append(data.publication_date[0:4])
-        line.append(data.document_type)
-        line.append(', '.join(languages))
-        line.append('X' if 'pt' in languages else '')  # PT
-        line.append('X' if 'es' in languages else '')  # ES
-        line.append('X' if 'en' in languages else '')  # EN
-        line.append('X' if len(languages.difference(know_languages)) > 0 else '')  # OTHER
-        line.append('X' if 'pt' in languages and 'es' in languages and len(languages) == 2 else '')  # PT-ES
-        line.append('X' if 'pt' in languages and 'en' in languages and len(languages) == 2 else '')  # PT-EN
-        line.append('X' if 'es' in languages and 'en' in languages and len(languages) == 2 else '')  # ES-EN
-        line.append('X' if 'pt' in languages and len(languages) == 1 else '')  # Exclusivo Nacional
-        line.append('X' if not 'pt' in languages and len(languages) > 0 else '')  # Exclusivo Estrangeiro
-        line.append('X' if 'pt' in languages and len(languages) > 1 else '')  # Nacional + Estrangeiro
+        countries = set()
+
+        if data.normalized_affiliations:
+            countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
+
+        line = [
+            data.publisher_id,
+            data.journal.scielo_issn,
+            data.journal.title,
+            data.publication_date[0:4],
+            data.document_type,
+            ', '.join(countries),
+            'X' if 'brazil' in countries and len(countries) == 1 else '',
+            'X' if not 'brazil' in countries and len(countries) > 0 else '',
+            'X' if 'brazil' in countries and len(countries) > 1 else '',
+        ]
 
         return ','.join(['"%s"' % i for i in line])
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+
             yield document
 
 
