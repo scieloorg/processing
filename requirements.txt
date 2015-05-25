@@ -1,3 +1,3 @@
 thriftpy==0.2.0
--e git+https://github.com/scieloorg/xylose@v0.5b#egg=xylose
--e git+https://github.com/scieloorg/processing@0.1.7#egg=processing
+-e git+https://github.com/scieloorg/xylose@v0.8b#egg=xylose
+-e git+https://github.com/scieloorg/processing@0.1.8#egg=processing
