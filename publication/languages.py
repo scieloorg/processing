@@ -80,16 +80,16 @@ class Dumper(object):
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
         line.append(', '.join(languages))
-        line.append('X' if 'pt' in languages else '')  # PT
-        line.append('X' if 'es' in languages else '')  # ES
-        line.append('X' if 'en' in languages else '')  # EN
-        line.append('X' if len(languages.difference(know_languages)) > 0 else '')  # OTHER
-        line.append('X' if 'pt' in languages and 'es' in languages and len(languages) == 2 else '')  # PT-ES
-        line.append('X' if 'pt' in languages and 'en' in languages and len(languages) == 2 else '')  # PT-EN
-        line.append('X' if 'es' in languages and 'en' in languages and len(languages) == 2 else '')  # ES-EN
-        line.append('X' if 'pt' in languages and len(languages) == 1 else '')  # Exclusivo Nacional
-        line.append('X' if not 'pt' in languages and len(languages) > 0 else '')  # Exclusivo Estrangeiro
-        line.append('X' if 'pt' in languages and len(languages) > 1 else '')  # Nacional + Estrangeiro
+        line.append('1' if 'pt' in languages else '0')  # PT
+        line.append('1' if 'es' in languages else '0')  # ES
+        line.append('1' if 'en' in languages else '0')  # EN
+        line.append('1' if len(languages.difference(know_languages)) > 0 else '0')  # OTHER
+        line.append('1' if 'pt' in languages and 'es' in languages and len(languages) == 2 else '0')  # PT-ES
+        line.append('1' if 'pt' in languages and 'en' in languages and len(languages) == 2 else '0')  # PT-EN
+        line.append('1' if 'es' in languages and 'en' in languages and len(languages) == 2 else '0')  # ES-EN
+        line.append('1' if 'pt' in languages and len(languages) == 1 else '0')  # Exclusivo Nacional
+        line.append('1' if not 'pt' in languages and len(languages) > 0 else '0')  # Exclusivo Estrangeiro
+        line.append('1' if 'pt' in languages and len(languages) > 1 else '0')  # Nacional + Estrangeiro
 
         return ','.join(['"%s"' % i for i in line])
 

@@ -83,9 +83,9 @@ class Dumper(object):
             data.publication_date[0:4],
             data.document_type,
             ', '.join(countries),
-            'X' if 'brazil' in countries and len(countries) == 1 else '',
-            'X' if not 'brazil' in countries and len(countries) > 0 else '',
-            'X' if 'brazil' in countries and len(countries) > 1 else '',
+            '1' if 'brazil' in countries and len(countries) == 1 else '0',
+            '1' if not 'brazil' in countries and len(countries) > 0 else '0',
+            '1' if 'brazil' in countries and len(countries) > 1 else '0',
         ]
 
         return ','.join(['"%s"' % i for i in line])

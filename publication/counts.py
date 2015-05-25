@@ -4,7 +4,7 @@ Este processamento gera uma tabulação com contagens, soma, mediana de alguns
 elementos do artigo: total de autores, total de citações, total de páginas
 
 Formato de saída:
-"PID","issn","título","ano de publicação","tipo de documento","total autores","total páginas","total citações"
+"PID","issn","título","ano de publicação","tipo de documento","total autores","0 autores", "1 autor","2 autores","3 autores","4 autores","5 autores","+6 autores","total páginas","total citações"
 """
 
 import argparse
@@ -66,7 +66,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'"PID","issn","título","ano de publicação","tipo de documento","total autores","total páginas","total citações"'
+        header = u'"PID","issn","título","ano de publicação","tipo de documento","total autores","0 autores","1 autor","2 autores","3 autores","4 autores","5 autores","+6 autores","total páginas","total citações"'
 
         if not self.issns:
             self.issns = [None]
@@ -90,13 +90,22 @@ class Dumper(object):
         if data.normalized_affiliations:
             countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
 
+        tot_authors = len(data.authors or [])
+
         line = [
             data.publisher_id,
             data.journal.scielo_issn,
             data.journal.title,
             data.publication_date[0:4],
             data.document_type,
-            str(len(data.authors or [])), # total de autores
+            str(tot_authors), # total de autores
+            '1' if tot_authors == 0 else '0', # total de autores
+            '1' if tot_authors == 1 else '0', # total de autores
+            '1' if tot_authors == 2 else '0', # total de autores
+            '1' if tot_authors == 3 else '0', # total de autores
+            '1' if tot_authors == 4 else '0', # total de autores
+            '1' if tot_authors == 5 else '0', # total de autores
+            '1' if tot_authors >= 6 else '0', # total de autores
             str(pages(data.start_page, data.end_page)), # total de páginas
             str(len(data.citations or [])) # total de citações
         ]
