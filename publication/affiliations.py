@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação de país de afiliação de cada artigo da
 coleção SciELO.
 Formato de saída:
-"PID","issn","título","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
+"PID","issn","título","área temática","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
 """
 import argparse
 import logging
@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'PID,ISSN,título,ano de publicação,tipo de documento,paises de afiliação,exclusivo nacional,exclusivo estrangeiro,nacional + estrangeiro'
+        header = u'"PID","ISSN","título","área temática","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"'
 
         if not self.issns:
             self.issns = [None]
@@ -80,6 +80,7 @@ class Dumper(object):
             data.publisher_id,
             data.journal.scielo_issn,
             data.journal.title,
+            ','.join(data.journal.subject_areas),
             data.publication_date[0:4],
             data.document_type,
             ', '.join(countries),
