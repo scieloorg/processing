@@ -4,7 +4,7 @@ Este processamento gera uma tabulação com contagens, soma, mediana de alguns
 elementos do artigo: total de autores, total de citações, total de páginas
 
 Formato de saída:
-"PID","issn","título","área temática","ano de publicação","tipo de documento","total autores","0 autores", "1 autor","2 autores","3 autores","4 autores","5 autores","+6 autores","total páginas","total citações"
+"issn scielo","issn impresso","issn eletrônico","título","área temática","bases WOS","áreas WOS","status","ano de inclusão","licença de uso padrão"
 """
 
 import argparse
@@ -42,18 +42,6 @@ def _config_logging(logging_level='INFO', logging_file=None):
     return logger
 
 
-def pages(first, last):
-
-    try:
-        pages = int(last)-int(first)
-    except:
-        pages = 0
-
-    if pages >= 0:
-        return pages
-    else:
-        return 0
-
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
@@ -66,7 +54,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'"PID","issn","título","área temática","ano de publicação","tipo de documento","total autores","0 autores","1 autor","2 autores","3 autores","4 autores","5 autores","+6 autores","total páginas","total citações"'
+        header = u'"issn scielo","issn impresso","issn eletrônico","nome do publicador","título","título abreviado","título nlm","área temática","bases WOS","áreas temáticas WOS","situação atual","ano de inclusão","licença de uso padrão"'
 
         if not self.issns:
             self.issns = [None]
@@ -85,36 +73,31 @@ class Dumper(object):
                     f.write(u'%s\r\n' % self.fmt_csv(data))
         
     def fmt_csv(self, data):
-        countries = set()
-
-        if data.normalized_affiliations:
-            countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
-
-        tot_authors = len(data.authors or [])
 
         line = [
-            data.publisher_id,
-            data.journal.scielo_issn,
-            data.journal.title,
-            ','.join(data.journal.subject_areas),
-            data.publication_date[0:4],
-            data.document_type,
-            str(tot_authors), # total de autores
-            '1' if tot_authors == 0 else '0', # total de autores
-            '1' if tot_authors == 1 else '0', # total de autores
-            '1' if tot_authors == 2 else '0', # total de autores
-            '1' if tot_authors == 3 else '0', # total de autores
-            '1' if tot_authors == 4 else '0', # total de autores
-            '1' if tot_authors == 5 else '0', # total de autores
-            '1' if tot_authors >= 6 else '0', # total de autores
-            str(pages(data.start_page, data.end_page)), # total de páginas
-            str(len(data.citations or [])) # total de citações
+            data.scielo_issn,
+            data.print_issn or "",
+            data.electronic_issn or "",
+            data.publisher_name or "",
+            data.title,
+            data.abbreviated_title or "",
+            data.title_nlm or "",
+            ','.join(data.subject_areas or []),
+            ','.join(data.wos_citation_indexes or []),
+            ','.join(data.wos_subject_areas or []),
+            data.current_status,
+            data.creation_date[:4],
         ]
+
+        if data.permissions:
+            line.append(data.permissions.get('id', "") or "")
+        else:
+            line.append("")
 
         return ','.join(['"%s"' % i for i in line])
 
     def get_data(self, issn):
-        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+        for document in self._articlemeta.journals(collection=self.collection, issn=issn):
 
             yield document
 

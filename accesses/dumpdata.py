@@ -87,6 +87,8 @@ def eligible_match_keys(document):
 
     keys.append(document.publisher_id)
     keys.append(fbpe_key(document.publisher_id))
+    if document.doi:
+        keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
 
     return keys
@@ -124,7 +126,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['access_abstract'] = accesses.get('abstract', 0)
     data['access_html'] = accesses.get('html', 0)
     data['access_pdf'] = accesses.get('pdf', 0)
-    data['access_epdf'] = accesses.get('epdf', 0)
+    data['access_epdf'] = accesses.get('readcube', 0)
     data['access_total'] = sum([v for i, v in accesses.items()])
 
     return data
@@ -187,7 +189,7 @@ def join_accesses(unique_id, accesses, from_date, until_date, dayly_granularity)
 
     for data in accesses:
         for key, value in data.items():
-            if not key in ['abstract', 'html', 'pdf', 'epdf']:
+            if not key in ['abstract', 'html', 'pdf', 'readcube']:
                 continue
             joined_data = joining(joined_data, key, value)
 

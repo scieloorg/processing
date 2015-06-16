@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação de idiomas de publicação de cada artigo
 da coleção SciELO.
 Formato de saída:
-"PID","ISSN","título","ano de publicação","tipo de documento","idiomas","pt","es","en","other","pt-es","pt-en","en-es","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
+"PID","ISSN","título","área temática","ano de publicação","tipo de documento","idiomas","pt","es","en","other","pt-es","pt-en","en-es","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
 """
 import argparse
 import logging
@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'PID,ISSN,título,ano de publicação,tipo de documento,idiomas,pt,es,en,other,pt-es,pt-en,en-es,exclusivo nacional,exclusivo estrangeiro,nacional + estrangeiro'
+        header = u'"PID","ISSN","título","área temática","ano de publicação","tipo de documento","idiomas","pt","es","en","other","pt-es","pt-en","en-es","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"'
 
         if not self.issns:
             self.issns = [None]
@@ -77,9 +77,10 @@ class Dumper(object):
         line.append(data.publisher_id)
         line.append(data.journal.scielo_issn)
         line.append(data.journal.title)
+        line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        line.append(', '.join(languages))
+        line.append(','.join(languages))
         line.append('1' if 'pt' in languages else '0')  # PT
         line.append('1' if 'es' in languages else '0')  # ES
         line.append('1' if 'en' in languages else '0')  # EN

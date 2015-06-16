@@ -5,7 +5,7 @@ import json
 import logging
 
 from thriftpy.rpc import make_client
-from xylose.scielodocument import Article
+from xylose.scielodocument import Article, Journal
 
 LIMIT = 1000
 
@@ -53,6 +53,28 @@ class ArticleMeta(object):
 
     def client(self):
         return self._client
+
+
+    def journals(self, collection=None, issn=None):
+        offset = 0
+        while True:
+            identifiers = self._client.get_journal_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+            if len(identifiers) == 0:
+                raise StopIteration
+
+            for identifier in identifiers:
+                journal = self._client.get_journal(
+                    code=identifier.code[0], collection=identifier.collection)
+
+                jjournal = json.loads(journal)
+
+                xjournal = Journal(jjournal)
+
+                logger.info('Journal loaded: %s_%s' % ( identifier.collection, identifier.code))
+
+                yield xjournal
+
+            offset += 1000
 
     def documents(self, collection=None, issn=None):
         offset = 0
