@@ -308,14 +308,14 @@ def main():
         '--from_date',
         '-b',
         default=FROM,
-        help='Accesses granularity default will be monthly if not specified'
+        help='Delimite the accesses start period'
     )
 
     parser.add_argument(
         '--until_date',
         '-u',
         default=UNTIL,
-        help='Accesses granularity default will be monthly if not specified'
+        help='Delimite the accesses end period'
     )
 
     parser.add_argument(

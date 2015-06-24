@@ -10,6 +10,7 @@ Formato de saída:
 import argparse
 import logging
 import codecs
+import csv
 
 import utils
 
@@ -66,7 +67,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'"PID","issn","título","área temática","ano de publicação","tipo de documento","total autores","0 autores","1 autor","2 autores","3 autores","4 autores","5 autores","+6 autores","total páginas","total citações"'
+        header = [u"PID",u"issn",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"total autores",u"0 autores",u"1 autor",u"2 autores",u"3 autores",u"4 autores",u"5 autores",u"+6 autores",u"total páginas",u"total referências"]
 
         if not self.issns:
             self.issns = [None]
@@ -79,10 +80,11 @@ class Dumper(object):
             exit()
 
         with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            f.write(u'%s\r\n' % header)
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+            writer.writerow(header)
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
-                    f.write(u'%s\r\n' % self.fmt_csv(data))
+                    writer.writerow(self.fmt_csv(data))
         
     def fmt_csv(self, data):
         countries = set()
@@ -111,7 +113,7 @@ class Dumper(object):
             str(len(data.citations or [])) # total de citações
         ]
 
-        return ','.join(['"%s"' % i for i in line])
+        return line
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):

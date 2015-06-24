@@ -10,6 +10,7 @@ Formato de saída:
 import argparse
 import logging
 import codecs
+import csv
 
 import utils
 
@@ -54,7 +55,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'"issn scielo","issn impresso","issn eletrônico","nome do publicador","título","título abreviado","título nlm","área temática","bases WOS","áreas temáticas WOS","situação atual","ano de inclusão","licença de uso padrão"'
+        header = [u"issn scielo",u"issn impresso",u"issn eletrônico",u"nome do publicador",u"título",u"título abreviado",u"título nlm",u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão"]
 
         if not self.issns:
             self.issns = [None]
@@ -67,10 +68,11 @@ class Dumper(object):
             exit()
 
         with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            f.write(u'%s\r\n' % header)
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+            writer.writerow(header)
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
-                    f.write(u'%s\r\n' % self.fmt_csv(data))
+                    writer.writerow(self.fmt_csv(data))
         
     def fmt_csv(self, data):
 
@@ -94,7 +96,8 @@ class Dumper(object):
         else:
             line.append("")
 
-        return ','.join(['"%s"' % i for i in line])
+        #return ','.join(['"%s"' % i.replace('"', '\\"') for i in line])
+        return line
 
     def get_data(self, issn):
         for document in self._articlemeta.journals(collection=self.collection, issn=issn):

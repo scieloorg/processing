@@ -8,6 +8,7 @@ Formato de saída:
 import argparse
 import logging
 import codecs
+import csv
 
 import utils
 
@@ -52,7 +53,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = u'"PID","ISSN","título","área temática","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"'
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"paises de afiliação",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]
 
         if not self.issns:
             self.issns = [None]
@@ -65,10 +66,11 @@ class Dumper(object):
             exit()
 
         with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            f.write(u'%s\r\n' % header)
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+            writer.writerow(header)
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
-                    f.write(u'%s\r\n' % self.fmt_csv(data))
+                    writer.writerow(self.fmt_csv(data))
         
     def fmt_csv(self, data):
         countries = set()
@@ -89,7 +91,7 @@ class Dumper(object):
             '1' if 'brazil' in countries and len(countries) > 1 else '0',
         ]
 
-        return ','.join(['"%s"' % i for i in line])
+        return line
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
