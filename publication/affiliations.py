@@ -8,7 +8,6 @@ Formato de saída:
 import argparse
 import logging
 import codecs
-import csv
 
 import utils
 
@@ -66,11 +65,10 @@ class Dumper(object):
             exit()
 
         with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-            writer.writerow(header)
+            f.write('%s\r\n' % ','.join(header))
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
-                    writer.writerow(self.fmt_csv(data))
+                    f.write('%s\r\n' % self.fmt_csv(data))
         
     def fmt_csv(self, data):
         countries = set()
@@ -91,7 +89,8 @@ class Dumper(object):
             '1' if 'brazil' in countries and len(countries) > 1 else '0',
         ]
 
-        return line
+        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        return joined_line
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):

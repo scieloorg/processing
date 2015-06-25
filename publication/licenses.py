@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"idiomas",u"pt",u"es",u"en",u"other",u"pt-es",u"pt-en",u"en-es",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"license"]
 
         if not self.issns:
             self.issns = [None]
@@ -80,17 +80,10 @@ class Dumper(object):
         line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        line.append(','.join(languages))
-        line.append('1' if 'pt' in languages else '0')  # PT
-        line.append('1' if 'es' in languages else '0')  # ES
-        line.append('1' if 'en' in languages else '0')  # EN
-        line.append('1' if len(languages.difference(know_languages)) > 0 else '0')  # OTHER
-        line.append('1' if 'pt' in languages and 'es' in languages and len(languages) == 2 else '0')  # PT-ES
-        line.append('1' if 'pt' in languages and 'en' in languages and len(languages) == 2 else '0')  # PT-EN
-        line.append('1' if 'es' in languages and 'en' in languages and len(languages) == 2 else '0')  # ES-EN
-        line.append('1' if 'pt' in languages and len(languages) == 1 else '0')  # Exclusivo Nacional
-        line.append('1' if not 'pt' in languages and len(languages) > 0 else '0')  # Exclusivo Estrangeiro
-        line.append('1' if 'pt' in languages and len(languages) > 1 else '0')  # Nacional + Estrangeiro
+        perm = ''
+        if data.permissions:
+            perm = data.permissions.get('id' or '')
+        line.append(perm)
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
         return joined_line
