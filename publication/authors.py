@@ -88,21 +88,21 @@ class Dumper(object):
             data.publication_date[0:4],
             data.document_type
         ]
-        if not data.authors:
+        if data.authors:
+            for author in data.authors:
+                author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
+                if 'xref' in author:
+                    for index in author['xref']:
+                        aff_line = []
+                        aff_line.append(affs.get(index, {}).get('institution', '')),
+                        aff_line.append(affs.get(index, {}).get('country', '')),
+                        aff_line.append(affs.get(index, {}).get('state', '')),
+                        aff_line.append(affs.get(index, {}).get('city', ''))
+                        yield self.join_line(line+author_line+aff_line)
+                else:
+                    yield self.join_line(line+author_line)
+        else:
             yield self.join_line(line)
-
-        for author in data.authors:
-            author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
-            if 'xref' in author:
-                for index in author['xref']:
-                    aff_line = []
-                    aff_line.append(affs.get(index, {}).get('institution', '')),
-                    aff_line.append(affs.get(index, {}).get('country', '')),
-                    aff_line.append(affs.get(index, {}).get('state', '')),
-                    aff_line.append(affs.get(index, {}).get('city', ''))
-                    yield self.join_line(line+author_line+aff_line)
-            else:
-                yield self.join_line(line+author_line)
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
