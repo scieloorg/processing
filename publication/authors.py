@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação de autores e afiliação de cada artigo da
 coleção SciELO.
 Formato de saída:
-"PID","issn","título","área temática","ano de publicação","tipo de documento","autor","paises de afiliação","Instituição"
+"PID","issn","título","área temática","ano de publicação","tipo de documento","author","instituição","paises de afiliação","estado de afiliação","cidade de afiliação"
 """
 import argparse
 import logging
@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"author",u"instituição",u"paises de afiliação",u"estado de afiliação",u"país de afiliação"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"author",u"instituição",u"paises de afiliação",u"estado de afiliação",u"cidade de afiliação"]
 
         if not self.issns:
             self.issns = [None]
@@ -68,36 +68,45 @@ class Dumper(object):
             f.write('%s\r\n' % ','.join(header))
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
-                    f.write('%s\r\n' % self.fmt_csv(data))
+                    for item in self.fmt_csv(data):
+                        f.write('%s\r\n' % item)
         
+    def join_line(self, line):
+
+        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+
     def fmt_csv(self, data):
         countries = set()
 
         affs = {item['index'].upper():item for item in data.mixed_affiliations}
 
+        line = [
+            data.publisher_id,
+            data.journal.scielo_issn,
+            data.journal.title,
+            ','.join(data.journal.subject_areas),
+            data.publication_date[0:4],
+            data.document_type
+        ]
+        if not data.authors:
+            yield self.join_line(line)
+
         for author in data.authors:
-            line = [
-                data.publisher_id,
-                data.journal.scielo_issn,
-                data.journal.title,
-                ','.join(data.journal.subject_areas),
-                data.publication_date[0:4],
-                data.document_type,
-                ' '.join([author.get('given_names', ''), author.get('surname', '')])
-            ]
+            author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
             if 'xref' in author:
                 for index in author['xref']:
-                    line.append(affs.get(index, {}).get('institution', '')),
-                    line.append(affs.get(index, {}).get('country', '')),
-                    line.append(affs.get(index, {}).get('state', '')),
-                    line.append(affs.get(index, {}).get('city', ''))
-
-            joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
-            return joined_line
+                    aff_line = []
+                    aff_line.append(affs.get(index, {}).get('institution', '')),
+                    aff_line.append(affs.get(index, {}).get('country', '')),
+                    aff_line.append(affs.get(index, {}).get('state', '')),
+                    aff_line.append(affs.get(index, {}).get('city', ''))
+                    yield self.join_line(line+author_line+aff_line)
+            else:
+                yield self.join_line(line+author_line)
 
     def get_data(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-
+            logger.debug('Reading document: %s' % document.publisher_id)
             yield document
 
 
