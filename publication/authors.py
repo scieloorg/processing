@@ -106,10 +106,9 @@ class Dumper(object):
             yield self.join_line(line)
 
     def get_data(self, issn):
-        document = self._articlemeta.document('S0034-72802014000400230', collection=self.collection)
-        #for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-        logger.debug('Reading document: %s' % document.publisher_id)
-        yield document
+        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+            logger.debug('Reading document: %s' % document.publisher_id)
+            yield document
 
 
 def main():
