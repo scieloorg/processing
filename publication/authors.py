@@ -93,6 +93,7 @@ class Dumper(object):
                 author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
                 if 'xref' in author:
                     for index in author['xref']:
+                        index = index.upper()
                         aff_line = []
                         aff_line.append(affs.get(index, {}).get('institution', '')),
                         aff_line.append(affs.get(index, {}).get('country', '')),
@@ -105,9 +106,10 @@ class Dumper(object):
             yield self.join_line(line)
 
     def get_data(self, issn):
-        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-            logger.debug('Reading document: %s' % document.publisher_id)
-            yield document
+        document = self._articlemeta.document('S0034-72802014000400230', collection=self.collection)
+        #for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+        logger.debug('Reading document: %s' % document.publisher_id)
+        yield document
 
 
 def main():

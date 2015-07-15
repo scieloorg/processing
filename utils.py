@@ -108,7 +108,7 @@ def articlemeta_server():
         host = 'articlemeta.scielo.org'
         port = 11720
 
-    return clients.ArticleMeta('articlemeta.scielo.org', 11720)
+    return clients.ArticleMeta(host, port)
 
 
 def is_valid_date(value):

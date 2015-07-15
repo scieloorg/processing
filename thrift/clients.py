@@ -76,7 +76,25 @@ class ArticleMeta(object):
 
             offset += 1000
 
-    def documents(self, collection=None, issn=None):
+    def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
+        article = self._client.get_article(
+            code=code,
+            collection=collection,
+            replace_journal_metadata=True, 
+            fmt=fmt
+        )
+
+        if fmt == 'xylose':
+            jarticle = json.loads(article)
+            xarticle = Article(jarticle)
+            logger.info('Document loaded: %s_%s' % ( collection, code))
+            return xarticle
+        else:
+            logger.info('Document loaded: %s_%s' % ( collection, code))
+            return article
+
+
+    def documents(self, collection=None, issn=None, fmt='xylose'):
         offset = 0
         while True:
             identifiers = self._client.get_article_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
@@ -84,16 +102,15 @@ class ArticleMeta(object):
                 raise StopIteration
 
             for identifier in identifiers:
-                article = self._client.get_article(
-                    code=identifier.code, collection=identifier.collection)
 
-                jarticle = json.loads(article)
+                document = self.document(
+                    code=identifier.code,
+                    collection=identifier.collection,
+                    replace_journal_metadata=True, 
+                    fmt=fmt
+                )
 
-                xarticle = Article(jarticle)
-
-                logger.info('Document loaded: %s_%s' % ( identifier.collection, identifier.code))
-
-                yield xarticle
+                yield document
 
             offset += 1000
 
