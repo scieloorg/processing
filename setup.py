@@ -3,8 +3,7 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'thriftpy==0.2.0',
-    'xylose',
-    'packtools'
+    'xylose'
 ]
 
 tests_require = []
@@ -41,6 +40,5 @@ setup(
     processing_publication_counts=publication.counts:main
     processing_publication_journals=publication.journals:main
     processing_publication_licenses=publication.licenses:main
-    processing_export_xmlrsps=export.xml_rsps:main
     """
 )
