@@ -1,3 +1,4 @@
 thriftpy==0.2.0
+packtools
 -e git+https://github.com/scieloorg/xylose@0.21#egg=xylose
--e git+https://github.com/scieloorg/processing@0.1.15#egg=processing
+-e git+https://github.com/scieloorg/processing@0.1.16#egg=processing
