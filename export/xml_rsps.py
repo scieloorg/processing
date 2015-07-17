@@ -98,10 +98,15 @@ def analyze_xml(xml, document):
         xml = packtools.XMLValidator(f)
     except:
         logger.error('Could not read file %s' % document.publisher_id)
+        summary = {}
+        summary['dtd_is_valid'] = False
+        summary['sps_is_valid'] = False
+        summary['is_valid'] = False
+        summary['parsing_error'] = True
+        return summary
     else:
         summary = summarize(xml)
-
-    return summary
+        return summary
 
 
 class Dumper(object):
@@ -132,6 +137,7 @@ class Dumper(object):
                 logger.debug('Reading document: %s' % document.publisher_id)
                 xml = self._articlemeta.document(code=document.publisher_id, collection=document.collection_acronym, fmt='xmlrsps')
                 validation_result = analyze_xml(xml, document)
+
                 print(self.fmt_json(document, validation_result))
 
 
