@@ -88,7 +88,7 @@ def summarize(validator):
 
     return summary
 
-def analyze_xml(xml):
+def analyze_xml(xml, document):
     """Analyzes `file` against packtools' XMLValidator.
     """
 
@@ -96,10 +96,8 @@ def analyze_xml(xml):
 
     try:
         xml = packtools.XMLValidator(f)
-
-    except (lxml.etree.XMLSyntaxError, IOError, ValueError) as e:
-        logger.error('Could not read file')
-
+    except:
+        logger.error('Could not read file %s' % document.publisher_id)
     else:
         summary = summarize(xml)
 
@@ -133,7 +131,7 @@ class Dumper(object):
             for document in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % document.publisher_id)
                 xml = self._articlemeta.document(code=document.publisher_id, collection=document.collection_acronym, fmt='xmlrsps')
-                validation_result = analyze_xml(xml)
+                validation_result = analyze_xml(xml, document)
                 print(self.fmt_json(document, validation_result))
 
 
