@@ -3,8 +3,7 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'thriftpy==0.2.0',
-    'xylose',
-    'packtools'
+    'xylose'
 ]
 
 tests_require = []
