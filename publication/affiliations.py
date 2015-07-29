@@ -48,27 +48,27 @@ class Dumper(object):
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
         self.issns = issns
-        self.output_file = output_file
+        self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
+        self.write(','.join([u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"paises de afiliação",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]))
+
+    def write(self, line):
+        if not self.output_file:
+            print('%s\r\n' % line)
+        else:
+            self.output_file.write('%s\r\n' % line)
 
     def run(self):
+        for item in self.items():
+            self.write(item)
 
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"paises de afiliação",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]
-
+    def items(self):
         if not self.issns:
             self.issns = [None]
 
-        if not self.output_file:
-            print(header)
-            for issn in self.issns:
-                for data in self.get_data(issn=issn):
-                    print(self.fmt_csv(data))
-            exit()
-
-        with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            f.write('%s\r\n' % ','.join(header))
-            for issn in self.issns:
-                for data in self.get_data(issn=issn):
-                    f.write('%s\r\n' % self.fmt_csv(data))
+        for issn in self.issns:
+            for data in self._articlemeta.documents(collection=self.collection, issn=issn):
+                logger.debug('Reading document: %s' % data.publisher_id)
+                yield self.fmt_csv(data)
         
     def fmt_csv(self, data):
         countries = set()
@@ -90,13 +90,8 @@ class Dumper(object):
         ]
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+
         return joined_line
-
-    def get_data(self, issn):
-        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-
-            yield document
-
 
 def main():
 

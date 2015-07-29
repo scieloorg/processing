@@ -17,24 +17,37 @@ ratchet_thrift = thriftpy.load(
 articlemeta_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/articlemeta.thrift')
 
+
+class ServerError(Exception):
+    def __init__(self, message=None):
+        self.message = message or 'thirftclient: ServerError'
+    
+    def __str__(self):
+        return repr(self.message)
+
+
 class Ratchet(object):
 
     def __init__(self, address, port):
         """
         Cliente thrift para o Ratchet.
         """
-        self._client = make_client(
+        self._address = address
+        self._port = port
+
+    @property
+    def client(self):
+        client = make_client(
             ratchet_thrift.RatchetStats,
-            address,
-            port
+            self._address,
+            self._port
         )
 
-    def client(self):
-        return self._client
+        return client
 
     def document(self, code):
 
-        data = self._client.general(code=code)
+        data = self.client.general(code=code)
 
         return data
 
@@ -45,25 +58,30 @@ class ArticleMeta(object):
         """
         Cliente thrift para o Articlemeta.
         """
-        self._client = make_client(
-            articlemeta_thrift.ArticleMeta,
-            address,
-            port
-        )
+        self._address = address
+        self._port = port
 
+    @property
     def client(self):
-        return self._client
+
+        client = make_client(
+            articlemeta_thrift.ArticleMeta,
+            self._address,
+            self._port
+        )
+        return client
 
 
     def journals(self, collection=None, issn=None):
         offset = 0
         while True:
-            identifiers = self._client.get_journal_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+            identifiers = self.client.get_journal_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
             if len(identifiers) == 0:
                 raise StopIteration
 
             for identifier in identifiers:
-                journal = self._client.get_journal(
+
+                journal = self.client.get_journal(
                     code=identifier.code[0], collection=identifier.collection)
 
                 jjournal = json.loads(journal)
@@ -77,12 +95,16 @@ class ArticleMeta(object):
             offset += 1000
 
     def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
-        article = self._client.get_article(
-            code=code,
-            collection=collection,
-            replace_journal_metadata=True, 
-            fmt=fmt
-        )
+        try:
+            article = self.client.get_article(
+                code=code,
+                collection=collection,
+                replace_journal_metadata=True, 
+                fmt=fmt
+            )
+        except:
+            msg = 'Error retrieving document: %s_%s' % (collection, code)
+            raise ServerError(msg)
 
         if fmt == 'xylose':
             jarticle = json.loads(article)
@@ -97,7 +119,8 @@ class ArticleMeta(object):
     def documents(self, collection=None, issn=None, fmt='xylose'):
         offset = 0
         while True:
-            identifiers = self._client.get_article_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+            identifiers = self.client.get_article_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+
             if len(identifiers) == 0:
                 raise StopIteration
 

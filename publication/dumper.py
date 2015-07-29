@@ -1,15 +1,12 @@
-# coding: utf-8
-"""
-Este processamento gera uma tabulação de idiomas de publicação de cada artigo
-da coleção SciELO.
-Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","idiomas","pt","es","en","other","pt-es","pt-en","en-es","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
-"""
+
+
 import argparse
 import logging
 import codecs
 
 import utils
+
+import counts, affiliations, languages, licenses, authors
 
 logger = logging.getLogger(__name__)
 
@@ -39,30 +36,21 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
     return logger
 
-
 class Dumper(object):
 
-    def __init__(self, collection, issns=None, output_file=None):
+    def __init__(self, collection, issns=None):
 
         self._ratchet = utils.ratchet_server()
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
         self.issns = issns
-        self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"license"]
-        self.write(','.join(header))
-
-    def write(self, line):
-        if not self.output_file:
-            print('%s\r\n' % line)
-        else:
-            self.output_file.write('%s\r\n' % line)
+        self.counts = counts.Dumper(collection, output_file='counts.csv')
+        self.affiliations = affiliations.Dumper(collection, output_file='affiliations.csv')
+        self.languages = languages.Dumper(collection, output_file='languages.csv')
+        self.licenses = licenses.Dumper(collection, output_file='licenses.csv')
+        self.authors = authors.Dumper(authors, output_file='authors.csv')
 
     def run(self):
-        for item in self.items():
-            self.write(item)
-
-    def items(self):
 
         if not self.issns:
             self.issns = [None]
@@ -70,26 +58,11 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
-                yield self.fmt_csv(data)
-        
-    def fmt_csv(self, data):
-        know_languages = set(['pt', 'es', 'en'])
-        languages = set(data.languages())
-        line = []
-        line.append(data.publisher_id)
-        line.append(data.journal.scielo_issn)
-        line.append(data.journal.title)
-        line.append(','.join(data.journal.subject_areas))
-        line.append(data.publication_date[0:4])
-        line.append(data.document_type)
-        perm = ''
-        if data.permissions:
-            perm = data.permissions.get('id' or '')
-        line.append(perm)
-
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
-
-        return joined_line
+                self.counts.write(self.counts.fmt_csv(data))
+                self.affiliations.write(self.affiliations.fmt_csv(data))
+                self.languages.write(self.languages.fmt_csv(data))
+                self.licenses.write(self.licenses.fmt_csv(data))
+                self.authors.write(self.authors.fmt_csv(data))
 
 def main():
 
@@ -107,12 +80,6 @@ def main():
         '--collection',
         '-c',
         help='Collection Acronym'
-    )
-
-    parser.add_argument(
-        '--output_file',
-        '-r',
-        help='File to receive the dumped data'
     )
 
     parser.add_argument(
@@ -137,6 +104,6 @@ def main():
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
 
-    dumper = Dumper(args.collection, issns, args.output_file)
+    dumper = Dumper(args.collection, issns)
 
     dumper.run()

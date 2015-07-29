@@ -134,16 +134,15 @@ class Dumper(object):
     def run(self):
         for issn in self.issns:
             for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-                logger.debug('Reading document: %s' % document.publisher_id)
                 try:
-                    xml = self._articlemeta.document(code=document.publisher_id, collection=document.collection_acronym, fmt='xmlrsps')
-                except:
-                    logger.exception('Got exception on xml production')
-                    validation_result = analyze_xml('', document)
-                    print(self.fmt_json(document, validation_result))
-                else:
-                    validation_result = analyze_xml(xml, document)
-                    print(self.fmt_json(document, validation_result))
+                    xml = self._articlemeta.document(document.publisher_id, document.collection_acronym, fmt='xmlrsps')
+                except Exception, e:
+                    logger.exception(e)
+                    logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
+                    xml = u''
+                logger.debug('Reading document: %s' % document.publisher_id)
+                validation_result = analyze_xml(xml, document)
+                print(self.fmt_json(document, validation_result))
 
 
 def main():

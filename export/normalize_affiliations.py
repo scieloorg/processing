@@ -2,7 +2,7 @@
 """
 Este processamento gera uma tabulação de afiliações para normalização.
 Formato de saída:
-"coleção","PID","ano de publicação","título","número","normalizado","id de afiliação","instituição original","paises original","instituição normalizada","país normalizado ISO-3661","código de país normalizado ISO-3166","estado normalizado ISO-3166","código de estado normalizado ISO-3166"
+"coleção","PID","ano de publicação","tipo de documento","título","número","normalizado","id de afiliação","instituição original","paises original","instituição normalizada","país normalizado ISO-3661","código de país normalizado ISO-3166","estado normalizado ISO-3166","código de estado normalizado ISO-3166"
 """
 import argparse
 import logging
@@ -52,7 +52,7 @@ class Dumper(object):
 
     def run(self):
 
-        header = [u"coleção", u"PID", u"ano de publicação", u"título", u"número", u"normalizado", u"id de afiliação", u"instituição original", u"paises original", u"instituição normalizada", u"país normalizado ISO-3661", u"código de país normalizado ISO-3166", u"estado normalizado ISO-3166", u"código de estado normalizado ISO-3166"]
+        header = [u"coleção", u"PID", u"ano de publicação", u"tipo de documento",u"título", u"número", u"normalizado", u"id de afiliação", u"instituição original", u"paises original", u"instituição normalizada", u"país normalizado ISO-3661", u"código de país normalizado ISO-3166", u"estado normalizado ISO-3166", u"código de estado normalizado ISO-3166"]
 
         if not self.issns:
             self.issns = [None]
@@ -78,6 +78,7 @@ class Dumper(object):
             data.collection_acronym,
             data.publisher_id,
             data.publication_date[0:4],
+            data.document_type,
             data.journal.title,
             data.issue_label
         ]
