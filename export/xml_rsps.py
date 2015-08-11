@@ -136,7 +136,7 @@ class Dumper(object):
             for document in self._articlemeta.documents(collection=self.collection, issn=issn):
                 try:
                     xml = self._articlemeta.document(document.publisher_id, document.collection_acronym, fmt='xmlrsps')
-                except Exception, e:
+                except Exception as e:
                     logger.exception(e)
                     logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     xml = u''

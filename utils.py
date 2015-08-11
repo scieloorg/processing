@@ -3,6 +3,8 @@ import os
 import weakref
 import datetime
 import re
+import unicodedata
+from django.utils.text import slugify
 
 from thrift import clients
 
@@ -13,6 +15,10 @@ except:
 
 
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
+
+def call_django_slugify(value):
+
+    return slugify(value)
 
 class SingletonMixin(object):
     """
