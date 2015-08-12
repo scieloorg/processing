@@ -58,7 +58,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns or [None]
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"pid", u"title", u"issn scielo", u"volume", u"número", u"first page", u"last page", u"e-location"]
+        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página", u"última página", u"e-location", "ahead of print id", u"chave"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -69,26 +69,50 @@ class Dumper(object):
 
     def fmt_json(self, data, xml_etree):
 
+        parsed_xml = xml_etree.lxml
+
+        def get_value(expression):
+            try:
+                first_occ = parsed_xml.xpath(expression)[0]
+            except IndexError:
+                return None
+
+            try:
+                value = first_occ.text
+            except AttributeError:
+                # valor de atributo
+                value = first_occ
+
+            try:
+                return value.strip()
+            except AttributeError:
+                return value
+
         line = []
 
-        journal_title = xml_etree.lxml.find('/front/journal-meta/journal-title-group/journal-title')
-        volume = xml_etree.lxml.find('/front/article-meta/volume')
-        issue = xml_etree.lxml.find('/front/article-meta/issue')
-        year = xml_etree.lxml.find('/front/article-meta/pub-date/year')
-        fpage = xml_etree.lxml.find('/front/article-meta/fpage')
-        lpage = xml_etree.lxml.find('/front/article-meta/lpage')
-        elocation = xml_etree.lxml.find('/front/article-meta/elocation')
+        journal_title = get_value('/article/front/journal-meta/journal-title-group/journal-title')
+        volume = get_value('/article/front/article-meta/volume')
+        issue = get_value('/article/front/article-meta/issue')
+        year = get_value('/article/front/article-meta/pub-date/year')
+        fpage = get_value('/article/front/article-meta/fpage')
+        fpage_seq = get_value('/article/article/front/article-meta/fpage/@seq')
+        lpage = get_value('/article/front/article-meta/lpage')
+        elocation = get_value('/article/front/article-meta/elocation')
+        aop_id = get_value('/article/front/article-meta/article-id[@pub-id-type="other"]')
+
 
         line = [
-            data.publisher_id,
             data.collection_acronym,
-            journal_title.text if not journal_title is None else '',
-            volume.text if not volume is None else '',
-            issue.text if not issue is None else '',
-            year.text if not year is None else '',
-            fpage.text if not fpage is None else '',
-            lpage.text if not lpage is None else '',
-            elocation.text if not elocation is None else ''
+            data.publisher_id,
+            journal_title if journal_title else '',
+            volume if volume else '',
+            issue if issue else '',
+            year if year else '',
+            fpage if fpage else '',
+            fpage_seq if fpage_seq else '',
+            lpage if lpage else '',
+            elocation if elocation else '',
+            aop_id if aop_id else ''
         ]
 
         natural_key = self.build_key(line[2:])
