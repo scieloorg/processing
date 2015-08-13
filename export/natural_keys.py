@@ -58,7 +58,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns or [None]
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página", u"última página", u"e-location", "ahead of print id", u"chave"]
+        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página","primeria página seq" u"última página", u"e-location", "ahead of print id", u"chave"]
         self.write(','.join(header))
 
     def write(self, line):
