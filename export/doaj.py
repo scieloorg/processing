@@ -189,7 +189,7 @@ def main():
         '--from_date',
         '-f',
         default=FROM,
-        help='ISO date like 2013-12-31'
+        help='ISO date like %s' % FROM
     )
 
     parser.add_argument(
