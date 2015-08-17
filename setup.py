@@ -45,5 +45,6 @@ setup(
     processing_export_xmlrsps=export.xml_rsps:main
     processing_export_normalize_affiliations=export.normalize_affiliations:main
     processing_export_natural_keys=export.natural_keys:main
+    processing_export_doaj=export.doaj:main
     """
 )

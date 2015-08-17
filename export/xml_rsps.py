@@ -2,14 +2,6 @@
 """
 Este processamento realiza a exportação de registros SciELO para o formato RSPS
 """
-# coding: utf-8
-"""
-Este processamento gera uma tabulação com contagens, soma, mediana de alguns
-elementos do artigo: total de autores, total de citações, total de páginas
-
-Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","bases WOS","áreas WOS","status","ano de inclusão","licença de uso padrão"
-"""
 
 import os
 import argparse

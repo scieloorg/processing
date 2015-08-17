@@ -116,10 +116,13 @@ class ArticleMeta(object):
             return article
 
 
-    def documents(self, collection=None, issn=None, fmt='xylose'):
+    def documents(self, collection=None, issn=None, from_date=None,
+        until_date=None, fmt='xylose'):
         offset = 0
         while True:
-            identifiers = self.client.get_article_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+            identifiers = self.client.get_article_identifiers(
+                collection=collection, issn=issn, from_date=from_date,
+                until_date=until_date, limit=LIMIT, offset=offset)
 
             if len(identifiers) == 0:
                 raise StopIteration

@@ -1,5 +1,6 @@
 thriftpy==0.3.1
 packtools
 django==1.8.3
+requests
 -e git+https://github.com/scieloorg/xylose@0.30#egg=xylose
 -e git+https://github.com/scieloorg/processing@0.1.21#egg=processing
