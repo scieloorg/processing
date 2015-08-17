@@ -78,7 +78,11 @@ class Dumper(object):
         auth_url = 'https://doaj.org/account/login'
         login = {'username': self.user, 'password': self.password}
         session = requests.Session()
-        request = session.post(auth_url, data=login)
+        try:
+            request = session.post(auth_url, data=login)
+        except requests.exceptions.SSLError:
+            logger.debug('Authentication without SSL validation')
+            request = session.post(auth_url, data=login, verify=False)
 
         if request.status_code != 200:
             return None
