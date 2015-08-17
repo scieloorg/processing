@@ -214,14 +214,15 @@ def main():
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
 
+    issns_from_file = None
     if args.issns_file:
         with open(args.issns_file, 'r') as f:
             issns_from_file = utils.ckeck_given_issns([i.strip() for i in f])
 
     if issns:
-        issns += issns_from_file
+        issns += issns_from_file if issns_from_file else []
     else:
-        issns = issns_from_file
+        issns = issns_from_file if issns_from_file else []
 
     dumper = Dumper(
         args.collection, issns, from_date=args.from_date, user=args.user,
