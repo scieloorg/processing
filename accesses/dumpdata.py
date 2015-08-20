@@ -119,7 +119,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['aff_countries'] = ['undefined']
     if document.mixed_affiliations:
         data['aff_countries'] = list(set([country(aff.get('country', 'undefined')) for aff in document.mixed_affiliations]))
-    data['access_date'] = accesses_date
+    data['access_date'] = str(datetime.datetime.strptime(accesses_date, '%Y-%m'))
     data['access_year'] = accesses_date[:4]
     data['access_month'] = accesses_date[5:7]
     data['access_day'] = accesses_date[8:]
