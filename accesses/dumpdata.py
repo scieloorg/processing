@@ -101,6 +101,16 @@ def country(country):
         return choices.ISO_3166_COUNTRY_AS_KEY[country]
     return 'undefined'
 
+def get_date_timestamp(date):
+    try:
+        return str(datetime.datetime.strptime(date, '%Y-%m'))
+    except ValueError:
+        try:
+            return str(datetime.datetime.strptime(date, '%Y-%m-%d'))
+        except ValueError:
+            return date
+
+    return date
 
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
@@ -119,7 +129,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['aff_countries'] = ['undefined']
     if document.mixed_affiliations:
         data['aff_countries'] = list(set([country(aff.get('country', 'undefined')) for aff in document.mixed_affiliations]))
-    data['access_date'] = str(datetime.datetime.strptime(accesses_date, '%Y-%m'))
+    data['access_date'] = get_date_timestamp(accesses_date)
     data['access_year'] = accesses_date[:4]
     data['access_month'] = accesses_date[5:7]
     data['access_day'] = accesses_date[8:]

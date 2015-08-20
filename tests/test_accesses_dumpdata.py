@@ -347,7 +347,7 @@ class DumpDataTest(unittest.TestCase):
                 'access_html': 1,
                 'access_pdf': 10,
                 'access_epdf': 0,
-                'access_date': '2012-01-08',
+                'access_date': '2012-01-08 00:00:00',
                 'access_year': '2012',
                 'access_month': '01',
                 'access_day': '08',
