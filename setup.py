@@ -4,7 +4,10 @@ from setuptools import setup, find_packages
 install_requires = [
     'thriftpy==0.3.1',
     'xylose',
-    'packtools'
+    'packtools',
+    'django>=1.8.3',
+    'requests',
+    'lxml>=3.4.4'
 ]
 
 tests_require = []
