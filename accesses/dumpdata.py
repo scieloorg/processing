@@ -103,10 +103,10 @@ def country(country):
 
 def get_date_timestamp(date):
     try:
-        return str(datetime.datetime.strptime(date, '%Y-%m'))
+        return datetime.datetime.strptime(date, '%Y-%m').isoformat()
     except ValueError:
         try:
-            return str(datetime.datetime.strptime(date, '%Y-%m-%d'))
+            return datetime.datetime.strptime(date, '%Y-%m-%d').isoformat()
         except ValueError:
             return date
 
