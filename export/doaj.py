@@ -59,7 +59,7 @@ class Dumper(object):
         self.user = user
         self.password = password
         self.issns = issns or [None]
-        self.authenticated_session()
+        self.session = self.authenticated_session()
         self.parse_schema()
 
     def parse_schema(self):
@@ -77,6 +77,7 @@ class Dumper(object):
     def authenticated_session(self):
         auth_url = 'https://doaj.org/account/login'
         login = {'username': self.user, 'password': self.password}
+
         session = requests.Session()
         try:
             request = session.post(auth_url, data=login)
@@ -85,12 +86,16 @@ class Dumper(object):
             request = session.post(auth_url, data=login, verify=False)
 
         if request.status_code != 200:
+            logger.debug('Authentication attempt done')
             return None
 
         if u'Incorrect' in request.text:
+            logger.debug('Incorrect username or password')
             return None
 
-        self.session = session
+        logger.debug('Authenticated successfully')
+
+        return session
 
     def xml_is_valid(self, xml):
         
@@ -121,7 +126,7 @@ class Dumper(object):
                 data={'schema': 'doaj'},
                 files=files
             )
-        except ConnectionError:
+        except requests.ConnectionError:
             logger.debug('Fail to send document to DOAJ')
             return False
 
@@ -130,6 +135,9 @@ class Dumper(object):
             return True
 
     def run(self):
+        if not self.session:
+            return None
+
         for issn in self.issns:
             for document in self._articlemeta.documents(collection=self.collection, issn=issn, from_date=self.from_date):
                 logger.debug('Reading document: %s_%s' % (document.publisher_id, document.collection_acronym))
