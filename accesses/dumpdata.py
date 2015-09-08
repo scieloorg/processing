@@ -18,6 +18,8 @@ __version__ = 0.1
 
 logger = logging.getLogger(__name__)
 
+SUPPLBEG_REGEX = re.compile(r'^0 ')
+SUPPLEND_REGEX = re.compile(r' 0$')
 REGEX_PDF_PATH = re.compile(r'/pdf.*\.pdf$')
 FROM = '1500-01-01'
 UNTIL = datetime.datetime.now().isoformat()[0:10]
@@ -112,6 +114,34 @@ def get_date_timestamp(date):
 
     return date
 
+def issuelabel(document):
+    label_volume = document.volume if document.volume else ''
+    label_issue = document.issue if document.issue else ''
+
+    label_suppl_issue = ' suppl %s' % document.supplement_issue if document.supplement_issue else ''
+
+    if label_suppl_issue:
+        label_issue += label_suppl_issue
+
+    label_suppl_volume = ' suppl %s' % document.supplement_volume if document.supplement_volume else ''
+
+    if label_suppl_volume:
+        label_issue += label_suppl_volume
+    
+    label_issue = SUPPLBEG_REGEX.sub('', label_issue)
+    label_issue = SUPPLEND_REGEX.sub('', label_issue)
+
+    label_volume = 'n.' + label_volume
+    label_issue = 'v.' + label_issue
+
+    itens = [
+        document.journal.abbreviated_title,
+        ' '.join([label_volume, label_issue]),
+        document.publication_date[0:4]
+        ]
+
+    return ', '.join(itens)
+
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data = {}
@@ -120,6 +150,9 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['issn'] = document.journal.scielo_issn
     data['journal_title'] = document.journal.title
     data['issue'] = document.publisher_id[0:18]
+    if document.original_title():
+        data['document_title'] = document.original_title()
+    data['issue_title'] = issuelabel(document)
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
     data['subject_areas'] = [i for i in document.journal.subject_areas]
@@ -252,8 +285,10 @@ class Dumper(object):
             data['collection'],
             data['pid'],
             data['issn'],
-            data['issue'],
             data['journal_title'],
+            data['issue'],
+            data['issue_title'],
+            data['document_title'],
             data['publication_date'],
             data['publication_year'],
             data['document_type'],
