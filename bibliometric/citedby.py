@@ -92,11 +92,15 @@ class Dumper(object):
         line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        line.append(data.original_title())
+        line.append(data.original_title() or '')
         line.append(citedby.get('code', ''))
         line.append(citedby.get('issn', ''))
         line.append(citedby.get('source', ''))
-        line.append(citedby.get('titles', [''])[0])
+
+        if 'titles' in citedby and len(citedby['titles']) > 0:
+            line.append(citedby['titles'][0])
+        else:
+            line.append('')
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
