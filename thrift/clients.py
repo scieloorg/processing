@@ -18,12 +18,42 @@ articlemeta_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/articlemeta.thrift')
 
 
+citedby_thrift = thriftpy.load(
+    os.path.join(os.path.dirname(__file__))+'/citedby.thrift')
+
+
 class ServerError(Exception):
     def __init__(self, message=None):
         self.message = message or 'thirftclient: ServerError'
     
     def __str__(self):
         return repr(self.message)
+
+
+class Citedby(object):
+
+    def __init__(self, address, port):
+        """
+        Cliente thrift para o Citedby.
+        """
+        self._address = address
+        self._port = port
+
+    @property
+    def client(self):
+        client = make_client(
+            citedby_thrift.Citedby,
+            self._address,
+            self._port
+        )
+
+        return client
+
+    def citedby_pid(self, code, metaonly=False):
+
+        data = self.client.citedby_pid(code, metaonly)
+
+        return data
 
 
 class Ratchet(object):

@@ -4,6 +4,8 @@ import weakref
 import datetime
 import re
 import unicodedata
+import logging
+
 from django.utils.text import slugify
 
 from thrift import clients
@@ -13,6 +15,7 @@ try:
 except:
     from ConfigParser import ConfigParser
 
+logger = logging.getLogger(__name__)
 
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 
@@ -90,6 +93,19 @@ class Configuration(SingletonMixin):
 
 config = Configuration.from_env()
 settings = dict(config.items())
+
+
+def citedby_server():
+    try:
+        server = settings['app:main']['citedby_thriftserver'].split(':')
+        host = server[0]
+        port = int(server[1])
+    except:
+        logger.warning('Error defining Citedby thrift server, assuming default server ratchet.scielo.org:11630')
+        host = 'citedby.scielo.org'
+        port = 11610
+
+    return clients.Citedby(host, port)
 
 
 def ratchet_server():

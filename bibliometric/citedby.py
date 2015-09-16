@@ -3,11 +3,12 @@
 Este processamento gera uma tabulação de idiomas de publicação de cada artigo
 da coleção SciELO.
 Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","license"
+"PID","ISSN","título","área temática","ano de publicação","tipo de documento","título do documento","citado por PID","citado por ISSN","citado por título","citado por título do documento"
 """
 import argparse
 import logging
 import codecs
+import json
 
 import utils
 
@@ -44,12 +45,12 @@ class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
 
-        self._ratchet = utils.ratchet_server()
+        self._citedby = utils.citedby_server()
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"license"]
+        header = [u"PID", u"ISSN", u"título", u"área temática", u"ano de publicação", u"tipo de documento", u"título do documento", u"citado por PID", u"citado por ISSN", u"citado por título", u"citado por título do documento"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -62,6 +63,14 @@ class Dumper(object):
         for item in self.items():
             self.write(item)
 
+
+    def citedby(self, pid):
+        data = self._citedby.citedby_pid(pid, False)
+        dataj = json.loads(data)
+        if isinstance(dataj, dict):
+            for item in dataj.get('cited_by', []):
+                yield item
+
     def items(self):
 
         if not self.issns:
@@ -70,9 +79,10 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
-                yield self.fmt_csv(data)
+                for item in self.citedby(data.publisher_id):
+                    yield self.fmt_csv(data, item)
         
-    def fmt_csv(self, data):
+    def fmt_csv(self, data, citedby):
         know_languages = set(['pt', 'es', 'en'])
         languages = set(data.languages())
         line = []
@@ -82,10 +92,11 @@ class Dumper(object):
         line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        perm = ''
-        if data.permissions:
-            perm = data.permissions.get('id' or '')
-        line.append(perm)
+        line.append(data.original_title())
+        line.append(citedby.get('code', ''))
+        line.append(citedby.get('issn', ''))
+        line.append(citedby.get('source', ''))
+        line.append(citedby.get('titles', [''])[0])
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
