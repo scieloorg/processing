@@ -3,4 +3,4 @@ packtools
 django==1.8.3
 requests
 -e git+https://github.com/scieloorg/xylose@0.33#egg=xylose
--e git+https://github.com/scieloorg/processing@0.1.29#egg=processing
+-e git+https://github.com/scieloorg/processing@0.1.31#egg=processing

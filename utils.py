@@ -95,13 +95,25 @@ config = Configuration.from_env()
 settings = dict(config.items())
 
 
+def publicationstats_server():
+    try:
+        server = settings['app:main']['publicationstats_thriftserver'].split(':')
+        host = server[0]
+        port = int(server[1])
+    except:
+        logger.warning('Error defining PublicationStats thrift server, assuming default server publicationstats.scielo.org:11620')
+        host = 'publicationstats.scielo.org'
+        port = 11620
+
+    return clients.PublicationStats(host, port)
+
 def citedby_server():
     try:
         server = settings['app:main']['citedby_thriftserver'].split(':')
         host = server[0]
         port = int(server[1])
     except:
-        logger.warning('Error defining Citedby thrift server, assuming default server ratchet.scielo.org:11630')
+        logger.warning('Error defining Citedby thrift server, assuming default server citedby.scielo.org:11610')
         host = 'citedby.scielo.org'
         port = 11610
 

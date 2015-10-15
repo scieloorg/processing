@@ -1,3 +1,5 @@
 [app:main]
 articlemeta_thriftserver = 127.0.0.1:11720
 ratchet_thriftserver = 127.0.0.1:11630
+citedby_thriftserver = 127.0.0.1:11610
+publicationstats_thriftserver = 127.0.0.1:11620

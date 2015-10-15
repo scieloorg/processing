@@ -21,6 +21,8 @@ articlemeta_thrift = thriftpy.load(
 citedby_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/citedby.thrift')
 
+publication_stats_thrift = thriftpy.load(
+    os.path.join(os.path.dirname(__file__))+'/publication_stats.thrift')
 
 class ServerError(Exception):
     def __init__(self, message=None):
@@ -29,6 +31,116 @@ class ServerError(Exception):
     def __str__(self):
         return repr(self.message)
 
+
+class PublicationStats(object):
+
+    def __init__(self, address, port):
+        """
+        Cliente thrift para o PublicationStats.
+        """
+        self._address = address
+        self._port = port
+
+    @property
+    def client(self):
+        client = make_client(
+            publication_stats_thrift.PublicationStats,
+            self._address,
+            self._port
+        )
+
+        return client
+
+    def first_included_document_by_journal(self, issn, collection):
+
+        body = {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "collection": collection
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "issn": issn
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "filter": {
+                        "exists": {
+                            "field": "processing_date"
+                        }
+                    }
+                }
+            },
+            "sort": [
+                {
+                    "processing_date": {
+                        "order": "asc"
+                    }
+                }
+            ]
+        }
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '1')
+        ]
+
+        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+
+        return query_result
+
+
+    def last_included_document_by_journal(self, issn, collection, metaonly=False):
+
+        body = {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "collection": collection
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "issn": issn
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "filter": {
+                        "exists": {
+                            "field": "processing_date"
+                        }
+                    }
+                }
+            },
+            "sort": [
+                {
+                    "processing_date": {
+                        "order": "desc"
+                    }
+                }
+            ]
+        }
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '1')
+        ]
+
+        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+
+        return query_result
 
 class Citedby(object):
 

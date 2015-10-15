@@ -358,6 +358,7 @@ class DumpDataTest(unittest.TestCase):
                 'collection': 'scl',
                 'publication_year': '2009',
                 'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\u00e3o Paulo)',
+                'processing_date': '2010-05-14',
                 'publication_date': '2009-09',
                 'issue': 'S0102-672020090003'
             }

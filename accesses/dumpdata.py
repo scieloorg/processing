@@ -153,9 +153,11 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     if document.original_title():
         data['document_title'] = document.original_title()
     data['issue_title'] = issuelabel(document)
+    data['processing_date'] = document.processing_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
-    data['subject_areas'] = [i for i in document.journal.subject_areas]
+    subject_areas = document.journal.subject_areas or ['undefined']
+    data['subject_areas'] = [i for i in subject_areas]
     data['collection'] = document.collection_acronym
     data['document_type'] = document.document_type
     data['languages'] = list(set([i for i in document.languages()]+[document.original_language() or 'undefined']))
@@ -289,6 +291,7 @@ class Dumper(object):
             data['issue'],
             data['issue_title'],
             data['document_title'],
+            data['processing_date'],
             data['publication_date'],
             data['publication_year'],
             data['document_type'],
