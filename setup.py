@@ -14,7 +14,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version ="0.1.31",
+    version ="0.1.32",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -30,7 +30,7 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+https://git@github.com/scieloorg/xylose.git@v0.32#egg=xylose"
+        "git+https://git@github.com/scieloorg/xylose.git@v0.34#egg=xylose"
     ],
     tests_require=tests_require,
     test_suite='tests',
@@ -43,6 +43,7 @@ setup(
     processing_publication_authors=publication.authors:main
     processing_publication_counts=publication.counts:main
     processing_publication_journals=publication.journals:main
+    processing_publication_journals_history=publication.journals_history:main
     processing_publication_licenses=publication.licenses:main
     processing_publication_all=publication.dumper:main
     processing_evaluation_altmetrics=evaluation.altmetrics:main
