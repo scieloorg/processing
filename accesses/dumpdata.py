@@ -150,8 +150,16 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['issn'] = document.journal.scielo_issn
     data['journal_title'] = document.journal.title
     data['issue'] = document.publisher_id[0:18]
+    data['document_title'] = ''
     if document.original_title():
         data['document_title'] = document.original_title()
+    elif document.translated_titles():
+        for language, title in document.translated_titles().items():
+            if title:
+                data['document_title'] = title
+                break
+
+
     data['issue_title'] = issuelabel(document)
     data['processing_date'] = document.processing_date
     data['publication_date'] = document.publication_date
