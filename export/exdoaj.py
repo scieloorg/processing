@@ -68,16 +68,27 @@ class Dumper(object):
 
     def _doaj_id_by_meta(self, issn, publication_year, title):
         ### Query by metadata
+
+        escaped_title = ''
+
+        for char in title:
+            if char in ['+','-','&','|','!','(',')','{','}','[',']','^','"','~','*','?',':','\\']:
+                escaped_title += u'\\'+char
+                continue
+            escaped_title += char
+
         query = 'issn:%s AND year:%s AND title:%s' % (
             issn,
             publication_year,
-            title
+            escaped_title
         )
+
         result = []
+
         try:
             result = [i for i in self.doaj_articles.search(query)]
         except:
-            logger.debug('Fail to query DOAJ API')
+            logger.debug('Fail to query DOAJ API using metadata: %s' % query)
 
         if len(result) == 1:
             return result[0].get('id', None)
@@ -87,11 +98,10 @@ class Dumper(object):
         query = 'doi:%s' % (doi)
 
         result = []
-
         try:
             result = [i for i in self.doaj_articles.search(query)]
         except:
-            logger.debug('Fail to query DOAJ API')
+            logger.debug('Fail to query DOAJ API using DOI: %s' % query)
 
         if len(result) == 1:
             return result[0].get('id', None)
