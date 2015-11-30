@@ -7,7 +7,8 @@ install_requires = [
     'packtools',
     'django>=1.8.3',
     'requests',
-    'lxml>=3.4.4'
+    'lxml>=3.4.4',
+    'doaj_client'
 ]
 
 tests_require = []
@@ -30,7 +31,8 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+https://git@github.com/scieloorg/xylose.git@v0.34#egg=xylose"
+        "git+https://git@github.com/scieloorg/xylose.git@v0.34#egg=xylose",
+        "git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client"
     ],
     tests_require=tests_require,
     test_suite='tests',
@@ -50,7 +52,7 @@ setup(
     processing_export_xmlrsps=export.xml_rsps:main
     processing_export_normalize_affiliations=export.normalize_affiliations:main
     processing_export_natural_keys=export.natural_keys:main
-    processing_export_doaj=export.doaj:main
+    processing_export_doaj=export.exdoaj:main
     processing_export_kbart=export.kbart:main
     processing_bibliometric_citedby=bibliometric.citedby:main
     """
