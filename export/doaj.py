@@ -12,7 +12,7 @@ from io import BytesIO, StringIO
 from datetime import datetime, timedelta
 
 from lxml import etree
-
+from doaj.articles import Articles
 import utils
 
 FROM = datetime.now() - timedelta(days=30)
@@ -51,7 +51,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None, from_date=FROM, 
-        user=None, password=None):
+        user=None, password=None, api_token=None):
 
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
@@ -61,6 +61,52 @@ class Dumper(object):
         self.issns = issns or [None]
         self.session = self.authenticated_session()
         self.parse_schema()
+        self.doaj_articles = Articles(usertoken=api_token)
+
+
+    def _doaj_id_by_meta(self, issn, publication_year, title):
+        ### Query by metadata
+        query = 'issn:%s AND year:%s AND title:%s' % (
+            issn,
+            publication_year,
+            title
+        )
+        result = []
+        try:
+            result = [i for i in self.doaj_articles.search(query)]
+        except:
+            logger.debug('Fail to query DOAJ API')
+
+        if len(result) == 1:
+            return result[0].get('id', None)
+
+    def _doaj_id_by_doi(self, doi):
+        ### Query by doi
+        query = 'doi:%s' % (doi)
+
+        result = []
+
+        try:
+            result = [i for i in self.doaj_articles.search(query)]
+        except:
+            logger.debug('Fail to query DOAJ API')
+
+        if len(result) == 1:
+            return result[0].get('id', None)
+
+    def _doaj_id(self, document):
+
+        doaj_id = self._doaj_id_by_meta(
+            document.scielo_issn,
+            document.publication_date[0:4],
+            document.original_title()
+        )
+
+        if doaj_id:
+            return doaj_id
+
+        if document.doi:
+            return self._doaj_id_by_doi(document.doi)
 
     def parse_schema(self):
         xsd = BytesIO(DOAJ_XSD.encode('utf-8'))
@@ -141,6 +187,16 @@ class Dumper(object):
         for issn in self.issns:
             for document in self._articlemeta.documents(collection=self.collection, issn=issn, from_date=self.from_date):
                 logger.debug('Reading document: %s_%s' % (document.publisher_id, document.collection_acronym))
+
+                if document.data.get('doaj_id', None):
+                    logger.debug('Document already available in DOAJ: %s_%s' % (document.publisher_id, document.collection_acronym))
+                    continue
+
+                doaj_id = self._doaj_id(document)
+
+                if doaj_id:
+                    self._articlemeta.set_doaj_id(document.publisher_id, document.collection_acronym, doaj_id)
+                    continue
 
                 try:
                     xml = self._articlemeta.document(document.publisher_id, document.collection_acronym, fmt='xmldoaj')

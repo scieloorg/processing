@@ -2,5 +2,6 @@ thriftpy==0.3.1
 packtools
 django==1.8.3
 requests
--e git+https://github.com/scieloorg/xylose@0.34#egg=xylose
--e git+https://github.com/scieloorg/processing@0.1.33#egg=processing
+-e git+https://github.com/scieloorg/xylose@0.36#egg=xylose
+-e git+https://github.com/scieloorg/processing@0.1.34#egg=processing
+-e git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client

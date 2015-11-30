@@ -236,6 +236,28 @@ class ArticleMeta(object):
 
             offset += 1000
 
+    def exists_article(self, code, collection):
+        try:
+            return self.client.exists_article(
+                code,
+                collection
+            )
+        except:
+            msg = 'Error checking if document exists: %s_%s' % (collection, code)
+            raise ServerError(msg)
+
+    def set_doaj_id(self, code, collection, doaj_id):
+        try:
+            article = self.client.set_doaj_id(
+                code,
+                collection,
+                doaj_id
+            )
+        except:
+            msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
+            raise ServerError(msg)
+
+
     def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
         try:
             article = self.client.get_article(
