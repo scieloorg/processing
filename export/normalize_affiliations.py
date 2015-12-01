@@ -97,6 +97,7 @@ class Dumper(object):
 
             normalized_institution = normalized_aff.get(mx_aff['index'], {}).get('institution', '')
             normalized_country = normalized_aff.get(mx_aff['index'], {}).get('country', '')
+            normalized_state = normalized_aff.get(mx_aff['index'], {}).get('state', '')
             original_institution = original_aff.get(mx_aff['index'], {}).get('institution', '')
             original_country = original_aff.get(mx_aff['index'], {}).get('country', '')
 
@@ -113,7 +114,8 @@ class Dumper(object):
                 original_country,
                 normalized_institution,
                 normalized_country,
-                ISO_3166_COUNTRY_AS_KEY.get(normalized_country, '')
+                ISO_3166_COUNTRY_AS_KEY.get(normalized_country, ''),
+                normalized_state
             ]
 
             joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line+aff_line])
