@@ -110,7 +110,7 @@ class Dumper(object):
 
         doaj_id = None
 
-        if document.original_title().strip():
+        if document.original_title():
             doaj_id = self._doaj_id_by_meta(
                 document.scielo_issn,
                 document.publication_date[0:4],
