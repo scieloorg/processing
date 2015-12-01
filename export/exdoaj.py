@@ -108,11 +108,14 @@ class Dumper(object):
 
     def _doaj_id(self, document):
 
-        doaj_id = self._doaj_id_by_meta(
-            document.scielo_issn,
-            document.publication_date[0:4],
-            document.original_title()
-        )
+        doaj_id = None
+
+        if document.original_title().strip():
+            doaj_id = self._doaj_id_by_meta(
+                document.scielo_issn,
+                document.publication_date[0:4],
+                document.original_title()
+            )
 
         if doaj_id:
             return doaj_id
