@@ -51,7 +51,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"issn scielo",u"issn impresso",u"issn eletrônico",u"nome do publicador",u"título",u"título abreviado",u"título nlm",u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão"]
+        header = [u"issn scielo",u"issn impresso",u"issn eletrônico",u"nome do publicador",u"título",u"título abreviado",u"título nlm",u"periodicidade",u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -83,6 +83,7 @@ class Dumper(object):
             data.title,
             data.abbreviated_title or "",
             data.title_nlm or "",
+            data.periodicity or "",
             ','.join(data.subject_areas or []),
             ','.join(data.wos_citation_indexes or []),
             ','.join(data.wos_subject_areas or []),
