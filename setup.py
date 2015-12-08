@@ -53,6 +53,7 @@ setup(
     processing_export_normalize_affiliations=export.normalize_affiliations:main
     processing_export_natural_keys=export.natural_keys:main
     processing_export_doaj=export.exdoaj:main
+    processing_export_doaj_journals=export.doaj_journals:main
     processing_export_kbart=export.kbart:main
     processing_bibliometric_citedby=bibliometric.citedby:main
     """
