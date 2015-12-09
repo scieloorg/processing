@@ -213,6 +213,7 @@ class Dumper(object):
                 doaj_id = self._doaj_id(document)
 
                 if doaj_id:
+                    logger.debug('Document already available in DOAJ, setting id on Article Meta for: %s_%s' % (document.publisher_id, document.collection_acronym))
                     self._articlemeta.set_doaj_id(document.publisher_id, document.collection_acronym, doaj_id)
                     continue
 
