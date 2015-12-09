@@ -192,8 +192,11 @@ class Dumper(object):
             return False
 
         if u'successfully uploaded' in response.text:
-            logger.debug('Document Sent')
+            logger.info('Document Sent')
             return True
+        else:
+            logger.error('Document not Sent: %s' % response.status_code)
+            return False
 
     def run(self):
         if not self.session:
@@ -201,7 +204,7 @@ class Dumper(object):
 
         for issn in self.issns:
             for document in self._articlemeta.documents(collection=self.collection, issn=issn, from_date=self.from_date):
-                logger.debug('Reading document: %s_%s' % (document.publisher_id, document.collection_acronym))
+                logger.info('Reading document: %s_%s' % (document.publisher_id, document.collection_acronym))
 
                 if document.data.get('doaj_id', None):
                     logger.debug('Document already available in DOAJ: %s_%s' % (document.publisher_id, document.collection_acronym))
@@ -224,7 +227,7 @@ class Dumper(object):
                     logger.error('Fail to parse xml document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     continue
 
-                logger.debug('Sending document: %s_%s' % (document.publisher_id, document.collection_acronym))
+                logger.info('Sending document: %s_%s' % (document.publisher_id, document.collection_acronym))
                 filename = '%s_%s.xml' % (document.publisher_id, document.collection_acronym)
 
                 self.send_xml(filename, xml)
