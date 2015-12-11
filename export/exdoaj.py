@@ -195,6 +195,7 @@ class Dumper(object):
             logger.info('Document Sent')
             return True
         else:
+            self.authenticated_session()
             logger.error('Document not Sent: %s' % response.status_code)
             return False
 
