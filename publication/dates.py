@@ -80,6 +80,7 @@ class Dumper(object):
         line.append(data.journal.title)
         line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
+        line.append(data.document_type)
         line.append(data.receive_date or '')
         line.append(data.review_date or '')
         line.append(data.review_date or '')

@@ -6,7 +6,7 @@ import codecs
 
 import utils
 
-import counts, affiliations, languages, licenses, authors
+import counts, affiliations, languages, licenses, authors, dates
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +49,7 @@ class Dumper(object):
         self.languages = languages.Dumper(collection, output_file='languages.csv')
         self.licenses = licenses.Dumper(collection, output_file='licenses.csv')
         self.authors = authors.Dumper(authors, output_file='authors.csv')
+        self.dates = authors.Dumper(authors, output_file='dates.csv')
 
     def run(self):
 
@@ -63,13 +64,14 @@ class Dumper(object):
                 self.languages.write(self.languages.fmt_csv(data))
                 self.licenses.write(self.licenses.fmt_csv(data))
                 self.authors.write(self.authors.fmt_csv(data))
+                self.dates.write(self.dates.fmt_csv(data))
 
         logger.info('Export finished')
 
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump SciELO tabs'
     )
 
     parser.add_argument(
