@@ -49,7 +49,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"submissão","recebido","revisado","aceito","publicado",u"entrada no SciELO",u"atualização no SciELO"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"submetido","recebido","revisado","aceito","publicado",u"entrada no SciELO",u"atualização no SciELO"]
         self.write(','.join(header))
 
     def write(self, line):
