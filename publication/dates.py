@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação de datas do artigo (publicação, submissão,
     aceite, entrada no scieloe atualização no scielo)
 Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","submissão","recebido","revisado","aceito","publicado","entrada no SciELO","Atualização no SciELO"
+"PID","ISSN","título","área temática","ano de publicação","tipo de documento","recebido","revisado","aceito","publicado","entrada no SciELO","Atualização no SciELO"
 """
 import argparse
 import logging
@@ -49,7 +49,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"submetido","recebido","revisado","aceito","publicado",u"entrada no SciELO",u"atualização no SciELO"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"recebido",u"revisado",u"aceito",u"publicado",u"entrada no SciELO",u"atualização no SciELO"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -82,7 +82,6 @@ class Dumper(object):
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
         line.append(data.receive_date or '')
-        line.append(data.review_date or '')
         line.append(data.review_date or '')
         line.append(data.acceptance_date or '')
         line.append(data.publication_date or '')
