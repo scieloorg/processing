@@ -1,9 +1,9 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de idiomas de publicação de cada artigo
-da coleção SciELO.
+Este processamento gera uma tabulação de datas do artigo (publicação, submissão,
+    aceite, entrada no scieloe atualização no scielo)
 Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","license"
+"PID","ISSN","título","área temática","ano de publicação","tipo de documento","submissão","recebido","revisado","aceito","publicado","entrada no SciELO","Atualização no SciELO"
 """
 import argparse
 import logging
@@ -49,7 +49,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"license"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"submissão","recebido","revisado","aceito","publicado",u"entrada no SciELO",u"atualização no SciELO"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -74,19 +74,19 @@ class Dumper(object):
                 yield self.fmt_csv(data)
         
     def fmt_csv(self, data):
-        know_languages = set(['pt', 'es', 'en'])
-        languages = set(data.languages())
         line = []
         line.append(data.publisher_id)
         line.append(data.journal.scielo_issn)
         line.append(data.journal.title)
         line.append(','.join(data.journal.subject_areas))
         line.append(data.publication_date[0:4])
-        line.append(data.document_type)
-        perm = ''
-        if data.permissions:
-            perm = data.permissions.get('id' or '')
-        line.append(perm)
+        line.append(data.receive_date or '')
+        line.append(data.review_date or '')
+        line.append(data.review_date or '')
+        line.append(data.acceptance_date or '')
+        line.append(data.publication_date or '')
+        line.append(data.creation_date or '')
+        line.append(data.update_date or '')
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
@@ -95,7 +95,7 @@ class Dumper(object):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump article dates'
     )
 
     parser.add_argument(

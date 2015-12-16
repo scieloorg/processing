@@ -15,7 +15,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version ="0.1.35",
+    version ="0.1.36",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -47,6 +47,7 @@ setup(
     processing_publication_journals=publication.journals:main
     processing_publication_journals_history=publication.journals_history:main
     processing_publication_licenses=publication.licenses:main
+    processing_publication_dates=publication.dates:main
     processing_publication_all=publication.dumper:main
     processing_evaluation_altmetrics=evaluation.altmetrics:main
     processing_export_xmlrsps=export.xml_rsps:main

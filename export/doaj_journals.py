@@ -1,15 +1,21 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de histórico de mudanças do status do 
-periódico na coleção SciELO
-
-Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","bases WOS","áreas WOS","status","ano de inclusão","licença de uso padrão","Histórico Ano","Histórico Status"
+Este processamento utiliza a API do DOAJ para listar o status dos periódicos
+nesta fonte de informação.
 """
-
+import os
 import argparse
 import logging
 import codecs
+import json
+import time
+from io import BytesIO, StringIO
+from datetime import datetime, timedelta
+
+import requests
+from lxml import etree
+
+from doaj.journals import Journals
 
 import utils
 
@@ -42,17 +48,62 @@ def _config_logging(logging_level='INFO', logging_file=None):
     return logger
 
 
+def request_api(url, timeout=3, attempts=10):
+
+    attempt = 0
+    while True:
+        result = None
+        if attempt == attempts:
+            return None
+        try:
+            result = requests.get(url, timeout=3)
+        except:
+            logger.error("Fail to retrieve data from (%s) attempt %d/%d" % (url, attempt, attempts))
+            time.sleep(1)
+
+        if result and result.status_code == 200:
+            return result
+
+        attempt += 1
+
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
 
-        self._ratchet = utils.ratchet_server()
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
+        self.doaj_journals = Journals()
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"issn scielo",u"issn impresso",u"issn eletrônico",u"nome do publicador",u"título",u"título abreviado",u"título nlm",u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão", u"histórico data", u"histórico ano", u"histórico status"]
+        header = [u"coleção",u"issn scielo",u"issn impresso",u"issn eletrônico",u"título",u"ID no DOAJ",u"Provider no DOAJ",u"Status no DOAJ"]
         self.write(','.join(header))
+
+    def get_doaj_journal(self, issns):
+        data = {}
+        journal = None
+
+        for issn in issns:
+            journal = request_api('https://doaj.org/api/v1/search/journals/issn:%s' % issn).json()
+            if journal:
+                break
+
+        if not journal:
+            logger.debug("No data available in DOAJ for %s" % str(issns))
+            return data
+
+        if not len(journal['results']) > 0:
+            logger.debug("No data available in DOAJ for %s" % str(issns))
+            return data
+
+        active = journal['results'][0]['bibjson'].get('active', None)
+
+        data['id'] = journal['results'][0]['id']
+        data['provider'] = journal['results'][0]['bibjson'].get('provider', 'undefined')
+        data['active'] = 'undefined' if active == None else str(active)
+        data['active'] = 'reapplication' if data['active'] == 'False' else data['active']
+        data['active'] = 'active' if data['active'] == 'True' else data['active']
+
+        return data
 
     def write(self, line):
         if not self.output_file:
@@ -63,7 +114,6 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
-        logger.info('Export finished')
 
     def items(self):
 
@@ -72,48 +122,36 @@ class Dumper(object):
 
         for issn in self.issns:
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
-                for history in data.status_history:
-                    yield self.fmt_csv(data, history)
+                jissns = set()
+                if data.print_issn:
+                    jissns.add(data.print_issn)
+                if data.electronic_issn:
+                    jissns.add(data.print_issn)
+                jissns.add(data.scielo_issn)
+                in_doaj = self.get_doaj_journal(list(jissns))
+                yield self.fmt_csv(data, in_doaj)
         
-    def fmt_csv(self, data, history):
-
-        hist, status = history
+    def fmt_csv(self, data, in_doaj):
 
         line = [
+            data.collection_acronym,
             data.scielo_issn,
             data.print_issn or "",
             data.electronic_issn or "",
-            data.publisher_name or "",
             data.title,
-            data.abbreviated_title or "",
-            data.title_nlm or "",
-            ','.join(data.subject_areas or []),
-            ','.join(data.wos_citation_indexes or []),
-            ','.join(data.wos_subject_areas or []),
-            data.current_status,
-            data.creation_date[:4]
-        ]
-
-        if data.permissions:
-            line.append(data.permissions.get('id', "") or "")
-        else:
-            line.append("")
-
-        line += [
-            hist,
-            hist[0:4],
-            status
+            in_doaj.get('id', ""),
+            in_doaj.get('provider', ""),
+            in_doaj.get('active', "")
         ]
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
 
-
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Retrieve the SciELO journals status in DOAJ'
     )
 
     parser.add_argument(

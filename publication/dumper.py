@@ -64,6 +64,8 @@ class Dumper(object):
                 self.licenses.write(self.licenses.fmt_csv(data))
                 self.authors.write(self.authors.fmt_csv(data))
 
+        logger.info('Export finished')
+
 def main():
 
     parser = argparse.ArgumentParser(

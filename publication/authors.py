@@ -65,6 +65,7 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
+        logger.info('Export finished')
 
     def items(self):
 
