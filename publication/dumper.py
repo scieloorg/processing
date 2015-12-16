@@ -49,7 +49,7 @@ class Dumper(object):
         self.languages = languages.Dumper(collection, output_file='languages.csv')
         self.licenses = licenses.Dumper(collection, output_file='licenses.csv')
         self.authors = authors.Dumper(authors, output_file='authors.csv')
-        self.dates = authors.Dumper(authors, output_file='dates.csv')
+        self.dates = dates.Dumper(authors, output_file='dates.csv')
 
     def run(self):
 
