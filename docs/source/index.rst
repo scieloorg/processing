@@ -3,8 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to SciELO Processing's documentation!
-=============================================
+Processamentos SciELO
+=====================
+
+Utilitário para produção de tabulações de metadados e estatísticas. Este
+utilitário foi implementado utulizando os serviços RPC de coleta de indicadores
+bibliométricos, de publicação e de acessos aos documentos da Rede SciELO.
 
 Contents:
 

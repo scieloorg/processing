@@ -175,7 +175,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['access_date'] = get_date_timestamp(accesses_date)
     data['access_year'] = accesses_date[:4]
     data['access_month'] = accesses_date[5:7]
-    data['access_day'] = accesses_date[8:]
+    data['access_day'] = accesses_date[8:10]
     data['access_abstract'] = accesses.get('abstract', 0)
     data['access_html'] = accesses.get('html', 0)
     data['access_pdf'] = accesses.get('pdf', 0)
