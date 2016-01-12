@@ -15,7 +15,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   line_commands.rst
+   tools.rst
    public_reports.rst
 
 Indices and tables
