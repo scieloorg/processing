@@ -318,7 +318,7 @@ Relatório de datas do documento
 **finalidade:** Relatório com datas do documento.
 
 Formatos de saída
-`````````````````
+````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -337,7 +337,38 @@ Formato CSV::
     * entrada no SciELO
     * atualização no SciELO
 
-processing_publication_dates
+Relatório de periódicos
+-----------------------
+
+**comando:** processing_publication_journals
+
+**escopo:** documentos
+
+**finalidade:** Relatório de periódicos com metadados básicos para extração de
+indicadores.
+
+Formatos de saída
+`````````````````
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * issn scielo
+    * issn impresso
+    * issn eletrônico
+    * nome do publicador
+    * título
+    * título abreviado
+    * título nlm
+    * periodicidade
+    * área temática
+    * bases WOS
+    * áreas temáticas WOS
+    * situação atual
+    * ano de inclusão
+    * licença de uso padrão
+
 processing_publication_journals
 processing_publication_journals_history
 processing_publication_languages
