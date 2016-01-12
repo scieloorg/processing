@@ -7,10 +7,10 @@ Processamentos SciELO
 =====================
 
 Utilitário para produção de tabulações de metadados e estatísticas. Este
-utilitário foi implementado utulizando os serviços RPC de coleta de indicadores
+utilitário foi implementado utilizando os serviços RPC de coleta de indicadores
 bibliométricos, de publicação e de acessos aos documentos da Rede SciELO.
 
-Contents:
+Conteúdo:
 
 .. toctree::
    :maxdepth: 2
