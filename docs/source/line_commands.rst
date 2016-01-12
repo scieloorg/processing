@@ -11,7 +11,7 @@ Relatório de Acessos aos documentos
 **finalidade:** Extração de indicadores
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV, JSON.
 
@@ -80,7 +80,7 @@ Relatório de citação recebida por artigos no SciELO
 **finalidade:** Extração de indicadores
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -108,7 +108,7 @@ Relatórido de citações em Altmetrics
 **finalidade:** Extração de indicadores
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -142,7 +142,7 @@ Relatório com status de periódicos do DOAJ
 **finalidade:** Extração de relatório de situação dos periódicos SciELO no DOAJ.
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -167,7 +167,7 @@ Relatório com dados de periódicos em formato KBART
 **finalidade:** Extração de relatório de periódicos de acordo com formato KBART
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -198,7 +198,7 @@ do legado para minimizar impactos no momento de migração do legado para o SciE
 Manager.
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -229,7 +229,7 @@ normalizadas e não normalizadas. Este relatório serve de insumo para o process
 de normalização conduzido pelos departamentos de produção da Rede SciELO.
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -275,7 +275,7 @@ Relatório de afiliações dos documentos
 de indicadores de publicação.
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
@@ -303,7 +303,7 @@ Relatório de contagens gerais relacionadas aos dos documentos
 de indicadores de publicação.
 
 Formatos de saída
-˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+`````````````````
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
