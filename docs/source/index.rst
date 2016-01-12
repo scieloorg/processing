@@ -16,6 +16,7 @@ Contents:
    :maxdepth: 2
 
    line_commands.rst
+   public_reports.rst
 
 Indices and tables
 ==================
