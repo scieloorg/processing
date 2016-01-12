@@ -157,7 +157,7 @@ Formato CSV::
     * Provider no DOAJ
     * Status no DOAJ
 
-Relatóeio com dados de periódicos em formato KBART
+Relatório com dados de periódicos em formato KBART
 --------------------------------------------------
 
 **comando:** processing_export_kbart
