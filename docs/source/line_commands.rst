@@ -5,7 +5,9 @@ Relatório de Acessos aos documentos
 -----------------------------------
 
 **comando:** processing_accesses_dumpdata
+
 **escopo:** documentos
+
 **finalidade:** Extração de indicadores
 
 Formatos de saída
@@ -72,7 +74,9 @@ Relatório de citação recebida por artigos no SciELO
 ---------------------------------------------------
 
 **comando:** processing_bibliometric_citedby
+
 **escopo:** documentos
+
 **finalidade:** Extração de indicadores
 
 Formatos de saída
@@ -88,7 +92,9 @@ Relatórido de citações em Altmetrics
 ------------------------------------
 
 **comando:** processing_evaluation_altmetrics
+
 **escopo:** documentos
+
 **finalidade:** Extração de indicadores
 
 Formatos de saída
@@ -104,14 +110,18 @@ Exportação de metadados para DOAJ
 ---------------------------------
 
 **comando:** processing_export_doaj
+
 **escopo:** documentos
+
 **finalidade:** Envío de metadados ao DOAJ
 
 Relatório com status de periódicos do DOAJ
 ------------------------------------------
 
 **comando:** processing_export_doaj_journals
+
 **escopo:** periódicos
+
 **finalidade:** Extração de relatório de situação dos periódicos SciELO no DOAJ.
 
 Formatos de saída
@@ -127,7 +137,9 @@ Relatóeio com dados de periódicos em formato KBART
 --------------------------------------------------
 
 **comando:** processing_export_kbart
+
 **escopo:** periódicos
+
 **finalidade:** Extração de relatório de periódicos de acordo com formato KBART
 
 Formatos de saída
@@ -143,7 +155,9 @@ Gerador de chaves naturais de artigos SciELO
 --------------------------------------------
 
 **comando:** processing_export_natural_keys
+
 **escopo:** periódicos
+
 **finalidade:** Gerar chaves naturais de artigos SciELO no formato esperado pelo
 Scielo Manager, com o objetivo de testar inconsistências no metadado de registros
 do legado para minimizar impactos no momento de migração do legado para o SciELO
@@ -162,7 +176,9 @@ Relatório com Dados de afiliação dos documentos
 -----------------------------------------------
 
 **comando:** processing_export_normalize_affiliations
+
 **escopo:** documentos
+
 **finalidade:** Relatório geral de afiliações dos documentos incluindo afiliações
 normalizadas e não normalizadas. Este relatório serve de insumo para o processo
 de normalização conduzido pelos departamentos de produção da Rede SciELO.
@@ -180,7 +196,9 @@ Exportação de documentos no formato XML RSPS
 --------------------------------------------
 
 **comando:** processing_export_xmlrsps
+
 **escopo:** documentos
+
 **finalidade:** Exportar todos os documentos SciELO para o formato XML RSPS. 
 Muitos documentos do legado não conseguem produzir o XML RSPS de forma integral
 e em conformidade com a Especificação SciELO PS devido a falta de metadados,
@@ -224,7 +242,9 @@ Relatório de afiliações dos documentos
 --------------------------------------
 
 **comando:** processing_publication_affiliations
+
 **escopo:** documentos
+
 **finalidade:** Relatório com país de afiliação dos documentos, para extração
 de indicadores de publicação.
 
@@ -258,7 +278,9 @@ Relatório de contagens gerais relacionadas aos dos documentos
 -------------------------------------------------------------
 
 **comando:** processing_publication_counts
+
 **escopo:** documentos
+
 **finalidade:** Relatório com contagens de dos documentos, para extração
 de indicadores de publicação.
 
@@ -269,7 +291,51 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 Formato CSV::
 
-    *
+    * PID
+    * issn
+    * título da revista
+    * área temática
+    * ano de publicação
+    * tipo de documento
+    * total autores
+    * 0 autores
+    * 1 autor
+    * 2 autores
+    * 3 autores
+    * 4 autores
+    * 5 autores
+    * +6 autores
+    * total páginas
+    * total referências
+
+Relatório de datas do documento
+-------------------------------
+
+**comando:** processing_publication_dates
+
+**escopo:** documentos
+
+**finalidade:** Relatório com datas do documento.
+
+Formatos de saída
+`````````````````
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * PID
+    * ISSN
+    * título
+    * área temática
+    * ano de publicação
+    * tipo de documento
+    * recebido
+    * revisado
+    * aceito
+    * publicado
+    * entrada no SciELO
+    * atualização no SciELO
 
 processing_publication_dates
 processing_publication_journals
