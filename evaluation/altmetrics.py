@@ -120,7 +120,7 @@ class Dumper(object):
     def fmt_csv(self, data, altmetrics):
         article = None
         url = altmetrics.get('url', None)
-        title = altmetrics.get('title', None)
+        title = altmetrics.get('title', '').replace('\n', '')
         doi = altmetrics.get('doi', get_doi_from_url(url))
         details_url = altmetrics.get('details_url', None)
         pid = urlparse.parse_qs(urlparse.urlparse(url).query).get('pid', None) if url else None
