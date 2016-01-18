@@ -17,9 +17,11 @@ ratchet_thrift = thriftpy.load(
 articlemeta_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/articlemeta.thrift')
 
-
 citedby_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/citedby.thrift')
+
+accessstats_thrift = thriftpy.load(
+    os.path.join(os.path.dirname(__file__))+'/access_stats.thrift')
 
 publication_stats_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/publication_stats.thrift')
@@ -30,6 +32,129 @@ class ServerError(Exception):
     
     def __str__(self):
         return repr(self.message)
+
+
+class AccessStats(object):
+
+    def __init__(self, address, port):
+        """
+        Cliente thrift para o Access Stats.
+        """
+        self._address = address
+        self._port = port
+
+    @property
+    def client(self):
+
+        client = make_client(
+            accessstats_thrift.AccessStats,
+            self._address,
+            self._port
+        )
+        return client
+
+    def _compute_access_lifetime(self, query_result):
+
+        data = []
+
+        for access_year in query_result['aggregations']['access_year']['buckets']:
+            for publication_year in access_year['publication_year']['buckets']:
+                 data.append([
+                    access_year['key'],
+                    publication_year['key'],
+                    int(publication_year['access_html']['value']),
+                    int(publication_year['access_abstract']['value']),
+                    int(publication_year['access_pdf']['value']),
+                    int(publication_year['access_epdf']['value']),
+                    int(publication_year['access_total']['value'])
+                ])
+
+        return sorted(data)
+
+    def access_lifetime(self, issn, collection, raw=False):
+
+        body = {
+            "query": {
+                "bool": {
+                    "must": [{
+                            "match": {
+                                "collection": collection
+                            }
+                        },
+                        {
+                            "match": {
+                                "issn": issn
+                            }
+                        }
+                    ]
+                }
+            },
+            "size": 0,
+            "aggs": {
+                "access_year": {
+                    "terms": {
+                        "field": "access_year",
+                        "size": 2,
+                        "order": {
+                            "access_total": "desc"
+                        }
+                  },
+                  "aggs": {
+                        "access_total": {
+                            "sum": {
+                                "field": "access_total"
+                            }
+                        },
+                        "publication_year": {
+                            "terms": {
+                                "field": "publication_year",
+                                "size": 2,
+                                "order": {
+                                    "access_total": "desc"
+                                }
+                            },
+                            "aggs": {
+                                "access_total": {
+                                    "sum": {
+                                        "field": "access_total"
+                                    }
+                                },
+                                "access_abstract": {
+                                    "sum": {
+                                        "field": "access_abstract"
+                                    }
+                                },
+                                "access_epdf": {
+                                    "sum": {
+                                        "field": "access_epdf"
+                                    }
+                                },
+                                "access_html": {
+                                    "sum": {
+                                        "field": "access_html"
+                                    }
+                                },
+                                "access_pdf": {
+                                    "sum": {
+                                        "field": "access_pdf"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        query_parameters = [
+            accessstats_thrift.kwargs('size', '0')
+        ]
+
+        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        
+        computed = self._compute_access_lifetime(query_result)
+
+        return query_result if raw else computed
 
 
 class PublicationStats(object):
@@ -167,7 +292,6 @@ class Citedby(object):
 
         return data
 
-
 class Ratchet(object):
 
     def __init__(self, address, port):
@@ -192,7 +316,6 @@ class Ratchet(object):
         data = self.client.general(code=code)
 
         return data
-
 
 class ArticleMeta(object):
 

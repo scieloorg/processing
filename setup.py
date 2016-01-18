@@ -40,6 +40,7 @@ setup(
     entry_points="""
     [console_scripts]
     processing_accesses_dumpdata=accesses.dumpdata:main
+    processing_accesses_documents_by_journals=accesses.documents_by_journals:main
     processing_publication_languages=publication.languages:main
     processing_publication_affiliations=publication.affiliations:main
     processing_publication_authors=publication.authors:main

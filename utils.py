@@ -144,6 +144,17 @@ def articlemeta_server():
 
     return clients.ArticleMeta(host, port)
 
+def accessstats_server():
+    try:
+        server = settings['app:main']['accessesstats_thriftserver'].split(':')
+        host = server[0]
+        port = int(server[1])
+    except:
+        logger.warning('Error defining Access Stats thrift server, assuming default server accessstats.scielo.org:11660')
+        host = 'ratchet.scielo.org'
+        port = 11660
+
+    return clients.AccessStats(host, port)
 
 def is_valid_date(value):
 
