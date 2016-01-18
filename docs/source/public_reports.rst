@@ -77,6 +77,38 @@ Formato CSV::
 Relatórios de Documentos
 ------------------------
 
+Relatório de pontuação de documentos no altmetrics
+==================================================
+
+**nome do arquivo:** altmetrics.csv
+
+**finalidade:** Relatório geral pontuação dos documentos SciELO no Altmetrics,
+
+
+.. note::
+
+    os metadados deste relatório estão condicionados a qualidade dos metadados 
+    disponíveis no altmetrics.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * PID
+    * ISSN
+    * título
+    * área temática
+    * ano de publicação
+    * tipo de documento
+    * título do artigo
+    * doi
+    * url
+    * altmetrics url
+    * score
+
 Relatório com Dados de afiliação dos documentos
 ===============================================
 

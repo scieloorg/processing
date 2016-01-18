@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação com scores do altimetrics para documentos SciELO
 
 Formato de saída:
-"issn","título","data de publicação","título do artigo","doi","url","altmetrics url","score"
+"PID","ISSN","título","área temática","ano de publicação","tipo de documento","título do artigo","doi","url","altmetrics url","score"
 """
 
 import argparse
