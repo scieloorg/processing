@@ -270,8 +270,18 @@ class ArticleMeta(object):
             msg = 'Error retrieving document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
-        if fmt == 'xylose':
+        jarticle = None
+        try:
             jarticle = json.loads(article)
+        except:
+            msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
+            raise ServerError(msg)
+
+        if not jarticle:
+            logger.warning('Document not found for : %s_%s' % ( collection, code))
+            return None
+
+        if fmt == 'xylose':
             xarticle = Article(jarticle)
             logger.info('Document loaded: %s_%s' % ( collection, code))
             return xarticle

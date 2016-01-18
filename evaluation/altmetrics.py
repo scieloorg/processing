@@ -61,7 +61,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"issn",u"título",u"data de publicação",u"título do artigo",u"doi",u"url",u"altmetrics url",u"score"]
+        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"título do artigo",u"doi",u"url",u"altmetrics url",u"score"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -124,12 +124,22 @@ class Dumper(object):
         doi = altmetrics.get('doi', get_doi_from_url(url))
         details_url = altmetrics.get('details_url', None)
         pid = urlparse.parse_qs(urlparse.urlparse(url).query).get('pid', None) if url else None
+
+        if doi:
+            article = self._articlemeta.document(doi.upper(), self.collection)
+
         publication_date = article.publication_date if article else u'not defined'
+        publisher_id = article.publisher_id if article else u'not defined'
+        document_type = article.document_type if article else u'not defined'
+        subject_areas = ', '.join(article.journal.subject_areas if article else [u'not defined'])
         score = altmetrics.get('score', None)
         line = [
+            publisher_id,
             data.scielo_issn,
             data.title,
-            publication_date or 'not defined',
+            subject_areas,
+            publication_date,
+            document_type,
             title or 'not defined',
             doi or 'not defined',
             url or 'not defined',
@@ -137,9 +147,7 @@ class Dumper(object):
             str(score) or '0'
         ]
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
-
-        return joined_line
+        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
 
 def main():
