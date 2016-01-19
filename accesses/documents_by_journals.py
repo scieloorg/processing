@@ -56,12 +56,8 @@ class Dumper(object):
             u"issn eletrônico",
             u"título",
             u"área temática",
-            u"status atual",
-            u"ano de inclusão",
-            u"licença de uso padrão",
-            u"data de acesso",
+            u"ano de publicação",
             u"ano de acesso",
-            u"mês de acesso",
             u"acesso ao html",
             u"acesso ao abstract",
             u"acesso ao PDF",
@@ -98,15 +94,8 @@ class Dumper(object):
             data.print_issn or "",
             data.electronic_issn or "",
             data.title,
-            ','.join(data.subject_areas or []),
-            data.current_status,
-            data.creation_date[:4],
+            ','.join(data.subject_areas or [])
         ]
-
-        if data.permissions:
-            line.append(data.permissions.get('id', "") or "")
-        else:
-            line.append("")
 
         acessos = self._accessstats.access_lifetime(data.scielo_issn, self.collection)
 

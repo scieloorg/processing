@@ -57,16 +57,16 @@ class AccessStats(object):
 
         data = []
 
-        for access_year in query_result['aggregations']['access_year']['buckets']:
-            for publication_year in access_year['publication_year']['buckets']:
+        for publication_year in query_result['aggregations']['publication_year']['buckets']:
+            for access_year in publication_year['access_year']['buckets']:
                  data.append([
-                    access_year['key'],
                     publication_year['key'],
-                    int(publication_year['access_html']['value']),
-                    int(publication_year['access_abstract']['value']),
-                    int(publication_year['access_pdf']['value']),
-                    int(publication_year['access_epdf']['value']),
-                    int(publication_year['access_total']['value'])
+                    access_year['key'],
+                    int(access_year['access_html']['value']),
+                    int(access_year['access_abstract']['value']),
+                    int(access_year['access_pdf']['value']),
+                    int(access_year['access_epdf']['value']),
+                    int(access_year['access_total']['value'])
                 ])
 
         return sorted(data)
@@ -91,10 +91,10 @@ class AccessStats(object):
             },
             "size": 0,
             "aggs": {
-                "access_year": {
+                "publication_year": {
                     "terms": {
-                        "field": "access_year",
-                        "size": 2,
+                        "field": "publication_year",
+                        "size": 0,
                         "order": {
                             "access_total": "desc"
                         }
@@ -105,10 +105,10 @@ class AccessStats(object):
                                 "field": "access_total"
                             }
                         },
-                        "publication_year": {
+                        "access_year": {
                             "terms": {
-                                "field": "publication_year",
-                                "size": 2,
+                                "field": "access_year",
+                                "size": 0,
                                 "order": {
                                     "access_total": "desc"
                                 }
@@ -151,7 +151,7 @@ class AccessStats(object):
         ]
 
         query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
-        
+
         computed = self._compute_access_lifetime(query_result)
 
         return query_result if raw else computed

@@ -73,6 +73,34 @@ Formato CSV::
     * histórico ano
     * histórico status
 
+Relatório de acessos por periódico e ano de publicação dos documento
+====================================================================
+
+**nome do arquivo:** accesses_by_journals.csv
+
+**finalidade:** Relatório de acessos aos documentos nos formatos html, abstract,
+pdf e epdf por periódico e ano de publicação do documento.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * issn scielo
+    * issn impresso
+    * issn eletrônico
+    * título
+    * área temática
+    * ano de publicação
+    * ano de acesso
+    * acesso ao html
+    * acesso ao abstract
+    * acesso ao PDF
+    * acesso ao EPDF
+    * total de acessos
+
 ------------------------
 Relatórios de Documentos
 ------------------------
