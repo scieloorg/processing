@@ -3,5 +3,5 @@ packtools
 django==1.8.3
 requests==2.8.1
 -e git+https://github.com/scieloorg/xylose@0.41#egg=xylose
--e git+https://github.com/scieloorg/processing@0.1.38#egg=processing
+-e git+https://github.com/scieloorg/processing@0.1.39#egg=processing
 -e git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client
