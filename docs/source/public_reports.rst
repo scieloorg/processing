@@ -101,6 +101,35 @@ Formato CSV::
     * acesso ao EPDF
     * total de acessos
 
+Relatório de fator de impacto por periódico
+===========================================
+
+**nome do arquivo:** impact_factor.csv
+
+**finalidade:** Relatório de fator de impacto dos periódicos, com indice de 
+imediatez, fator de impacto para 1, 2, 3, 4 e 5 anos.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * issn scielo
+    * issn impresso
+    * issn eletrônico
+    * título
+    * área temática
+    * ano de publicação
+    * ano base
+    * imediatez
+    * fator de impacto 1 ano
+    * fator de impacto 2 anos
+    * fator de impacto 3 anos
+    * fator de impacto 4 anos
+    * fator de impacto 5 anos
+
 ------------------------
 Relatórios de Documentos
 ------------------------

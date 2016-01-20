@@ -1,7 +1,7 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de idiomas de publicação de cada artigo
-da coleção SciELO.
+Este processamento gera uma tabulação de citações concedidas no SciELO por
+artigos da coleção SciELO.
 Formato de saída:
 "PID","ISSN","título","área temática","ano de publicação","tipo de documento","título do documento","citado por PID","citado por ISSN","citado por título","citado por título do documento"
 """

@@ -123,6 +123,67 @@ Formato CSV::
     * altmetrics url
     * score
 
+Relatório de acessos por periódico e ano de publicação dos documento
+====================================================================
+
+**comando:** processing_accesses_journals_by_publication_year
+
+**escopo:** periódicos
+
+**finalidade:** Relatório de acessos aos documentos nos formatos html, abstract,
+pdf e epdf por periódico e ano de publicação do documento.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * issn scielo
+    * issn impresso
+    * issn eletrônico
+    * título
+    * área temática
+    * ano de publicação
+    * ano de acesso
+    * acesso ao html
+    * acesso ao abstract
+    * acesso ao PDF
+    * acesso ao EPDF
+    * total de acessos
+
+Relatório de fator de impacto por periódico
+===========================================
+
+**comando:** processing_bibliometrics_impact_factor
+
+**escopo:** periódicos
+
+**finalidade:** Relatório de fator de impacto dos periódicos, com indice de 
+imediatez, fator de impacto para 1, 2, 3, 4 e 5 anos.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * issn scielo
+    * issn impresso
+    * issn eletrônico
+    * título
+    * área temática
+    * ano de publicação
+    * ano base
+    * imediatez
+    * fator de impacto 1 ano
+    * fator de impacto 2 anos
+    * fator de impacto 3 anos
+    * fator de impacto 4 anos
+    * fator de impacto 5 anos
+
 Exportação de metadados para DOAJ
 ---------------------------------
 

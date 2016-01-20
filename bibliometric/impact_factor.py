@@ -1,10 +1,9 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de acessos por periódico, ano de publicação e ano de
-acesso para o texto completo em HTML, resumo em HTML, PDF e EPDF. 
+Este processamento gera uma tabulação de fator de impacto dos periódicos SciELO. 
 
 Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","status","ano de inclusão","licença de uso padrão","data de acesso","ano de acesso","mês de acesso","acesso ao html","acesso ao abstract","acesso ao PDF","acesso ao EPDF","total de acessos"
+"issn scielo","issn impresso","issn eletrônico","título","área temática","ano de publicação","ano base","imediatez","fator de impacto 1 ano","fator de impacto 2 anos","fator de impacto 3 anos","fator de impacto 4 anos","fator de impacto 5 anos"
 """
 
 import argparse
@@ -12,6 +11,7 @@ import logging
 import codecs
 
 import utils
+from analytics.client import Analytics
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
         self._articlemeta = utils.articlemeta_server()
-        self._accessstats = utils.accessstats_server()
+        self._analytics = Analytics()
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
@@ -57,12 +57,13 @@ class Dumper(object):
             u"título",
             u"área temática",
             u"ano de publicação",
-            u"ano de acesso",
-            u"acesso ao html",
-            u"acesso ao abstract",
-            u"acesso ao PDF",
-            u"acesso ao EPDF",
-            u"total de acessos"
+            u"ano base",
+            u"imediatez",
+            u"fator de impacto 1 ano",
+            u"fator de impacto 2 anos",
+            u"fator de impacto 3 anos",
+            u"fator de impacto 4 anos",
+            u"fator de impacto 5 anos",
         ]
         self.write(','.join(header))
 
@@ -97,9 +98,9 @@ class Dumper(object):
             ','.join(data.subject_areas or [])
         ]
 
-        acessos = self._accessstats.access_lifetime(data.scielo_issn, self.collection)
+        impact_factor = self._analytics.impact_factor(data.scielo_issn, self.collection)
 
-        for item in acessos:
+        for item in impact_factor or []:
             l = None
             l = line + [str(i) for i in item]
             joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in l])
