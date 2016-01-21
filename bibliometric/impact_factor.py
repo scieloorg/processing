@@ -56,7 +56,6 @@ class Dumper(object):
             u"issn eletrônico",
             u"título",
             u"área temática",
-            u"ano de publicação",
             u"ano base",
             u"imediatez",
             u"fator de impacto 1 ano",
