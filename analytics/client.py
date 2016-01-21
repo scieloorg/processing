@@ -30,13 +30,13 @@ class Analytics(object):
         
         return result
 
-    def impact_factor(self, code, collection):
+    def impact_factor(self, issn, collection):
         endpoint = '/ajx/bibliometrics/journal/impact_factor_chart'
 
         url = self.source + endpoint
 
         payload = {
-            "code":  code,
+            "journal":  issn,
             "collection":  collection
         }
 
