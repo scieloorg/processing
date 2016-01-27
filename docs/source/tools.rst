@@ -184,6 +184,34 @@ Formato CSV::
     * fator de impacto 4 anos
     * fator de impacto 5 anos
 
+Relatório de periódicos em formato Kbart
+========================================
+
+**comando:** processing_export_kbart
+
+**escopo:** periódicos
+
+**finalidade:** Relatório de periódicos no formato Kbart.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+Formato CSV::
+
+    * Título do Periódico
+    * ISSN impresso
+    * ISSN online
+    * Data do primeiro número
+    * volume
+    * número
+    * Data do último número publicado
+    * volume
+    * número
+    * url issues
+    * ID SciELO
+
 Exportação de metadados para DOAJ
 ---------------------------------
 
