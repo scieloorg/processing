@@ -176,6 +176,13 @@ class PublicationStats(object):
 
         return client
 
+    def _compute_first_included_document_by_journal(self, query_result):
+
+        if len(query_result.get('hits', {'hits': []}).get('hits', [])) == 0:
+            return None
+
+        return query_result['hits']['hits'][0].get('_source', None)
+
     def first_included_document_by_journal(self, issn, collection):
 
         body = {
@@ -196,17 +203,12 @@ class PublicationStats(object):
                                 }
                             ]
                         }
-                    },
-                    "filter": {
-                        "exists": {
-                            "field": "processing_date"
-                        }
                     }
                 }
             },
             "sort": [
                 {
-                    "processing_date": {
+                    "publication_date": {
                         "order": "asc"
                     }
                 }
@@ -219,8 +221,15 @@ class PublicationStats(object):
 
         query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
 
-        return query_result
+        return self._compute_first_included_document_by_journal(query_result)
 
+
+    def _compute_last_included_document_by_journal(self, query_result):
+
+        if len(query_result.get('hits', {'hits': []}).get('hits', [])) == 0:
+            return None
+
+        return query_result['hits']['hits'][0].get('_source', None)
 
     def last_included_document_by_journal(self, issn, collection, metaonly=False):
 
@@ -245,14 +254,14 @@ class PublicationStats(object):
                     },
                     "filter": {
                         "exists": {
-                            "field": "processing_date"
+                            "field": "publication_date"
                         }
                     }
                 }
             },
             "sort": [
                 {
-                    "processing_date": {
+                    "publication_date": {
                         "order": "desc"
                     }
                 }
@@ -265,7 +274,7 @@ class PublicationStats(object):
 
         query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
 
-        return query_result
+        return self._compute_last_included_document_by_journal(query_result)
 
 class Citedby(object):
 

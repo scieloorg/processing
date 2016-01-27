@@ -1,10 +1,246 @@
 # coding: utf-8
 import unittest
 
-from utils import accessstats_server
+from utils import accessstats_server, publicationstats_server
 
 
 class ThirftClientsTest(unittest.TestCase):
+
+    def test_compute_last_included_document_by_journal_without_data(self):
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [],
+                "total": 0,
+                "max_score": None
+            },
+            "took": 4,
+            "timed_out": False,
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = None
+
+        result = publicationtats._compute_last_included_document_by_journal(query_result)
+
+        self.assertEqual(expected, result)
+
+    def test_compute_first_included_document_by_journal(self):
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [
+                    {
+                        "sort": [
+                            "2003"
+                        ],
+                        "_type": "article",
+                        "_index": "publication",
+                        "_score": None,
+                        "_source": {
+                            "pid": "S1678-53202003000100002",
+                            "creation_date": "2011",
+                            "id": "scl_S1678-53202003000100002",
+                            "creation_year": "2011",
+                            "languages": [
+                                "pt"
+                            ],
+                            "citations": 0,
+                            "issue": "scl_S1678-532020030001",
+                            "doi_prefix": "10.1590",
+                            "journal_title": "ARS (S\u00e3o Paulo)",
+                            "collection": "scl",
+                            "authors": 1,
+                            "publication_date": "2003",
+                            "document_type": "research-article",
+                            "pages": 1,
+                            "processing_date": "2011",
+                            "doi": "10.1590/S1678-53202003000100002",
+                            "license": "by-nc/4.0",
+                            "processing_year": "2011",
+                            "subject_areas": [
+                                "Linguistics, Letters and Arts"
+                            ],
+                            "issn": "1678-5320",
+                            "publication_year": "2003",
+                            "aff_countries": [
+                                "undefined"
+                            ]
+                        },
+                        "_id": "scl_S1678-53202003000100002"
+                    }
+                ],
+                "total": 220,
+                "max_score": None
+            },
+            "took": 94,
+            "timed_out": False,
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = {
+            "pid": "S1678-53202003000100002",
+            "creation_date": "2011",
+            "id": "scl_S1678-53202003000100002",
+            "creation_year": "2011",
+            "languages": [
+                "pt"
+            ],
+            "citations": 0,
+            "issue": "scl_S1678-532020030001",
+            "doi_prefix": "10.1590",
+            "journal_title": "ARS (S\u00e3o Paulo)",
+            "collection": "scl",
+            "authors": 1,
+            "publication_date": "2003",
+            "document_type": "research-article",
+            "pages": 1,
+            "processing_date": "2011",
+            "doi": "10.1590/S1678-53202003000100002",
+            "license": "by-nc/4.0",
+            "processing_year": "2011",
+            "subject_areas": [
+                "Linguistics, Letters and Arts"
+            ],
+            "issn": "1678-5320",
+            "publication_year": "2003",
+            "aff_countries": [
+                "undefined"
+            ]
+        }
+
+        result = publicationtats._compute_last_included_document_by_journal(query_result)
+
+        self.assertEqual(expected, result)
+
+    def test_compute_first_included_document_by_journal_without_data(self):
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [],
+                "total": 0,
+                "max_score": None
+            },
+            "took": 4,
+            "timed_out": False,
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = None
+
+        result = publicationtats._compute_first_included_document_by_journal(query_result)
+
+        self.assertEqual(expected, result)
+
+
+    def test_compute_first_included_document_by_journal(self):
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [
+                    {
+                        "sort": [
+                            "2003"
+                        ],
+                        "_type": "article",
+                        "_index": "publication",
+                        "_score": None,
+                        "_source": {
+                            "pid": "S1678-53202003000100002",
+                            "creation_date": "2011",
+                            "id": "scl_S1678-53202003000100002",
+                            "creation_year": "2011",
+                            "languages": [
+                                "pt"
+                            ],
+                            "citations": 0,
+                            "issue": "scl_S1678-532020030001",
+                            "doi_prefix": "10.1590",
+                            "journal_title": "ARS (S\u00e3o Paulo)",
+                            "collection": "scl",
+                            "authors": 1,
+                            "publication_date": "2003",
+                            "document_type": "research-article",
+                            "pages": 1,
+                            "processing_date": "2011",
+                            "doi": "10.1590/S1678-53202003000100002",
+                            "license": "by-nc/4.0",
+                            "processing_year": "2011",
+                            "subject_areas": [
+                                "Linguistics, Letters and Arts"
+                            ],
+                            "issn": "1678-5320",
+                            "publication_year": "2003",
+                            "aff_countries": [
+                                "undefined"
+                            ]
+                        },
+                        "_id": "scl_S1678-53202003000100002"
+                    }
+                ],
+                "total": 220,
+                "max_score": None
+            },
+            "took": 94,
+            "timed_out": False,
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = {
+            "pid": "S1678-53202003000100002",
+            "creation_date": "2011",
+            "id": "scl_S1678-53202003000100002",
+            "creation_year": "2011",
+            "languages": [
+                "pt"
+            ],
+            "citations": 0,
+            "issue": "scl_S1678-532020030001",
+            "doi_prefix": "10.1590",
+            "journal_title": "ARS (S\u00e3o Paulo)",
+            "collection": "scl",
+            "authors": 1,
+            "publication_date": "2003",
+            "document_type": "research-article",
+            "pages": 1,
+            "processing_date": "2011",
+            "doi": "10.1590/S1678-53202003000100002",
+            "license": "by-nc/4.0",
+            "processing_year": "2011",
+            "subject_areas": [
+                "Linguistics, Letters and Arts"
+            ],
+            "issn": "1678-5320",
+            "publication_year": "2003",
+            "aff_countries": [
+                "undefined"
+            ]
+        }
+
+        result = publicationtats._compute_first_included_document_by_journal(query_result)
+
+        self.assertEqual(expected, result)
+
 
     def test_compute_access_lifetime(self):
 
