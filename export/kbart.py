@@ -107,9 +107,12 @@ class Dumper(object):
         line.append(first_document.publication_date or '' if first_document else '')
         line.append(first_document.volume or '' if first_document else '')
         line.append(first_document.issue or '' if first_document else '')
-        line.append(last_document.publication_date or '' if last_document else '')
-        line.append(last_document.volume or '' if last_document else '')
-        line.append(last_document.issue or '' if last_document else '')
+        if data.current_status != 'current':
+            line.append(last_document.publication_date or '' if last_document else '')
+            line.append(last_document.volume or '' if last_document else '')
+            line.append(last_document.issue or '' if last_document else '')
+        else:
+            line += ['', '', '']
         line.append(data.url().replace('sci_serial', 'sci_issues'))
         line.append(data.scielo_issn or '')
 
