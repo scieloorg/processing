@@ -39,6 +39,7 @@ Formato CSV::
     * áreas temáticas WOS
     * situação atual
     * ano de inclusão
+    * data de inclusão
     * licença de uso padrão
 
 Relatório de histórico de mudanças de status dos periódicos
@@ -145,17 +146,31 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 Formato CSV::
 
-    * Título do Periódico
-    * ISSN impresso
-    * ISSN online
-    * Data do primeiro número
-    * volume
-    * número
-    * Data do último número publicado
-    * volume
-    * número
-    * url issues
-    * ID SciELO
+    * Título do Periódico (publication_title)
+    * ISSN impresso (print_identifier)
+    * ISSN online (online_identifier)
+    * Data do primeiro fascículo (date_first_issue_online)
+    * volume do primeiro fascículo (num_first_vol_online)
+    * número do primeiro fascículo (num_first_issue_online)
+    * Data do último fascículo publicado (date_last_issue_online)
+    * volume do último fascículo publicado (num_last_vol_online)
+    * número do último fascículo publicado (num_last_issue_online)
+    * url de fascículos (title_url)
+    * primeiro autor (first_author)
+    * ID do periódico no SciELO (title_id)
+    * informação de embargo (embargo_info)
+    * cobertura (coverage_depth)
+    * informação sobre cobertura (coverage_notes)
+    * nome do publicador (publisher_name)
+    * tipo de publicação (publication_type)
+    * data de publicação monográfica impressa (date_monograph_published_print)
+    * data de publicação monográfica online (date_monograph_published_online)
+    * volume de monografia (monograph_volume)
+    * edição de monografia (monograph_edition)
+    * primeiro editor (first_editor)
+    * ID de publicação pai (parent_publication_title_id)
+    * ID de publicação prévia (preceding_publication_title_id)
+    * tipo de acesso (access_type)
 
 ------------------------
 Relatórios de Documentos

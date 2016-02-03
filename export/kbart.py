@@ -50,7 +50,34 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"Título do Periódico",u"ISSN impresso",u"ISSN online",u"Data do primeiro número",u"volume",u"número",u"Data do último número publicado",u"volume",u"número",u"url issues",u"ID SciELO"]
+        header = [
+            u"Título do Periódico (publication_title)",
+            u"ISSN impresso (print_identifier)",
+            u"ISSN online (online_identifier)",
+            u"Data do primeiro fascículo (date_first_issue_online)",
+            u"volume do primeiro fascículo (num_first_vol_online)",
+            u"número do primeiro fascículo (num_first_issue_online)",
+            u"Data do último fascículo publicado (date_last_issue_online)",
+            u"volume do último fascículo publicado (num_last_vol_online)",
+            u"número do último fascículo publicado (num_last_issue_online)",
+            u"url de fascículos (title_url)",
+            u"primeiro autor (first_author)",
+            u"ID do periódico no SciELO (title_id)",
+            u"informação de embargo (embargo_info)",
+            u"cobertura (coverage_depth)",
+            u"informação sobre cobertura (coverage_notes)",
+            u"nome do publicador (publisher_name)",
+            u"tipo de publicação (publication_type)",
+            u"data de publicação monográfica impressa (date_monograph_published_print)",
+            u"data de publicação monográfica online (date_monograph_published_online)",
+            u"volume de monografia (monograph_volume)",
+            u"edição de monografia (monograph_edition)",
+            u"primeiro editor (first_editor)",
+            u"ID de publicação pai (parent_publication_title_id)",
+            u"ID de publicação prévia (preceding_publication_title_id)",
+            u"tipo de acesso (access_type)"
+
+        ]
         self.write(','.join(header))
 
 
@@ -114,7 +141,21 @@ class Dumper(object):
         else:
             line += ['', '', '']
         line.append(data.url().replace('sci_serial', 'sci_issues'))
+        line.append('') # first_author
         line.append(data.scielo_issn or '')
+        line.append('') # embargo_info
+        line.append('') # coverage_depth
+        line.append('') # coverage_notes
+        line.append(data.publisher_name if data.publisher_name else '') # publisher_name
+        line.append('Serial') # publication_type
+        line.append('') # date_monograph_published_print
+        line.append('') # date_monograph_published_online
+        line.append('') # monograph_volume
+        line.append('') # monograph_edition
+        line.append('') # first_editor
+        line.append('') # parent_publication_title_id
+        line.append('') # preceding_publication_title_id
+        line.append('F') # access_type
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
