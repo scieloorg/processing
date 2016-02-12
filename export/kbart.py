@@ -13,6 +13,7 @@ import utils
 
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -79,7 +80,6 @@ class Dumper(object):
 
         ]
         self.write(','.join(header))
-
 
     def _first_included_document_by_journal(self, issn, collection):
 

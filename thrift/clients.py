@@ -26,10 +26,11 @@ accessstats_thrift = thriftpy.load(
 publication_stats_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/publication_stats.thrift')
 
+
 class ServerError(Exception):
     def __init__(self, message=None):
         self.message = message or 'thirftclient: ServerError'
-    
+
     def __str__(self):
         return repr(self.message)
 
@@ -59,7 +60,7 @@ class AccessStats(object):
 
         for publication_year in query_result['aggregations']['publication_year']['buckets']:
             for access_year in publication_year['access_year']['buckets']:
-                 data.append([
+                data.append([
                     publication_year['key'],
                     access_year['key'],
                     int(access_year['access_html']['value']),
@@ -176,6 +177,44 @@ class PublicationStats(object):
 
         return client
 
+    def _compute_number_of_issues_by_year(self, query_result):
+
+        return query_result.get('aggregations', {}).get('issue', {}).get('value', 0)
+
+    def number_of_issues_by_year(self, issn, year=None):
+
+        body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "issn": issn
+                            }
+                        }
+                    ]
+                }
+            },
+            "aggs": {
+                "issue": {
+                    "cardinality": {
+                        "field": "issue"
+                    }
+                }
+            }
+        }
+
+        if year:
+            body['query']['bool']['must'].append({'match': {'publication_year': year}})
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '1')
+        ]
+
+        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+
+        return self._compute_number_of_issues_by_year(query_result)
+
     def _compute_first_included_document_by_journal(self, query_result):
 
         if len(query_result.get('hits', {'hits': []}).get('hits', [])) == 0:
@@ -222,7 +261,6 @@ class PublicationStats(object):
         query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
 
         return self._compute_first_included_document_by_journal(query_result)
-
 
     def _compute_last_included_document_by_journal(self, query_result):
 

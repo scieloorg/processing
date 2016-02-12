@@ -15,6 +15,7 @@ import utils
 
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -45,14 +46,19 @@ def _config_logging(logging_level='INFO', logging_file=None):
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
-
-        self._ratchet = utils.ratchet_server()
         self._articlemeta = utils.articlemeta_server()
+        self._publicationstats = utils.publicationstats_server()
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"issn scielo",u"issn impresso",u"issn eletrônico",u"nome do publicador",u"título",u"título abreviado",u"título nlm",u"periodicidade",u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão"]
+        header = [u"issn scielo", u"issn impresso", u"issn eletrônico", u"nome do publicador", u"título", u"título e subtitulo", u"título abreviado", u"título abreviado sob norma ISO", u"título nlm",u"periodicidade descritiva", u"periodicidade numérica", u"área temática",u"bases WOS",u"áreas temáticas WOS",u"situação atual",u"ano de inclusão",u"licença de uso padrão", u"issues todos os anos", u"issues ano anterior", u"issues ano corrente"]
         self.write(','.join(header))
+
+    def _number_of_issues_by_year(self, issn, year=None):
+
+        issues = self._publicationstats.number_of_issues_by_year(issn, year)
+
+        return issues
 
     def write(self, line):
         if not self.output_file:
@@ -73,7 +79,7 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
                 yield self.fmt_csv(data)
-        
+
     def fmt_csv(self, data):
 
         line = [
@@ -82,20 +88,27 @@ class Dumper(object):
             data.electronic_issn or "",
             data.publisher_name or "",
             data.title,
+            data.fulltitle,
             data.abbreviated_title or "",
+            data.abbreviated_iso_title or "",
             data.title_nlm or "",
             data.periodicity or "",
+            data.periodicity_in_months or "",
             ','.join(data.subject_areas or []),
             ','.join(data.wos_citation_indexes or []),
             ','.join(data.wos_subject_areas or []),
             data.current_status,
-            data.creation_date[:4],
+            data.creation_date[:4]
         ]
 
         if data.permissions:
             line.append(data.permissions.get('id', "") or "")
         else:
             line.append("")
+
+        line.append(str(self._number_of_issues_by_year(data.scielo_issn)))
+        line.append(str(self._number_of_issues_by_year(data.scielo_issn, '2015')))
+        line.append(str(self._number_of_issues_by_year(data.scielo_issn, '2016')))
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
