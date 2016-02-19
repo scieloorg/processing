@@ -3,6 +3,7 @@ import os
 import thriftpy
 import json
 import logging
+from datetime import date
 
 from thriftpy.rpc import make_client
 from xylose.scielodocument import Article, Journal
@@ -26,10 +27,11 @@ accessstats_thrift = thriftpy.load(
 publication_stats_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/publication_stats.thrift')
 
+
 class ServerError(Exception):
     def __init__(self, message=None):
         self.message = message or 'thirftclient: ServerError'
-    
+
     def __str__(self):
         return repr(self.message)
 
@@ -59,7 +61,7 @@ class AccessStats(object):
 
         for publication_year in query_result['aggregations']['publication_year']['buckets']:
             for access_year in publication_year['access_year']['buckets']:
-                 data.append([
+                data.append([
                     publication_year['key'],
                     access_year['key'],
                     int(access_year['access_html']['value']),
@@ -176,6 +178,250 @@ class PublicationStats(object):
 
         return client
 
+    def _compute_documents_languages_by_year(self, query_result, years=0):
+
+        year = date.today().year
+
+        years = {str(i): {'pt': 0, 'en': 0, 'es': 0, 'other': 0} for i in range(year, year-years, -1)}
+
+        for item in query_result['aggregations']['publication_year']['buckets']:
+            if not item['key'] in years:
+                continue
+
+            langs = {'pt': 0, 'en': 0, 'es': 0, 'other': 0}
+
+            for language in item['languages']['buckets']:
+                if language['key'] in langs:
+                    langs[language['key']] += language['doc_count']
+                else:
+                    langs['other'] += language['doc_count']
+
+            years[item['key']] = langs
+
+        return years
+
+    def documents_languages_by_year(self, issn, collection, years=0):
+
+        body = {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "issn": issn
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "collection": collection
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "aggs": {
+                "publication_year": {
+                    "terms": {
+                        "field": "publication_year",
+                        "size": years,
+                        "order": {
+                            "_term": "desc"
+                        }
+                    },
+                    "aggs": {
+                        "languages": {
+                            "terms": {
+                                "field": "languages",
+                                "size": 0
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '0')
+        ]
+
+        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+
+        return self._compute_documents_languages_by_year(query_result, years=years)
+
+    def _compute_number_of_articles_by_year(self, query_result, years=0):
+
+        if years == 0:
+            return query_result['aggregations']['id']['value']
+
+        year = date.today().year
+
+        years = {str(i): 0 for i in range(year, year-years, -1)}
+
+        for item in query_result['aggregations']['publication_year']['buckets']:
+            if not item['key'] in years:
+                continue
+
+            years[item['key']] = item.get('id', {}).get('value', 0)
+
+        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+
+    def number_of_articles_by_year(self, issn, collection, document_types=None, years=0):
+
+        body = {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "issn": issn
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "collection": collection
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "aggs": {
+                "id": {
+                    "cardinality": {
+                        "field": "id"
+                    }
+                }
+            }
+        }
+
+        if document_types:
+
+            body['query']['filtered']['filter'] = {
+                "query": {
+                    "bool": {
+                        "should": []
+                    }
+                }
+            }
+
+            for item in document_types:
+
+                body['query']['filtered']['filter']['query']['bool']['should'].append({
+                    "match": {
+                        "document_type": item
+                    }
+                })
+
+        if years != 0:
+            body['aggs'] = {
+                "publication_year": {
+                    "terms": {
+                        "field": "publication_year",
+                        "size": years,
+                        "order": {
+                            "_term": 'desc'
+                        }
+                    },
+                    "aggs": {
+                        "id": {
+                            "cardinality": {
+                                "field": "id"
+                            }
+                        }
+                    }
+                }
+            }
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '0')
+        ]
+
+        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+
+        return self._compute_number_of_articles_by_year(query_result, years=years)
+
+    def _compute_number_of_issues_by_year(self, query_result, years=0):
+
+        if years == 0:
+            return query_result['aggregations']['issue']['value']
+
+        year = date.today().year
+
+        years = {str(i): 0 for i in range(year, year-years, -1)}
+
+        for item in query_result['aggregations']['publication_year']['buckets']:
+            if not item['key'] in years:
+                continue
+            years[item['key']] = item.get('issue', {}).get('value', 0)
+
+        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+
+    def number_of_issues_by_year(self, issn, collection, years=0):
+
+        body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "issn": issn
+                            }
+                        },
+                        {
+                            "match": {
+                                "collection": collection
+                            }
+                        }
+                    ]
+                }
+            },
+            "aggs": {
+                "issue": {
+                    "cardinality": {
+                        "field": "issue"
+                    }
+                }
+            }
+
+        }
+
+        if years != 0:
+            body['aggs'] = {
+                "publication_year": {
+                    "terms": {
+                        "field": "publication_year",
+                        "size": years,
+                        "order": {
+                            "_term": 'desc'
+                        }
+                    },
+                    "aggs": {
+                        "issue": {
+                            "cardinality": {
+                                "field": "issue"
+                            }
+                        }
+                    }
+                }
+            }
+
+        query_parameters = [
+            publication_stats_thrift.kwargs('size', '0')
+        ]
+
+        query_result = json.loads(self.client.search(
+            'article', json.dumps(body), query_parameters))
+
+        return self._compute_number_of_issues_by_year(
+            query_result, years=years)
+
     def _compute_first_included_document_by_journal(self, query_result):
 
         if len(query_result.get('hits', {'hits': []}).get('hits', [])) == 0:
@@ -222,7 +468,6 @@ class PublicationStats(object):
         query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
 
         return self._compute_first_included_document_by_journal(query_result)
-
 
     def _compute_last_included_document_by_journal(self, query_result):
 

@@ -6,6 +6,199 @@ from utils import accessstats_server, publicationstats_server
 
 class ThirftClientsTest(unittest.TestCase):
 
+    def test_compute_documents_languages_by_year(self):
+
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [],
+                "total": 19,
+                "max_score": 0.0
+            },
+            "timed_out": False,
+            "took": 3,
+            "aggregations": {
+                "publication_year": {
+                    "buckets": [
+                        {
+                            "languages": {
+                                "buckets": [
+                                    {
+                                        "key": "pt",
+                                        "doc_count": 9
+                                    },
+                                    {
+                                        "key": "en",
+                                        "doc_count": 8
+                                    },
+                                    {
+                                        "key": "fr",
+                                        "doc_count": 1
+                                    }
+                                ],
+                                "doc_count_error_upper_bound": 0,
+                                "sum_other_doc_count": 0
+                            },
+                            "key": "2016",
+                            "doc_count": 9
+                        },
+                        {
+                            "languages": {
+                                "buckets": [
+                                    {
+                                        "key": "pt",
+                                        "doc_count": 10
+                                    },
+                                    {
+                                        "key": "en",
+                                        "doc_count": 8
+                                    },
+                                    {
+                                        "key": "fr",
+                                        "doc_count": 2
+                                    }
+                                ],
+                                "doc_count_error_upper_bound": 0,
+                                "sum_other_doc_count": 0
+                            },
+                            "key": "2015",
+                            "doc_count": 10
+                        }
+                    ],
+                    "doc_count_error_upper_bound": 0,
+                    "sum_other_doc_count": 0
+                }
+            },
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = {
+            "2015": {
+                "other": 2,
+                "en": 8,
+                "es": 0,
+                "pt": 10
+            },
+            "2014": {
+                "other": 0,
+                "en": 0,
+                "es": 0,
+                "pt": 0
+            },
+            "2016": {
+                "other": 1,
+                "en": 8,
+                "es": 0,
+                "pt": 9
+            },
+            "2013": {
+                "other": 0,
+                "en": 0,
+                "es": 0,
+                "pt": 0
+            },
+            "2012": {
+                "other": 0,
+                "en": 0,
+                "es": 0,
+                "pt": 0
+            }
+        }
+
+        result = publicationtats._compute_documents_languages_by_year(
+            query_result, years=5)
+
+        self.assertEqual(expected, result)
+
+    def test_compute_compute_number_of_issues_by_year_0(self):
+
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "took": 18,
+            "timed_out": False,
+            "_shards": {
+                "total": 5,
+                "successful": 5,
+                "failed": 0
+            },
+            "hits": {
+                "total": 821,
+                "max_score": 0,
+                "hits": []
+            },
+            "aggregations": {
+                "issue": {
+                    "value": 82
+                }
+            }
+        }
+
+        expected = 82
+
+        result = publicationtats._compute_number_of_issues_by_year(
+            query_result, years=0)
+
+        self.assertEqual(expected, result)
+
+    def test_compute_compute_number_of_issues_by_year(self):
+
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [],
+                "total": 19,
+                "max_score": 0.0
+            },
+            "timed_out": False,
+            "took": 826,
+            "aggregations": {
+                "publication_year": {
+                    "buckets": [
+                        {
+                            "issue": {
+                                "value": 1
+                            },
+                            "key": "2016",
+                            "doc_count": 9
+                        },
+                        {
+                            "issue": {
+                                "value": 2
+                            },
+                            "key": "2015",
+                            "doc_count": 20
+                        }
+                    ],
+                    "doc_count_error_upper_bound": 0,
+                    "sum_other_doc_count": 0
+                }
+            },
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = [
+            ('2016', 1),
+            ('2015', 2),
+            ('2014', 0),
+            ('2013', 0),
+            ('2012', 0)
+        ]
+
+        result = publicationtats._compute_number_of_issues_by_year(query_result, years=5)
+
+        self.assertEqual(expected, result)
+
     def test_compute_last_included_document_by_journal_without_data(self):
         publicationtats = publicationstats_server()
 
