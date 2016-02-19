@@ -51,7 +51,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"issn scielo", u"issn impresso", u"issn eletrônico", u"nome do publicador", u"título", u"título abreviado", u"título nlm", u"área temática", u"bases WOS", u"áreas temáticas WOS", u"situação atual", u"ano de inclusão", u"licença de uso padrão", u"histórico data", u"histórico ano", u"histórico status"]
+        header = [u"issn scielo", u"issn impresso", u"issn eletrônico", u"nome do publicador", u"título", u"título abreviado", u"título nlm", u"área temática", u"bases WOS", u"áreas temáticas WOS", u"situação atual", u"ano de inclusão", u"licença de uso padrão", u"histórico data", u"histórico ano", u"histórico status", "histório motivo"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -77,7 +77,7 @@ class Dumper(object):
 
     def fmt_csv(self, data, history):
 
-        hist, status = history
+        hist, status, reason = history
 
         line = [
             data.scielo_issn,
@@ -102,7 +102,8 @@ class Dumper(object):
         line += [
             hist,
             hist[0:4],
-            status
+            status,
+            reason
         ]
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
