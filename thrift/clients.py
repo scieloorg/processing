@@ -634,7 +634,6 @@ class ArticleMeta(object):
             msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
-
     def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
         try:
             article = self.client.get_article(
@@ -647,25 +646,25 @@ class ArticleMeta(object):
             msg = 'Error retrieving document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
-        jarticle = None
-        try:
-            jarticle = json.loads(article)
-        except:
-            msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
-            raise ServerError(msg)
-
-        if not jarticle:
-            logger.warning('Document not found for : %s_%s' % ( collection, code))
-            return None
-
         if fmt == 'xylose':
+            jarticle = None
+            try:
+                jarticle = json.loads(article)
+            except:
+                msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
+                raise ServerError(msg)
+
+            if not jarticle:
+                logger.warning('Document not found for : %s_%s' % ( collection, code))
+                return None
+
             xarticle = Article(jarticle)
             logger.info('Document loaded: %s_%s' % ( collection, code))
-            return xarticle
-        else:
-            logger.info('Document loaded: %s_%s' % ( collection, code))
-            return article
 
+            return xarticle
+
+        logger.info('Document loaded: %s_%s' % ( collection, code))
+        return article
 
     def documents(self, collection=None, issn=None, from_date=None,
         until_date=None, fmt='xylose'):
