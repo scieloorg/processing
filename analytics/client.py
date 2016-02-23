@@ -1,9 +1,15 @@
 # coding: utf-8
+"""
+Client for the analytics.scielo.org.
+
+This client connects to ajx interfaces to collect impact-factor indicadors.
+"""
 import logging
 
 import requests
 
 logger = logging.getLogger(__name__)
+
 
 class Analytics(object):
 
@@ -19,15 +25,15 @@ class Analytics(object):
         for index in range(len(categories)):
             line = [
                 categories[index],
-                series[0]['data'][index], # imediatez
-                series[1]['data'][index], # 1 ano
-                series[2]['data'][index], # 2 anos
-                series[3]['data'][index], # 3 anos
-                series[4]['data'][index], # 4 anos
-                series[5]['data'][index]  # 5 anos
+                series[0]['data'][index],  # imediatez
+                series[1]['data'][index],  # 1 ano
+                series[2]['data'][index],  # 2 anos
+                series[3]['data'][index],  # 3 anos
+                series[4]['data'][index],  # 4 anos
+                series[5]['data'][index]   # 5 anos
             ]
             result.append(line)
-        
+
         return result
 
     def impact_factor(self, issn, collection):

@@ -57,6 +57,7 @@ setup(
     processing_export_doaj=export.exdoaj:main
     processing_export_doaj_journals=export.doaj_journals:main
     processing_export_kbart=export.kbart:main
+    processing_export_search_update_citations=export.search_update_citations:main
     processing_bibliometric_citedby=bibliometric.citedby:main
     processing_bibliometric_impact_factor=bibliometric.impact_factor:main
     """

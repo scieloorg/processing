@@ -521,6 +521,7 @@ class PublicationStats(object):
 
         return self._compute_last_included_document_by_journal(query_result)
 
+
 class Citedby(object):
 
     def __init__(self, address, port):
@@ -541,10 +542,25 @@ class Citedby(object):
         return client
 
     def citedby_pid(self, code, metaonly=False):
+        """
+        Metodo que faz a interface com o metodo de mesmo nome na interface
+        thrift, atribuindo metaonly default como FALSE.
+        """
 
         data = self.client.citedby_pid(code, metaonly)
 
         return data
+
+    def citedby_meta(self, title, author_surname, year, metaonly=False):
+        """
+        Metodo que faz a interface com o metodo de mesmo nome na interface
+        thrift, atribuindo metaonly default como FALSE.
+        """
+
+        data = self.client.citedby_meta(title, author_surname, year, metaonly)
+
+        return data
+
 
 class Ratchet(object):
 
@@ -570,6 +586,7 @@ class Ratchet(object):
         data = self.client.general(code=code)
 
         return data
+
 
 class ArticleMeta(object):
 
@@ -692,4 +709,4 @@ class ArticleMeta(object):
 
     def collections(self):
         
-        return [i for i in self._client.get_collection_identifiers()]
+        return [i for i in self.client.get_collection_identifiers()]

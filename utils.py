@@ -19,9 +19,11 @@ logger = logging.getLogger(__name__)
 
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 
+
 def call_django_slugify(value):
 
     return slugify(value)
+
 
 class SingletonMixin(object):
     """
