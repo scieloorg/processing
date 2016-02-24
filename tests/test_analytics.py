@@ -1,7 +1,7 @@
 # coding: utf-8
 import unittest
 
-from analytics.client import Analytics
+from clients.analytics import Analytics
 
 
 class AnalyticsClientTest(unittest.TestCase):

@@ -14,7 +14,7 @@ from datetime import date
 
 import utils
 
-from analytics.client import Analytics
+from clients.analytics import Analytics
 
 logger = logging.getLogger(__name__)
 
@@ -227,7 +227,6 @@ class Dumper(object):
                 yield self.fmt_csv(data)
 
     def fmt_csv(self, data):
-
         first_document = self._first_included_document_by_journal(
             data.scielo_issn, data.collection_acronym)
         last_document = self._last_included_document_by_journal(

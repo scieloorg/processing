@@ -9,6 +9,7 @@ import json
 
 import requests
 
+from clients.search import Search
 import utils
 
 logger = logging.getLogger(__name__)
@@ -48,42 +49,10 @@ class Dumper(object):
         self._articlemeta = utils.articlemeta_server()
         self._accessstats = utils.accessstats_server()
         self._cited_by = utils.citedby_server()
-        self._solr_search_scielo_org = utils.settings.get('app:main', {}).get(
-            'solr_search_scielo_org', 'localhost:8080')
+        self._search = Search()
         self._load_citations = self._load_citations_by_meta if citations_mode == 'meta' else self._load_citations_by_pid
         self.collection = collection
         self.issns = issns or [None]
-
-    def _commit(self):
-        url_commit = 'http://%s/solr/scielo-articles/update?commit=true' % self._solr_search_scielo_org
-        url_optimize = 'http://%s/solr/scielo-articles/update?optimize=true' % self._solr_search_scielo_org
-
-        requests.get(url_commit)
-        requests.get(url_optimize)
-
-    def _update_document_indicators(self, doc_id, citations, accesses):
-        headers = {'content-type': 'application/json'}
-
-        data = {
-            "add": {
-                "doc": {
-                    "id": doc_id
-                }
-            }
-        }
-
-        if citations:
-            data['add']['doc']['total_received'] = {'set': str(citations)}
-
-        if accesses:
-            data['add']['doc']['total_access'] = {'set': str(accesses)}
-
-        url = 'http://%s/solr/scielo-articles/update?wt=json' % self._solr_search_scielo_org
-
-        response = requests.get(url, data=json.dumps(data), headers=headers)
-
-        if response.status_code == 200:
-            return response.json()
 
     def _load_citations_by_pid(self, item):
 
@@ -129,13 +98,13 @@ class Dumper(object):
 
         for item in self.items():
             citations = self._load_citations(item)
-            item_id = '-'.join([item.publisher_id, item.collection_acronym])
-
             accesses = self._load_accesses(item)
 
-            self._update_document_indicators(item_id, citations, accesses)
+            item_id = '-'.join([item.publisher_id, item.collection_acronym])
+            self._search.update_document_indicators(
+                item_id, citations, accesses)
 
-        self._commit()
+        self._search.deploy()
 
         logger.info('Export finished')
 
