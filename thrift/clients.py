@@ -607,7 +607,6 @@ class ArticleMeta(object):
         )
         return client
 
-
     def journals(self, collection=None, issn=None):
         offset = 0
         while True:
@@ -672,19 +671,18 @@ class ArticleMeta(object):
                 raise ServerError(msg)
 
             if not jarticle:
-                logger.warning('Document not found for : %s_%s' % ( collection, code))
+                logger.warning('Document not found for : %s_%s' % (collection, code))
                 return None
 
             xarticle = Article(jarticle)
-            logger.info('Document loaded: %s_%s' % ( collection, code))
+            logger.info('Document loaded: %s_%s' % (collection, code))
 
             return xarticle
 
-        logger.info('Document loaded: %s_%s' % ( collection, code))
+        logger.info('Document loaded: %s_%s' % (collection, code))
         return article
 
-    def documents(self, collection=None, issn=None, from_date=None,
-        until_date=None, fmt='xylose'):
+    def documents(self, collection=None, issn=None, from_date=None, until_date=None, fmt='xylose'):
         offset = 0
         while True:
             identifiers = self.client.get_article_identifiers(
@@ -699,7 +697,7 @@ class ArticleMeta(object):
                 document = self.document(
                     code=identifier.code,
                     collection=identifier.collection,
-                    replace_journal_metadata=True, 
+                    replace_journal_metadata=True,
                     fmt=fmt
                 )
 
@@ -708,5 +706,5 @@ class ArticleMeta(object):
             offset += 1000
 
     def collections(self):
-        
+
         return [i for i in self.client.get_collection_identifiers()]
