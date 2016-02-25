@@ -15,7 +15,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version ="0.1.42",
+    version="0.2.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -31,7 +31,7 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+https://git@github.com/scieloorg/xylose.git@v0.34#egg=xylose",
+        "git+https://git@github.com/scieloorg/xylose.git@v1.0.1#egg=xylose",
         "git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client"
     ],
     tests_require=tests_require,
