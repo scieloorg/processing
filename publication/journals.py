@@ -195,9 +195,10 @@ class Dumper(object):
 
         impact_factor = self._analytics.impact_factor(issn, collection)
 
-        for item in impact_factor:
-            if item[0] in itens:
-                itens[item[0]] = tuple(item[1:])
+        if impact_factor:
+            for item in impact_factor:
+                if item[0] in itens:
+                    itens[item[0]] = tuple(item[1:])
 
         return itens
 
@@ -262,12 +263,12 @@ class Dumper(object):
 
         line.append(
             first_document.publication_date or '' if first_document else '')
-        line.append(first_document.volume or '' if first_document else '')
-        line.append(first_document.issue or '' if first_document else '')
+        line.append(first_document.issue.volume or '' if first_document else '')
+        line.append(first_document.issue.number or '' if first_document else '')
         line.append(
             last_document.publication_date or '' if last_document else '')
-        line.append(last_document.volume or '' if last_document else '')
-        line.append(last_document.issue or '' if last_document else '')
+        line.append(last_document.issue.volume or '' if last_document else '')
+        line.append(last_document.issue.number or '' if last_document else '')
 
         line.append(
             str(self._number_of_issues_by_year(

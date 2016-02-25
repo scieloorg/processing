@@ -23,6 +23,7 @@ import utils
 os.environ['XML_CATALOG_FILES'] = XML_CATALOG
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -58,7 +59,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns or [None]
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página","primeria página seq" u"última página", u"e-location", "ahead of print id", u"chave"]
+        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página", u"primeria página seq" u"última página", u"e-location", u"ahead of print id", u"chave"]
         self.write(','.join(header))
 
     def write(self, line):
@@ -100,7 +101,6 @@ class Dumper(object):
         elocation = get_value('/article/front/article-meta/elocation')
         aop_id = get_value('/article/front/article-meta/article-id[@pub-id-type="other"]')
 
-
         line = [
             data.collection_acronym,
             data.publisher_id,
@@ -124,9 +124,7 @@ class Dumper(object):
         return joined_line
 
     def parse(self, xml):
-        
         f = StringIO(xml)
-        
         try:
             tree = packtools.XMLValidator(f)
         except Exception as e:
@@ -146,22 +144,27 @@ class Dumper(object):
 
     def run(self):
         for issn in self.issns:
-            for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+            for document in self._articlemeta.documents(
+                    collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % document.publisher_id)
 
                 try:
-                    xml = self._articlemeta.document(document.publisher_id, document.collection_acronym, fmt='xmlrsps')
+                    xml = self._articlemeta.document(
+                        document.publisher_id, document.collection_acronym,
+                        fmt='xmlrsps')
                 except Exception as e:
                     logger.exception(e)
-                    logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
+                    logger.error('Fail to read document: %s_%s' % (
+                        document.publisher_id, document.collection_acronym))
                     xml = u''
 
                 et = self.parse(xml)
 
                 if not et:
-                    logger.error('Fail to parse xml document: %s_%s' % (document.publisher_id, document.collection_acronym))
+                    logger.error('Fail to parse xml document: %s_%s' % (
+                        document.publisher_id, document.collection_acronym))
                     continue
-                
+
                 self.write(self.fmt_json(document, et))
 
 

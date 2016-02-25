@@ -21,6 +21,7 @@ import utils
 
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -65,6 +66,7 @@ def request_api(url, timeout=3, attempts=10):
             return result
 
         attempt += 1
+
 
 class Dumper(object):
 

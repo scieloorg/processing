@@ -83,7 +83,8 @@ class Dumper(object):
 
     def _first_included_document_by_journal(self, issn, collection):
 
-        fid = self._publicationstats.first_included_document_by_journal(issn, collection)
+        fid = self._publicationstats.first_included_document_by_journal(
+            issn, collection)
 
         if not fid:
             return None
@@ -94,7 +95,8 @@ class Dumper(object):
 
     def _last_included_document_by_journal(self, issn, collection):
 
-        lid = self._publicationstats.last_included_document_by_journal(issn, collection)
+        lid = self._publicationstats.last_included_document_by_journal(
+            issn, collection)
 
         if not lid:
             return None
@@ -122,7 +124,7 @@ class Dumper(object):
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.scielo_issn)
                 yield self.fmt_csv(data)
-        
+
     def fmt_csv(self, data):
         line = []
 
@@ -131,35 +133,42 @@ class Dumper(object):
         line.append(data.title)
         line.append(data.print_issn or '')
         line.append(data.electronic_issn or '')
-        line.append(first_document.publication_date or '' if first_document else '')
-        line.append(first_document.volume or '' if first_document else '')
-        line.append(first_document.issue or '' if first_document else '')
+        line.append(
+            first_document.publication_date or '' if first_document else '')
+        line.append(
+            first_document.issue.volume or '' if first_document else '')
+        line.append(
+            first_document.issue.number or '' if first_document else '')
         if data.current_status != 'current':
-            line.append(last_document.publication_date or '' if last_document else '')
-            line.append(last_document.volume or '' if last_document else '')
-            line.append(last_document.issue or '' if last_document else '')
+            line.append(
+                last_document.publication_date or '' if last_document else '')
+            line.append(
+                last_document.issue.volume or '' if last_document else '')
+            line.append(
+                last_document.issue.number or '' if last_document else '')
         else:
             line += ['', '', '']
         line.append(data.url().replace('sci_serial', 'sci_issues'))
-        line.append('') # first_author
+        line.append('')  # first_author
         line.append(data.scielo_issn or '')
-        line.append('') # embargo_info
-        line.append('') # coverage_depth
-        line.append('') # coverage_notes
-        line.append(data.publisher_name if data.publisher_name else '') # publisher_name
-        line.append('Serial') # publication_type
-        line.append('') # date_monograph_published_print
-        line.append('') # date_monograph_published_online
-        line.append('') # monograph_volume
-        line.append('') # monograph_edition
-        line.append('') # first_editor
-        line.append('') # parent_publication_title_id
-        line.append('') # preceding_publication_title_id
-        line.append('F') # access_type
+        line.append('')  # embargo_info
+        line.append('')  # coverage_depth
+        line.append('')  # coverage_notes
+        line.append(data.publisher_name if data.publisher_name else '')  # publisher_name
+        line.append('Serial')  # publication_type
+        line.append('')  # date_monograph_published_print
+        line.append('')  # date_monograph_published_online
+        line.append('')  # monograph_volume
+        line.append('')  # monograph_edition
+        line.append('')  # first_editor
+        line.append('')  # parent_publication_title_id
+        line.append('')  # preceding_publication_title_id
+        line.append('F')  # access_type
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
+
 
 def main():
 

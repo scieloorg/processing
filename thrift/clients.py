@@ -655,7 +655,7 @@ class ArticleMeta(object):
             article = self.client.get_article(
                 code=code,
                 collection=collection,
-                replace_journal_metadata=True, 
+                replace_journal_metadata=True,
                 fmt=fmt
             )
         except:
@@ -682,12 +682,13 @@ class ArticleMeta(object):
         logger.info('Document loaded: %s_%s' % (collection, code))
         return article
 
-    def documents(self, collection=None, issn=None, from_date=None, until_date=None, fmt='xylose'):
+    def documents(self, collection=None, issn=None, from_date=None, until_date=None, fmt='xylose', extra_filter=None):
         offset = 0
         while True:
             identifiers = self.client.get_article_identifiers(
                 collection=collection, issn=issn, from_date=from_date,
-                until_date=until_date, limit=LIMIT, offset=offset)
+                until_date=until_date, limit=LIMIT, offset=offset,
+                extra_filter=extra_filter)
 
             if len(identifiers) == 0:
                 raise StopIteration
