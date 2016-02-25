@@ -103,6 +103,7 @@ def country(country):
         return choices.ISO_3166_COUNTRY_AS_KEY[country]
     return 'undefined'
 
+
 def get_date_timestamp(date):
     try:
         return datetime.datetime.strptime(date, '%Y-%m').isoformat()
@@ -114,20 +115,21 @@ def get_date_timestamp(date):
 
     return date
 
-def issuelabel(document):
-    label_volume = document.volume if document.volume else ''
-    label_issue = document.issue if document.issue else ''
 
-    label_suppl_issue = ' suppl %s' % document.supplement_issue if document.supplement_issue else ''
+def issuelabel(document):
+    label_volume = document.issue.volume if document.issue.volume else ''
+    label_issue = document.issue.number if document.issue.number else ''
+
+    label_suppl_issue = ' suppl %s' % document.issue.supplement_number if document.issue.supplement_number else ''
 
     if label_suppl_issue:
         label_issue += label_suppl_issue
 
-    label_suppl_volume = ' suppl %s' % document.supplement_volume if document.supplement_volume else ''
+    label_suppl_volume = ' suppl %s' % document.issue.supplement_volume if document.issue.supplement_volume else ''
 
     if label_suppl_volume:
         label_issue += label_suppl_volume
-    
+
     label_issue = SUPPLBEG_REGEX.sub('', label_issue)
     label_issue = SUPPLEND_REGEX.sub('', label_issue)
 

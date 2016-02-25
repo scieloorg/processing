@@ -11,7 +11,7 @@ import logging
 import codecs
 
 import utils
-from analytics.client import Analytics
+from clients.analytics import Analytics
 
 logger = logging.getLogger(__name__)
 

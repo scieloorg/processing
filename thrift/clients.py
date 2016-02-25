@@ -521,6 +521,7 @@ class PublicationStats(object):
 
         return self._compute_last_included_document_by_journal(query_result)
 
+
 class Citedby(object):
 
     def __init__(self, address, port):
@@ -541,10 +542,25 @@ class Citedby(object):
         return client
 
     def citedby_pid(self, code, metaonly=False):
+        """
+        Metodo que faz a interface com o metodo de mesmo nome na interface
+        thrift, atribuindo metaonly default como FALSE.
+        """
 
         data = self.client.citedby_pid(code, metaonly)
 
         return data
+
+    def citedby_meta(self, title, author_surname, year, metaonly=False):
+        """
+        Metodo que faz a interface com o metodo de mesmo nome na interface
+        thrift, atribuindo metaonly default como FALSE.
+        """
+
+        data = self.client.citedby_meta(title, author_surname, year, metaonly)
+
+        return data
+
 
 class Ratchet(object):
 
@@ -571,6 +587,7 @@ class Ratchet(object):
 
         return data
 
+
 class ArticleMeta(object):
 
     def __init__(self, address, port):
@@ -589,7 +606,6 @@ class ArticleMeta(object):
             self._port
         )
         return client
-
 
     def journals(self, collection=None, issn=None):
         offset = 0
@@ -634,46 +650,45 @@ class ArticleMeta(object):
             msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
-
     def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
         try:
             article = self.client.get_article(
                 code=code,
                 collection=collection,
-                replace_journal_metadata=True, 
+                replace_journal_metadata=True,
                 fmt=fmt
             )
         except:
             msg = 'Error retrieving document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
-        jarticle = None
-        try:
-            jarticle = json.loads(article)
-        except:
-            msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
-            raise ServerError(msg)
-
-        if not jarticle:
-            logger.warning('Document not found for : %s_%s' % ( collection, code))
-            return None
-
         if fmt == 'xylose':
+            jarticle = None
+            try:
+                jarticle = json.loads(article)
+            except:
+                msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
+                raise ServerError(msg)
+
+            if not jarticle:
+                logger.warning('Document not found for : %s_%s' % (collection, code))
+                return None
+
             xarticle = Article(jarticle)
-            logger.info('Document loaded: %s_%s' % ( collection, code))
+            logger.info('Document loaded: %s_%s' % (collection, code))
+
             return xarticle
-        else:
-            logger.info('Document loaded: %s_%s' % ( collection, code))
-            return article
 
+        logger.info('Document loaded: %s_%s' % (collection, code))
+        return article
 
-    def documents(self, collection=None, issn=None, from_date=None,
-        until_date=None, fmt='xylose'):
+    def documents(self, collection=None, issn=None, from_date=None, until_date=None, fmt='xylose', extra_filter=None):
         offset = 0
         while True:
             identifiers = self.client.get_article_identifiers(
                 collection=collection, issn=issn, from_date=from_date,
-                until_date=until_date, limit=LIMIT, offset=offset)
+                until_date=until_date, limit=LIMIT, offset=offset,
+                extra_filter=extra_filter)
 
             if len(identifiers) == 0:
                 raise StopIteration
@@ -683,7 +698,7 @@ class ArticleMeta(object):
                 document = self.document(
                     code=identifier.code,
                     collection=identifier.collection,
-                    replace_journal_metadata=True, 
+                    replace_journal_metadata=True,
                     fmt=fmt
                 )
 
@@ -692,5 +707,5 @@ class ArticleMeta(object):
             offset += 1000
 
     def collections(self):
-        
-        return [i for i in self._client.get_collection_identifiers()]
+
+        return [i for i in self.client.get_collection_identifiers()]

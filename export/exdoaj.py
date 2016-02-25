@@ -23,6 +23,7 @@ FROM = FROM.isoformat()[:10]
 DOAJ_XSD = open(os.path.dirname(__file__)+'/xsd/doajArticles.xsd', 'r').read()
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -64,7 +65,6 @@ class Dumper(object):
         self.session = self.authenticated_session()
         self.parse_schema()
         self.doaj_articles = Articles(usertoken=api_token)
-
 
     def _doaj_id_by_meta(self, issn, publication_year, title):
         ### Query by metadata
@@ -112,7 +112,7 @@ class Dumper(object):
 
         if document.original_title():
             doaj_id = self._doaj_id_by_meta(
-                document.scielo_issn,
+                document.journal.scielo_issn,
                 document.publication_date[0:4],
                 document.original_title()
             )
@@ -132,7 +132,7 @@ class Dumper(object):
             logger.exception(e)
             logger.error('Fail to parse XML')
             return False
-        
+
         self.doaj_schema = sch
 
     def authenticated_session(self):
@@ -159,8 +159,8 @@ class Dumper(object):
         return session
 
     def xml_is_valid(self, xml):
-        
-        try: 
+
+        try:
             xml = StringIO(xml)
             xml_doc = etree.parse(xml)
             logger.debug('XML is well formed')
@@ -203,8 +203,16 @@ class Dumper(object):
         if not self.session:
             return None
 
+        extra_filter = json.dumps(
+            {
+                'doaj_id': {'$exists': 0}
+            }
+        )
+
         for issn in self.issns:
-            for document in self._articlemeta.documents(collection=self.collection, issn=issn, from_date=self.from_date):
+            for document in self._articlemeta.documents(
+                    collection=self.collection, issn=issn,
+                    from_date=self.from_date, extra_filter=extra_filter):
                 logger.info('Reading document: %s_%s' % (document.publisher_id, document.collection_acronym))
 
                 if document.data.get('doaj_id', None):
@@ -234,6 +242,7 @@ class Dumper(object):
 
                 self.send_xml(filename, xml)
 
+
 def main():
 
     parser = argparse.ArgumentParser(
@@ -251,7 +260,7 @@ def main():
         '-i',
         default=None,
         help='Full path to a txt file within a list of ISSNs to be exported'
-    )    
+    )
 
     parser.add_argument(
         '--user',
