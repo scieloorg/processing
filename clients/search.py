@@ -117,5 +117,5 @@ class Search(object):
         """
             Executa o commit e optimize do indice.
         """
-        self.commit()
-        self.optimize()
+        self._commit()
+        self._optimize()
