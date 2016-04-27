@@ -1,5 +1,16 @@
 # coding: utf-8
 
+THEMATIC_AREAS = sorted([
+    u"agricultural sciences",
+    u"applied social sciences",
+    u"biological sciences",
+    u"engineering",
+    u"exact and earth science",
+    u"health sciences",
+    u"human sciences",
+    u"literature and arts",
+])
+
 ISO_3166 = {
     'BD': u'Bangladesh',
     'BE': u'Belgium',

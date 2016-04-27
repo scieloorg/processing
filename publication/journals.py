@@ -64,7 +64,7 @@ def interruption_status(history):
 
 class Dumper(object):
 
-    def __init__(self, collection, issns=None, output_file=None, years=5):
+    def __init__(self, collection, issns=None, output_file=None, years=6):
         self._articlemeta = utils.articlemeta_server()
         self._publicationstats = utils.publicationstats_server()
         self._analytics = Analytics()
@@ -93,7 +93,7 @@ class Dumper(object):
             u"título nlm",
             u"periodicidade descritiva",
             u"periodicidade numérica (em meses)",
-            u"área temática",
+            u"áreas temáticas",
             u"bases WOS",
             u"áreas temáticas WOS",
             u"situação atual",
@@ -106,9 +106,11 @@ class Dumper(object):
             u"número do primeiro documento",
             u"data do último documento",
             u"volúme do último  documento",
-            u"número do último documento",
-            u"issues todos os anos"
+            u"número do último documento"
         ]
+        self._header.append(u"issues regulares todos os anos")
+        self._header += [u"issues regulares em %s" % str(i) for i in years_range]
+        self._header.append(u"issues todos os anos")
         self._header += [u"issues em %s" % str(i) for i in years_range]
         self._header.append(u"documentos todos os anos")
         self._header += [u"documentos em %s" % str(i) for i in years_range]
@@ -122,14 +124,6 @@ class Dumper(object):
                 'documentos em outros idiomas em %s ' % year
             ]
 
-        for year in years_range:
-            self._header.append(u'índice de imediatez, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 1 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 2 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 3 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 4 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 5 ano, ano base (%s)' % year)
-
         self.write(','.join(['"%s"' % i.replace('"', '""') for i in self._header]))
 
     def _documents_languages_by_year(self, issn, collection, years=None):
@@ -142,13 +136,13 @@ class Dumper(object):
 
         return languages
 
-    def _number_of_issues_by_year(self, issn, collection, years=None):
+    def _number_of_issues_by_year(self, issn, collection, years=None, type=None):
 
         if years is None:
             years = self._years
 
         issues = self._publicationstats.number_of_issues_by_year(
-            issn, collection, years=years)
+            issn, collection, years=years, type=type)
 
         return issues
 
@@ -239,13 +233,13 @@ class Dumper(object):
             data.scielo_issn,
             data.print_issn or "",
             data.electronic_issn or "",
-            data.publisher_name or "",
+            '; '.join(data.publisher_name or []),
             data.title,
             data.fulltitle,
             data.abbreviated_title or "",
             data.abbreviated_iso_title or "",
             data.title_nlm or "",
-            data.periodicity or "",
+            data.periodicity[1] or "",
             data.periodicity_in_months or "",
             ','.join(data.subject_areas or []),
             ','.join(data.wos_citation_indexes or []),
@@ -269,6 +263,20 @@ class Dumper(object):
             last_document.publication_date or '' if last_document else '')
         line.append(last_document.issue.volume or '' if last_document else '')
         line.append(last_document.issue.number or '' if last_document else '')
+
+        line.append(
+            str(self._number_of_issues_by_year(
+                data.scielo_issn, data.collection_acronym, years=0, type='regular'))
+        )
+
+        regular_issues = self._number_of_issues_by_year(
+            data.scielo_issn,
+            data.collection_acronym,
+            years=self._years,
+            type='regular'
+        )
+
+        line += [str(i[1]) for i in regular_issues]
 
         line.append(
             str(self._number_of_issues_by_year(
@@ -324,12 +332,6 @@ class Dumper(object):
                 str(values['en']),
                 str(values['other'])
             ]
-
-        impact_factor = self._impact_factor(
-            data.scielo_issn, self.collection)
-
-        for year, values in sorted(impact_factor.items(), reverse=True):
-            line += [str(i) for i in values]
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 

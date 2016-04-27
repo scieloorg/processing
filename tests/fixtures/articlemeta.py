@@ -3432,5 +3432,238 @@ document = {
         "costanalysisbetweenspinalandvenousanesthesiawithpropofolassociatedwithlocalperianalblockinanorectalprocedurespaulogustavokotze2009"
     ],
     "validated_scielo": "False",
-    "validated_wos": "False"
+    "validated_wos": "False",
+    "issue": {
+        "code": "0102-672020090003",
+        "_shard_id": "02671a107c9245cf8a4ec590b1e3e72f",
+        "collection": "scl",
+        "code_title": [
+            "0102-6720",
+            "2317-6326"
+        ],
+        "publication_year": "2009",
+        "issue_type": "regular",
+        "publication_date": "2009-09",
+        "issue": {
+            "v30": [
+                {
+                    "_": "ABCD, arq. bras. cir. dig."
+                }
+            ],
+            "v31": [
+                {
+                    "_": "22"
+                }
+            ],
+            "v32": [
+                {
+                    "_": "3"
+                }
+            ],
+            "v999": [
+                {
+                    "_": "../bases-work/abcd/abcd"
+                }
+            ],
+            "v36": [
+                {
+                    "_": "20093"
+                }
+            ],
+            "v991": [
+                {
+                    "_": "1"
+                }
+            ],
+            "v992": [
+                {
+                    "_": "scl"
+                }
+            ],
+            "v151": [
+                {
+                    "_": "ABCD, arq. bras. cir. dig"
+                }
+            ],
+            "v930": [
+                {
+                    "_": "ABCD"
+                }
+            ],
+            "v880": [
+                {
+                    "_": "0102-672020090003"
+                }
+            ],
+            "v935": [
+                {
+                    "_": "0102-6720"
+                }
+            ],
+            "v480": [
+                {
+                    "_": "Col\u00e9gio Brasileiro de Cirurgia Digestiva"
+                }
+            ],
+            "v35": [
+                {
+                    "_": "0102-6720"
+                }
+            ],
+            "v130": [
+                {
+                    "_": "ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\u00e3o Paulo)"
+                }
+            ],
+            "v117": [
+                {
+                    "_": "vancouv"
+                }
+            ],
+            "v43": [
+                {
+                    "a": "2009",
+                    "c": "S\u00e3o Paulo",
+                    "m": "jul./set.",
+                    "l": "es",
+                    "n": "no.3",
+                    "t": "ABCD, arq. bras. cir. dig.",
+                    "v": "vol.22",
+                    "_": ""
+                },
+                {
+                    "a": "2009",
+                    "c": "S\u00e3o Paulo",
+                    "m": "jul/set.",
+                    "l": "pt",
+                    "n": "no.3",
+                    "t": "ABCD, arq. bras. cir. dig.",
+                    "v": "vol.22",
+                    "_": ""
+                },
+                {
+                    "a": "2009",
+                    "c": "S\u00e3o Paulo",
+                    "m": "JulySept.",
+                    "l": "en",
+                    "n": "no.3",
+                    "t": "ABCD, arq. bras. cir. dig.",
+                    "v": "vol.22",
+                    "_": ""
+                }
+            ],
+            "v42": [
+                {
+                    "_": "1"
+                }
+            ],
+            "v49": [
+                {
+                    "c": "ABCD020",
+                    "l": "pt",
+                    "_": "",
+                    "t": "Artigos Originais"
+                },
+                {
+                    "c": "ABCD020",
+                    "l": "en",
+                    "_": "",
+                    "t": "Orginal Articles"
+                },
+                {
+                    "c": "ABCD030",
+                    "l": "pt",
+                    "_": "",
+                    "t": "Artigos de Revis\u00e3o"
+                },
+                {
+                    "c": "ABCD030",
+                    "l": "en",
+                    "_": "",
+                    "t": "Review Articles"
+                },
+                {
+                    "c": "ABCD040",
+                    "l": "pt",
+                    "_": "",
+                    "t": "Relatos de Casos"
+                },
+                {
+                    "c": "ABCD040",
+                    "l": "en",
+                    "_": "",
+                    "t": "Case Reports"
+                }
+            ],
+            "v48": [
+                {
+                    "h": "Sumario",
+                    "l": "es",
+                    "_": ""
+                },
+                {
+                    "h": "Sum\u00e1rio",
+                    "l": "pt",
+                    "_": ""
+                },
+                {
+                    "h": "Table of Contents",
+                    "l": "en",
+                    "_": ""
+                }
+            ],
+            "v230": [
+                {
+                    "_": "Brazilian Archives of Digestive Surgery"
+                }
+            ],
+            "v65": [
+                {
+                    "_": "20090900"
+                }
+            ],
+            "v85": [
+                {
+                    "_": "decs"
+                }
+            ],
+            "v6": [
+                {
+                    "_": "011"
+                }
+            ],
+            "v122": [
+                {
+                    "_": "11"
+                }
+            ],
+            "v701": [
+                {
+                    "_": "1"
+                }
+            ],
+            "v700": [
+                {
+                    "_": "0"
+                }
+            ],
+            "v706": [
+                {
+                    "_": "i"
+                }
+            ],
+            "v91": [
+                {
+                    "_": "20100514"
+                }
+            ],
+            "v200": [
+                {
+                    "_": "0"
+                }
+            ]
+        },
+        "created_at": "2010-05-14",
+        "processing_date": "2010-05-14"
+    }
 }

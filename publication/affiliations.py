@@ -3,7 +3,7 @@
 Este processamento gera uma tabulação de país de afiliação de cada artigo da
 coleção SciELO.
 Formato de saída:
-"PID","issn","título","área temática","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
+"PID","issn","título","áreas temáticas","ano de publicação","tipo de documento","paises de afiliação"
 """
 import argparse
 import logging
@@ -49,7 +49,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        self.write(','.join([u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"paises de afiliação",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]))
+        self.write(','.join([u"PID", u"ISSN", u"título", u"áreas temáticas", u"ano de publicação", u"tipo de documento", u"paises de afiliação"]))
 
     def write(self, line):
         if not self.output_file:
@@ -70,7 +70,7 @@ class Dumper(object):
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
                 yield self.fmt_csv(data)
-        
+
     def fmt_csv(self, data):
         countries = set()
 
@@ -84,15 +84,13 @@ class Dumper(object):
             ','.join(data.journal.subject_areas),
             data.publication_date[0:4],
             data.document_type,
-            ', '.join(countries),
-            '1' if 'brazil' in countries and len(countries) == 1 else '0',
-            '1' if not 'brazil' in countries and len(countries) > 0 else '0',
-            '1' if 'brazil' in countries and len(countries) > 1 else '0',
+            ', '.join(countries)
         ]
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
+
 
 def main():
 
