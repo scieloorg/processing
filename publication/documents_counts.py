@@ -1,22 +1,18 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação com scores do altimetrics para documentos SciELO
+Este processamento gera uma tabulação com contagens, soma, mediana de alguns
+elementos do artigo: total de autores, total de citações, total de páginas
 """
 
 import argparse
 import logging
 import codecs
-import requests
-import urlparse
 import datetime
 
 import utils
 import choices
 
 logger = logging.getLogger(__name__)
-
-ALTMETRICS_API_URL = 'http://api.altmetric.com/v1/citations/at'
-ALTMETRICS_KEY = '8f87ca8cd778d4140b1ef713afa4008d'
 
 
 def _config_logging(logging_level='INFO', logging_file=None):
@@ -46,12 +42,17 @@ def _config_logging(logging_level='INFO', logging_file=None):
     return logger
 
 
-def get_doi_from_url(url):
+def pages(first, last):
 
-    if 'http://dx.doi.org/' in url:
-        return url.lower().replace('http://dx.doi.org/', '')
+    try:
+        pages = int(last)-int(first)
+    except:
+        pages = 0
 
-    return None
+    if pages >= 0:
+        return pages
+    else:
+        return 0
 
 
 class Dumper(object):
@@ -78,8 +79,16 @@ class Dumper(object):
         header.append(u"document publishing year")
         header.append(u"document type")
         header.append(u"document is citable")
-        header.append(u"score")
-        header.append(u'altmetrics url')
+        header.append(u"authors")
+        header.append(u"0 authors")
+        header.append(u"1 author")
+        header.append(u"2 authors")
+        header.append(u"3 authors")
+        header.append(u"4 authors")
+        header.append(u"5 authors")
+        header.append(u"+6 authors")
+        header.append(u"pages")
+        header.append(u"references")
         self.write(','.join(header))
 
     def write(self, line):
@@ -91,39 +100,7 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
-
-    def altmetrics_items_by_journals(self, issn):
-
-        payload = {
-            'num_results': 100,
-            'key': ALTMETRICS_KEY
-        }
-        payload['issns'] = issn
-        page = 0
-        while True:
-            page += 1
-            payload['page'] = page
-            try:
-                logger.debug('Requesting data to altmetrics %s' % str(payload))
-                response = requests.get(ALTMETRICS_API_URL, params=payload, timeout=10)
-            except Exception as e:
-                logger.error('Could not retrieve data from altmetrics %s' % str(payload))
-                continue
-
-            if response.status_code == 404:  # fim de paginacao
-                raise StopIteration
-
-            try:
-                data = response.json()
-            except:
-                logger.debug('Invalid JSON data retrieved for %s' % response.url)
-                continue
-
-            if data == 'Not Found':
-                raise StopIteration
-
-            for item in data.get('results', []):
-                yield item
+        logger.info('Export finished')
 
     def items(self):
 
@@ -131,66 +108,62 @@ class Dumper(object):
             self.issns = [None]
 
         for issn in self.issns:
-            for data in self._articlemeta.journals(collection=self.collection, issn=issn):
-                for altmetrics_item in self.altmetrics_items_by_journals(data.scielo_issn):
-                    yield self.fmt_csv(data, altmetrics_item)
+            for data in self._articlemeta.documents(collection=self.collection, issn=issn):
+                logger.debug('Reading document: %s' % data.publisher_id)
+                yield self.fmt_csv(data)
 
-    def fmt_csv(self, data, altmetrics):
-        article = None
-        url = altmetrics.get('url', None)
-        title = altmetrics.get('title', '').replace('\n', '')
-        doi = altmetrics.get('doi', get_doi_from_url(url))
-        details_url = altmetrics.get('details_url', None)
-        pid = urlparse.parse_qs(urlparse.urlparse(url).query).get('pid', None) if url else None
+    def fmt_csv(self, data):
+        countries = set()
 
-        if doi:
-            article = self._articlemeta.document(doi.upper(), self.collection)
+        if data.normalized_affiliations:
+            countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
 
-        publication_date = article.publication_date if article else u'not defined'
-        publisher_id = article.publisher_id if article else u'not defined'
-        document_type = article.document_type if article else u'not defined'
-        score = altmetrics.get('score', None)
+        tot_authors = len(data.authors or [])
 
         issns = []
-        if data.print_issn:
-            issns.append(data.print_issn)
-        if data.electronic_issn:
-            issns.append(data.electronic_issn)
+        if data.journal.print_issn:
+            issns.append(data.journal.print_issn)
+        if data.journal.electronic_issn:
+            issns.append(data.journal.electronic_issn)
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
         line.append(u'document')
         line.append(data.collection_acronym)
-        line.append(data.scielo_issn)
+        line.append(data.journal.scielo_issn)
         line.append(u';'.join(issns))
-        line.append(data.title)
-        line.append(u';'.join(data.subject_areas))
+        line.append(data.journal.title)
+        line.append(u';'.join(data.journal.subject_areas))
         for area in choices.THEMATIC_AREAS:
-            if area.lower() in [i.lower() for i in data.subject_areas]:
+            if area.lower() in [i.lower() for i in data.journal.subject_areas]:
                 line.append(u'1')
             else:
                 line.append(u'0')
-        line.append(data.current_status)
-        line.append(publisher_id)
-        if publication_date == u'not define':
-            line.append(document_type)
-        else:
-            line.append(publication_date[0:4])
-        line.append(document_type)
-        if document_type == u'not define':
-            line.append(document_type)
-        else:
-            line.append(u'1' if document_type.lower() in choices.CITABLE_THEMATIC_AREAS else u'0')
-        line.append(str(score) or u'0')
-        line.append(details_url or u'not defined')
+        line.append(data.journal.current_status)
+        line.append(data.publisher_id)
+        line.append(data.publication_date[0:4])
+        line.append(data.document_type)
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        line.append(unicode(tot_authors))
+        line.append(u'1' if tot_authors == 0 else u'0')  # total de autores
+        line.append(u'1' if tot_authors == 1 else u'0')  # total de autores
+        line.append(u'1' if tot_authors == 2 else u'0')  # total de autores
+        line.append(u'1' if tot_authors == 3 else u'0')  # total de autores
+        line.append(u'1' if tot_authors == 4 else u'0')  # total de autores
+        line.append(u'1' if tot_authors == 5 else u'0')  # total de autores
+        line.append(u'1' if tot_authors >= 6 else u'0')  # total de autores
+        line.append(unicode(pages(data.start_page, data.end_page))),  # total de páginas
+        line.append(unicode(len(data.citations or []))) # total de citações
 
-        return u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
+        joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
+
+        return joined_line
 
 
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump Altmetrics Score'
+        description='Dump counts of authors, references and pages distribution by article'
     )
 
     parser.add_argument(

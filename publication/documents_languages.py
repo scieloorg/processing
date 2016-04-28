@@ -1,9 +1,8 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação com contagens, soma, mediana de alguns
-elementos do artigo: total de autores, total de citações, total de páginas
+Este processamento gera uma tabulação de idiomas de publicação de cada artigo
+da coleção SciELO.
 """
-
 import argparse
 import logging
 import codecs
@@ -42,19 +41,6 @@ def _config_logging(logging_level='INFO', logging_file=None):
     return logger
 
 
-def pages(first, last):
-
-    try:
-        pages = int(last)-int(first)
-    except:
-        pages = 0
-
-    if pages >= 0:
-        return pages
-    else:
-        return 0
-
-
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None):
@@ -77,17 +63,13 @@ class Dumper(object):
         header.append(u"title current status")
         header.append(u"document publishing ID (PID SciELO)")
         header.append(u"document publishing year")
+        header.append(u'docuemnt is citable')
         header.append(u"document type")
-        header.append(u"authors")
-        header.append(u"0 authors")
-        header.append(u"1 author")
-        header.append(u"2 authors")
-        header.append(u"3 authors")
-        header.append(u"4 authors")
-        header.append(u"5 authors")
-        header.append(u"+6 authors")
-        header.append(u"pages")
-        header.append(u"references")
+        header.append(u"document languages")
+        header.append(u"document pt")
+        header.append(u"document es")
+        header.append(u"document en")
+        header.append(u"document other languages")
         self.write(','.join(header))
 
     def write(self, line):
@@ -99,7 +81,6 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
-        logger.info('Export finished')
 
     def items(self):
 
@@ -108,16 +89,12 @@ class Dumper(object):
 
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
-                logger.debug('Reading document: %s' % data.publisher_id)
+                logger.debug(u'Reading document: %s' % data.publisher_id)
                 yield self.fmt_csv(data)
-        
+
     def fmt_csv(self, data):
-        countries = set()
-
-        if data.normalized_affiliations:
-            countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
-
-        tot_authors = len(data.authors or [])
+        know_languages = set([u'pt', u'es', u'en'])
+        languages = set(data.languages())
 
         issns = []
         if data.journal.print_issn:
@@ -127,7 +104,7 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'documents')
+        line.append(u'document')
         line.append(data.collection_acronym)
         line.append(data.journal.scielo_issn)
         line.append(u';'.join(issns))
@@ -141,19 +118,15 @@ class Dumper(object):
         line.append(data.journal.current_status)
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
         line.append(data.document_type)
-        line.append(unicode(tot_authors))
-        line.append(u'1' if tot_authors == 0 else u'0')  # total de autores
-        line.append(u'1' if tot_authors == 1 else u'0')  # total de autores
-        line.append(u'1' if tot_authors == 2 else u'0')  # total de autores
-        line.append(u'1' if tot_authors == 3 else u'0')  # total de autores
-        line.append(u'1' if tot_authors == 4 else u'0')  # total de autores
-        line.append(u'1' if tot_authors == 5 else u'0')  # total de autores
-        line.append(u'1' if tot_authors >= 6 else u'0')  # total de autores
-        line.append(unicode(pages(data.start_page, data.end_page))),  # total de páginas
-        line.append(unicode(len(data.citations or []))) # total de citações
+        line.append(';'.join(languages))
+        line.append('1' if 'pt' in languages else '0')  # PT
+        line.append('1' if 'es' in languages else '0')  # ES
+        line.append('1' if 'en' in languages else '0')  # EN
+        line.append('1' if len(languages.difference(know_languages)) > 0 else '0')  # OTHER
 
-        joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
+        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
 
@@ -161,7 +134,7 @@ class Dumper(object):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump counts of authors, references and pages distribution by article'
+        description='Dump languages distribution by article'
     )
 
     parser.add_argument(

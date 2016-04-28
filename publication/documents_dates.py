@@ -1,7 +1,7 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de autores e afiliação de cada artigo da
-coleção SciELO.
+Este processamento gera uma tabulação de datas do artigo (publicação, submissão,
+    aceite, entrada no scieloe atualização no scielo)
 """
 import argparse
 import logging
@@ -64,23 +64,38 @@ class Dumper(object):
         header.append(u"document publishing ID (PID SciELO)")
         header.append(u"document publishing year")
         header.append(u"document type")
-        header.append(u"document author")
-        header.append(u"author instituição")
-        header.append(u"author affiliation country")
-        header.append(u"author affiliation state")
-        header.append(u"author affiliation city")
+        header.append(u"document is citable")
+        header.append(u"document submited at")
+        header.append(u"document submited at year")
+        header.append(u"document submited at month")
+        header.append(u"document submited at day")
+        header.append(u"document accepted at")
+        header.append(u"document accepted at year")
+        header.append(u"document accepted at month")
+        header.append(u"document accepted at day")
+        header.append(u"document reviewed at")
+        header.append(u"document reviewed at year")
+        header.append(u"document reviewed at month")
+        header.append(u"document reviewed at day")
+        header.append(u"document published at")
+        header.append(u"document published at year")
+        header.append(u"document published at month")
+        header.append(u"document published at day")
+        header.append(u"document published in SciELO at")
+        header.append(u"document published in SciELO at year")
+        header.append(u"document published in SciELO at month")
+        header.append(u"document published in SciELO at day")
+        header.append(u"document updated in SciELO at")
+        header.append(u"document updated in SciELO at year")
+        header.append(u"document updated in SciELO at month")
+        header.append(u"document updated in SciELO at day")
         self.write(','.join(header))
 
-    def write(self, lines):
-
-        if isinstance(lines, unicode):
-            lines = [lines]
-
-        for line in lines:
-            if not self.output_file:
-                print(line.encode('utf-8'))
-            else:
-                self.output_file.write('%s\r\n' % line)
+    def write(self, line):
+        if not self.output_file:
+            print(line.encode('utf-8'))
+        else:
+            self.output_file.write('%s\r\n' % line)
 
     def run(self):
         for item in self.items():
@@ -95,18 +110,9 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
-                for item in self.fmt_csv(data):
-                    yield item
-
-    def join_line(self, line):
-
-        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+                yield self.fmt_csv(data)
 
     def fmt_csv(self, data):
-        countries = set()
-
-        affs = {item['index'].upper():item for item in data.mixed_affiliations}
-
         issns = []
         if data.journal.print_issn:
             issns.append(data.journal.print_issn)
@@ -115,7 +121,7 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'documents')
+        line.append(u'document')
         line.append(data.collection_acronym)
         line.append(data.journal.scielo_issn)
         line.append(u';'.join(issns))
@@ -130,28 +136,46 @@ class Dumper(object):
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        line.append(data.receive_date or '')
+        receive_splited = utils.split_date(data.receive_date or '')
+        line.append(receive_splited[0])  # year
+        line.append(receive_splited[1])  # month
+        line.append(receive_splited[2])  # day
+        line.append(data.acceptance_date or '')
+        acceptance_splited = utils.split_date(data.acceptance_date or '')
+        line.append(acceptance_splited[0])  # year
+        line.append(acceptance_splited[1])  # month
+        line.append(acceptance_splited[2])  # day
+        line.append(data.review_date or '')
+        review_splited = utils.split_date(data.review_date or '')
+        line.append(review_splited[0])  # year
+        line.append(review_splited[1])  # month
+        line.append(review_splited[2])  # day
+        line.append(data.publication_date or '')
+        publication_splited = utils.split_date(data.publication_date or '')
+        line.append(publication_splited[0])  # year
+        line.append(publication_splited[1])  # month
+        line.append(publication_splited[2])  # day
+        line.append(data.creation_date or '')
+        creation_splited = utils.split_date(data.creation_date or '')
+        line.append(creation_splited[0])  # year
+        line.append(creation_splited[1])  # month
+        line.append(creation_splited[2])  # day
+        line.append(data.update_date or '')
+        update_splited = utils.split_date(data.update_date or '')
+        line.append(update_splited[0])  # year
+        line.append(update_splited[1])  # month
+        line.append(update_splited[2])  # day
+        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
-        if data.authors:
-            for author in data.authors:
-                author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
-                if 'xref' in author:
-                    for index in author['xref']:
-                        index = index.upper()
-                        aff_line = []
-                        aff_line.append(affs.get(index, {}).get('institution', '')),
-                        aff_line.append(affs.get(index, {}).get('country', '')),
-                        aff_line.append(affs.get(index, {}).get('state', '')),
-                        aff_line.append(affs.get(index, {}).get('city', ''))
-                        yield self.join_line(line+author_line+aff_line)
-                else:
-                    yield self.join_line(line+author_line)
-        else:
-            yield self.join_line(line)
+        return joined_line
+
 
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump article dates'
     )
 
     parser.add_argument(

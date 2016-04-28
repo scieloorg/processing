@@ -109,6 +109,7 @@ def publicationstats_server():
 
     return clients.PublicationStats(host, port)
 
+
 def citedby_server():
     try:
         server = settings['app:main']['citedby_thriftserver'].split(':')
@@ -134,6 +135,7 @@ def ratchet_server():
 
     return clients.Ratchet(host, port)
 
+
 def articlemeta_server():
     try:
         server = settings['app:main']['articlemeta_thriftserver'].split(':')
@@ -145,6 +147,7 @@ def articlemeta_server():
         port = 11720
 
     return clients.ArticleMeta(host, port)
+
 
 def accessstats_server():
     try:
@@ -158,6 +161,7 @@ def accessstats_server():
 
     return clients.AccessStats(host, port)
 
+
 def is_valid_date(value):
 
     try:
@@ -166,9 +170,46 @@ def is_valid_date(value):
         try:
             datetime.datetime.strptime(value, '%Y-%m')
         except:
-            return False
+            try:
+                datetime.datetime.strptime(value, '%Y')
+            except:
+                return False
 
     return True
+
+
+def split_date(value):
+    """
+        This method splits a date in a tuple.
+        value: valid iso date
+
+        ex:
+        2016-01-31: ('2016','01','01')
+        2016-01: ('2016','01','')
+        2016: ('2016','','')
+    """
+    if not is_valid_date(value):
+        return ('', '', '')
+
+    splited = value.split('-')
+
+    try:
+        year = splited[0]
+    except IndexError:
+        year = ''
+
+    try:
+        month = splited[1]
+    except IndexError:
+        month = ''
+
+    try:
+        day = splited[2]
+    except IndexError:
+        day = ''
+
+    return (year, month, day)
+
 
 def ckeck_given_issns(issns):
     valid_issns = []
@@ -179,4 +220,3 @@ def ckeck_given_issns(issns):
         valid_issns.append(issn)
 
     return valid_issns
-

@@ -2,18 +2,18 @@
 """
 Este processamento gera uma tabulação de acessos por periódico, ano de publicação e ano de
 acesso para o texto completo em HTML, resumo em HTML, PDF e EPDF. 
-
-Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","status","ano de inclusão","licença de uso padrão","data de acesso","ano de acesso","mês de acesso","acesso ao html","acesso ao abstract","acesso ao PDF","acesso ao EPDF","total de acessos"
 """
 
 import argparse
 import logging
 import codecs
+import datetime
 
 import utils
+import choices
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -50,20 +50,25 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [
-            u"issn scielo",
-            u"issn impresso",
-            u"issn eletrônico",
-            u"título",
-            u"área temática",
-            u"ano de publicação",
-            u"ano de acesso",
-            u"acesso ao html",
-            u"acesso ao abstract",
-            u"acesso ao PDF",
-            u"acesso ao EPDF",
-            u"total de acessos"
-        ]
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"publishing year")
+        header.append(u"accesses year")
+        header.append(u"accesses to html")
+        header.append(u"accesses to abstract")
+        header.append(u"accesses to pdf")
+        header.append(u"accesses to epdf")
+        header.append(u"total accesses")
+
         self.write(','.join(header))
 
     def write(self, line):
@@ -86,16 +91,29 @@ class Dumper(object):
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
                 for item in self.fmt_csv(data):
                     yield item
-        
+
     def fmt_csv(self, data):
 
-        line = [
-            data.scielo_issn,
-            data.print_issn or "",
-            data.electronic_issn or "",
-            data.title,
-            ','.join(data.subject_areas or [])
-        ]
+        issns = []
+        if data.print_issn:
+            issns.append(data.print_issn)
+        if data.electronic_issn:
+            issns.append(data.electronic_issn)
+
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'journal')
+        line.append(data.collection_acronym)
+        line.append(data.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.title)
+        line.append(u';'.join(data.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.current_status)
 
         acessos = self._accessstats.access_lifetime(data.scielo_issn, self.collection)
 
