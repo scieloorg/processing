@@ -15,7 +15,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version="0.2.1",
+    version="0.3.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -41,14 +41,15 @@ setup(
     [console_scripts]
     processing_accesses_dumpdata=accesses.dumpdata:main
     processing_accesses_documents_by_journals=accesses.documents_by_journals:main
-    processing_publication_languages=publication.languages:main
-    processing_publication_affiliations=publication.affiliations:main
-    processing_publication_authors=publication.authors:main
-    processing_publication_counts=publication.counts:main
+    processing_publication_documents_languages=publication.documents_languages:main
+    processing_publication_documents_affiliations=publication.documents_affiliations:main
+    processing_publication_documents_authors=publication.documents_authors:main
+    processing_publication_documents_counts=publication.documents_counts:main
+    processing_publication_documents_licenses=publication.documents_licenses:main
+    processing_publication_documents_dates=publication.documents_dates:main
     processing_publication_journals=publication.journals:main
-    processing_publication_journals_history=publication.journals_history:main
-    processing_publication_licenses=publication.licenses:main
-    processing_publication_dates=publication.dates:main
+    processing_publication_journals_status_changes=publication.journals_status_changes:main
+    processing_publication_journals_indicators=publication.journals_indicators:main
     processing_publication_all=publication.dumper:main
     processing_evaluation_altmetrics=evaluation.altmetrics:main
     processing_export_xmlrsps=export.xml_rsps:main

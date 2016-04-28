@@ -1,9 +1,6 @@
 # coding: utf-8
 """
 Este processamento gera uma tabulação com scores do altimetrics para documentos SciELO
-
-Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","título do artigo","doi","url","altmetrics url","score"
 """
 
 import argparse
@@ -11,13 +8,16 @@ import logging
 import codecs
 import requests
 import urlparse
+import datetime
 
 import utils
+import choices
 
 logger = logging.getLogger(__name__)
 
 ALTMETRICS_API_URL = 'http://api.altmetric.com/v1/citations/at'
 ALTMETRICS_KEY = '8f87ca8cd778d4140b1ef713afa4008d'
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -45,12 +45,14 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
     return logger
 
+
 def get_doi_from_url(url):
 
     if 'http://dx.doi.org/' in url:
         return url.lower().replace('http://dx.doi.org/', '')
 
     return None
+
 
 class Dumper(object):
 
@@ -61,12 +63,28 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"título do artigo",u"doi",u"url",u"altmetrics url",u"score"]
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"document publishing ID (PID SciELO)")
+        header.append(u"document publishing year")
+        header.append(u"document type")
+        header.append(u"document is citable")
+        header.append(u"score")
+        header.append(u'altmetrics url')
         self.write(','.join(header))
 
     def write(self, line):
         if not self.output_file:
-            print(line)
+            print(line.encode('utf-8'))
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -131,23 +149,42 @@ class Dumper(object):
         publication_date = article.publication_date if article else u'not defined'
         publisher_id = article.publisher_id if article else u'not defined'
         document_type = article.document_type if article else u'not defined'
-        subject_areas = ', '.join(article.journal.subject_areas if article else [u'not defined'])
         score = altmetrics.get('score', None)
-        line = [
-            publisher_id,
-            data.scielo_issn,
-            data.title,
-            subject_areas,
-            publication_date,
-            document_type,
-            title or 'not defined',
-            doi or 'not defined',
-            url or 'not defined',
-            details_url or 'not defined',
-            str(score) or '0'
-        ]
 
-        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        issns = []
+        if data.print_issn:
+            issns.append(data.print_issn)
+        if data.electronic_issn:
+            issns.append(data.electronic_issn)
+
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'document')
+        line.append(data.collection_acronym)
+        line.append(data.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.title)
+        line.append(u';'.join(data.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.current_status)
+        line.append(publisher_id)
+        if publication_date == u'not define':
+            line.append(document_type)
+        else:
+            line.append(publication_date[0:4])
+        line.append(document_type)
+        if document_type == u'not define':
+            line.append(document_type)
+        else:
+            line.append(u'1' if document_type.lower() in choices.CITABLE_THEMATIC_AREAS else u'0')
+        line.append(str(score) or u'0')
+        line.append(details_url or u'not defined')
+
+        return u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 
 
 def main():

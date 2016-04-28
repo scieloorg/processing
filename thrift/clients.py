@@ -363,7 +363,10 @@ class PublicationStats(object):
 
         return [(k, v) for k, v in sorted(years.items(), reverse=True)]
 
-    def number_of_issues_by_year(self, issn, collection, years=0):
+    def number_of_issues_by_year(self, issn, collection, years=0, type=None):
+        """
+        type: ['regular', 'supplement', 'pressrelease', 'ahead', 'special']
+        """
 
         body = {
             "query": {
@@ -391,6 +394,9 @@ class PublicationStats(object):
             }
 
         }
+
+        if type:
+            body['query']['bool']['must'].append({"match": {"issue_type": type}})
 
         if years != 0:
             body['aggs'] = {
@@ -446,6 +452,11 @@ class PublicationStats(object):
                                     "match": {
                                         "issn": issn
                                     }
+                                },
+                                {
+                                    "match": {
+                                        "issue_type": "regular"
+                                    }
                                 }
                             ]
                         }
@@ -492,6 +503,11 @@ class PublicationStats(object):
                                 {
                                     "match": {
                                         "issn": issn
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "issue_type": "regular"
                                     }
                                 }
                             ]

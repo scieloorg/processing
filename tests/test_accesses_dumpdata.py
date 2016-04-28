@@ -4,6 +4,7 @@ import unittest
 from accesses import dumpdata
 from xylose.scielodocument import Article
 
+
 class DumpDataTest(unittest.TestCase):
 
     def test_pdf_keys(self):
@@ -320,7 +321,6 @@ class DumpDataTest(unittest.TestCase):
         }
 
         self.assertEqual(sorted(result), sorted(expected))
-
 
     def test_join_metadata_with_accesses(self):
 

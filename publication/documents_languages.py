@@ -1,17 +1,18 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de país de afiliação de cada artigo da
-coleção SciELO.
-Formato de saída:
-"PID","issn","título","área temática","ano de publicação","tipo de documento","paises de afiliação","exclusivo nacional","exclusivo estrangeiro","nacional + estrangeiro"
+Este processamento gera uma tabulação de idiomas de publicação de cada artigo
+da coleção SciELO.
 """
 import argparse
 import logging
 import codecs
+import datetime
 
 import utils
+import choices
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -49,7 +50,27 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        self.write(','.join([u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"paises de afiliação",u"exclusivo nacional",u"exclusivo estrangeiro",u"nacional + estrangeiro"]))
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"document publishing ID (PID SciELO)")
+        header.append(u"document publishing year")
+        header.append(u'docuemnt is citable')
+        header.append(u"document type")
+        header.append(u"document languages")
+        header.append(u"document pt")
+        header.append(u"document es")
+        header.append(u"document en")
+        header.append(u"document other languages")
+        self.write(','.join(header))
 
     def write(self, line):
         if not self.output_file:
@@ -60,39 +81,55 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
-        logger.info('Export finished')
 
     def items(self):
+
         if not self.issns:
             self.issns = [None]
 
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
-                logger.debug('Reading document: %s' % data.publisher_id)
+                logger.debug(u'Reading document: %s' % data.publisher_id)
                 yield self.fmt_csv(data)
-        
+
     def fmt_csv(self, data):
-        countries = set()
+        know_languages = set([u'pt', u'es', u'en'])
+        languages = set(data.languages())
 
-        if data.normalized_affiliations:
-            countries = set([i['country'].lower() for i in data.normalized_affiliations if 'country' in i and i['country'] != 'undefined'])
+        issns = []
+        if data.journal.print_issn:
+            issns.append(data.journal.print_issn)
+        if data.journal.electronic_issn:
+            issns.append(data.journal.electronic_issn)
 
-        line = [
-            data.publisher_id,
-            data.journal.scielo_issn,
-            data.journal.title,
-            ','.join(data.journal.subject_areas),
-            data.publication_date[0:4],
-            data.document_type,
-            ', '.join(countries),
-            '1' if 'brazil' in countries and len(countries) == 1 else '0',
-            '1' if not 'brazil' in countries and len(countries) > 0 else '0',
-            '1' if 'brazil' in countries and len(countries) > 1 else '0',
-        ]
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'document')
+        line.append(data.collection_acronym)
+        line.append(data.journal.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.journal.title)
+        line.append(u';'.join(data.journal.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.journal.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.journal.current_status)
+        line.append(data.publisher_id)
+        line.append(data.publication_date[0:4])
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        line.append(data.document_type)
+        line.append(';'.join(languages))
+        line.append('1' if 'pt' in languages else '0')  # PT
+        line.append('1' if 'es' in languages else '0')  # ES
+        line.append('1' if 'en' in languages else '0')  # EN
+        line.append('1' if len(languages.difference(know_languages)) > 0 else '0')  # OTHER
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
+
 
 def main():
 

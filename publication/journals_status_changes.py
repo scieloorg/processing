@@ -1,17 +1,19 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de idiomas de publicação de cada artigo
-da coleção SciELO.
-Formato de saída:
-"PID","ISSN","título","área temática","ano de publicação","tipo de documento","license"
+Este processamento gera uma tabulação de histórico de mudanças do status do
+periódico na coleção SciELO
 """
+
 import argparse
 import logging
 import codecs
+import datetime
 
 import utils
+import choices
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -49,7 +51,23 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"license"]
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"status change date")
+        header.append(u"status change year")
+        header.append(u"status change month")
+        header.append(u"status change day")
+        header.append(u"status changed to")
+        header.append(u"status change reason")
         self.write(','.join(header))
 
     def write(self, line):
@@ -69,33 +87,51 @@ class Dumper(object):
             self.issns = [None]
 
         for issn in self.issns:
-            for data in self._articlemeta.documents(collection=self.collection, issn=issn):
-                logger.debug('Reading document: %s' % data.publisher_id)
-                yield self.fmt_csv(data)
-        
-    def fmt_csv(self, data):
-        know_languages = set(['pt', 'es', 'en'])
-        languages = set(data.languages())
+            for data in self._articlemeta.journals(collection=self.collection, issn=issn):
+                for history in data.status_history:
+                    yield self.fmt_csv(data, history)
+
+    def fmt_csv(self, data, history):
+
+        hist, status, reason = history
+
+        issns = []
+        if data.print_issn:
+            issns.append(data.print_issn)
+        if data.electronic_issn:
+            issns.append(data.electronic_issn)
+
         line = []
-        line.append(data.publisher_id)
-        line.append(data.journal.scielo_issn)
-        line.append(data.journal.title)
-        line.append(','.join(data.journal.subject_areas))
-        line.append(data.publication_date[0:4])
-        line.append(data.document_type)
-        perm = ''
-        if data.permissions:
-            perm = data.permissions.get('id' or '')
-        line.append(perm)
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'journal')
+        line.append(data.collection_acronym)
+        line.append(data.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.title)
+        line.append(u';'.join(data.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.current_status)
+        line.append(hist)
+        hist_splited = utils.split_date(hist or '')
+        line.append(hist_splited[0])  # year
+        line.append(hist_splited[1])  # month
+        line.append(hist_splited[2])  # day
+        line.append(status)
+        line.append(reason)
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
 
+
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump the history change of journals status'
     )
 
     parser.add_argument(

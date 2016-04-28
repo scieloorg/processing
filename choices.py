@@ -1,5 +1,25 @@
 # coding: utf-8
 
+THEMATIC_AREAS = sorted([
+    u"agricultural sciences",
+    u"applied social sciences",
+    u"biological sciences",
+    u"engineering",
+    u"exact and earth science",
+    u"health sciences",
+    u"human sciences",
+    u"literature and arts",
+])
+
+CITABLE_THEMATIC_AREAS = (
+    u'article-commentary',
+    u'brief-report',
+    u'case-report',
+    u'rapid-communication',
+    u'research-article',
+    u'review-article'
+)
+
 ISO_3166 = {
     'BD': u'Bangladesh',
     'BE': u'Belgium',

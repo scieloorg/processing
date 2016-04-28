@@ -1,19 +1,19 @@
 # coding: utf-8
 """
 Este processamento gera uma tabulação de fator de impacto dos periódicos SciELO. 
-
-Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","ano de publicação","ano base","imediatez","fator de impacto 1 ano","fator de impacto 2 anos","fator de impacto 3 anos","fator de impacto 4 anos","fator de impacto 5 anos"
 """
 
 import argparse
 import logging
 import codecs
+import datetime
 
 import utils
 from clients.analytics import Analytics
+import choices
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -50,21 +50,25 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [
-            u"issn scielo",
-            u"issn impresso",
-            u"issn eletrônico",
-            u"título",
-            u"área temática",
-            u"ano base",
-            u"imediatez",
-            u"fator de impacto 1 ano",
-            u"fator de impacto 2 anos",
-            u"fator de impacto 3 anos",
-            u"fator de impacto 4 anos",
-            u"fator de impacto 5 anos",
-        ]
-        self.write(','.join(header))
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"base year")
+        header.append(u"imediacity")
+        header.append(u"SciELO impact 1 year")
+        header.append(u"SciELO impact 2 years")
+        header.append(u"SciELO impact 3 years")
+        header.append(u"SciELO impact 4 years")
+        header.append(u"SciELO impact 5 years")
+        self.write(u','.join(header))
 
     def write(self, line):
         if not self.output_file:
@@ -86,16 +90,29 @@ class Dumper(object):
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
                 for item in self.fmt_csv(data):
                     yield item
-        
+
     def fmt_csv(self, data):
 
-        line = [
-            data.scielo_issn,
-            data.print_issn or "",
-            data.electronic_issn or "",
-            data.title,
-            ','.join(data.subject_areas or [])
-        ]
+        issns = []
+        if data.print_issn:
+            issns.append(data.print_issn)
+        if data.electronic_issn:
+            issns.append(data.electronic_issn)
+
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'journal')
+        line.append(data.collection_acronym)
+        line.append(data.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.title)
+        line.append(u';'.join(data.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.current_status)
 
         impact_factor = self._analytics.impact_factor(data.scielo_issn, self.collection)
 

@@ -1,17 +1,18 @@
 # coding: utf-8
 """
-Este processamento gera uma tabulação de autores e afiliação de cada artigo da
+Este processamento gera uma tabulação de país de afiliação de cada artigo da
 coleção SciELO.
-Formato de saída:
-"PID","issn","título","área temática","ano de publicação","tipo de documento","author","instituição","paises de afiliação","estado de afiliação","cidade de afiliação"
 """
 import argparse
 import logging
 import codecs
+import datetime
 
 import utils
+import choices
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -49,7 +50,27 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        self.write(','.join([u"PID",u"ISSN",u"título",u"área temática",u"ano de publicação",u"tipo de documento",u"author",u"instituição",u"paises de afiliação",u"estado de afiliação",u"cidade de afiliação"]))
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"document publishing ID (PID SciELO)")
+        header.append(u"document publishing year")
+        header.append(u"document type")
+        header.append(u"document is citable")
+        header.append(u"document affiliation instituition")
+        header.append(u"document affiliation country")
+        header.append(u"document affiliation country ISO 3166")
+        header.append(u"document affiliation state")
+        header.append(u"document affiliation city")
+        self.write(','.join(header))
 
     def write(self, lines):
 
@@ -68,7 +89,7 @@ class Dumper(object):
         logger.info('Export finished')
 
     def items(self):
-
+        
         if not self.issns:
             self.issns = [None]
 
@@ -83,39 +104,47 @@ class Dumper(object):
         return ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
     def fmt_csv(self, data):
-        countries = set()
+        issns = []
+        if data.journal.print_issn:
+            issns.append(data.journal.print_issn)
+        if data.journal.electronic_issn:
+            issns.append(data.journal.electronic_issn)
 
-        affs = {item['index'].upper():item for item in data.mixed_affiliations}
-
-        line = [
-            data.publisher_id,
-            data.journal.scielo_issn,
-            data.journal.title,
-            ','.join(data.journal.subject_areas),
-            data.publication_date[0:4],
-            data.document_type
-        ]
-        if data.authors:
-            for author in data.authors:
-                author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]
-                if 'xref' in author:
-                    for index in author['xref']:
-                        index = index.upper()
-                        aff_line = []
-                        aff_line.append(affs.get(index, {}).get('institution', '')),
-                        aff_line.append(affs.get(index, {}).get('country', '')),
-                        aff_line.append(affs.get(index, {}).get('state', '')),
-                        aff_line.append(affs.get(index, {}).get('city', ''))
-                        yield self.join_line(line+author_line+aff_line)
-                else:
-                    yield self.join_line(line+author_line)
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'document')
+        line.append(data.collection_acronym)
+        line.append(data.journal.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.journal.title)
+        line.append(u';'.join(data.journal.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.journal.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.journal.current_status)
+        line.append(data.publisher_id)
+        line.append(data.publication_date[0:4])
+        line.append(data.document_type)
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        if data.mixed_affiliations:
+            for aff in data.mixed_affiliations:
+                aff_line = []
+                aff_line.append(aff.get('institution', '')),
+                aff_line.append(aff.get('country', '')),
+                aff_line.append(aff.get('country_iso_3166', '')),
+                aff_line.append(aff.get('state', '')),
+                aff_line.append(aff.get('city', ''))
+                yield self.join_line(line+aff_line)
         else:
             yield self.join_line(line)
+
 
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump affiliations distribution by article'
     )
 
     parser.add_argument(

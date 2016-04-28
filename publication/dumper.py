@@ -6,9 +6,12 @@ import codecs
 
 import utils
 
-import counts, affiliations, languages, licenses, authors, dates
+import documents_counts, documents_affiliations, documents_languages, documents_licenses, documents_authors, documents_dates
+
+
 
 logger = logging.getLogger(__name__)
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -36,6 +39,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
     return logger
 
+
 class Dumper(object):
 
     def __init__(self, collection, issns=None):
@@ -44,12 +48,12 @@ class Dumper(object):
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
         self.issns = issns
-        self.counts = counts.Dumper(collection, output_file='counts.csv')
-        self.affiliations = affiliations.Dumper(collection, output_file='affiliations.csv')
-        self.languages = languages.Dumper(collection, output_file='languages.csv')
-        self.licenses = licenses.Dumper(collection, output_file='licenses.csv')
-        self.authors = authors.Dumper(authors, output_file='authors.csv')
-        self.dates = dates.Dumper(authors, output_file='dates.csv')
+        self.documents_counts = documents_counts.Dumper(collection, output_file='documents_counts.csv')
+        self.documents_affiliations = documents_affiliations.Dumper(collection, output_file='documents_affiliations.csv')
+        self.documents_languages = documents_languages.Dumper(collection, output_file='documents_languages.csv')
+        self.documents_licenses = documents_licenses.Dumper(collection, output_file='documents_licenses.csv')
+        self.documents_authors = documents_authors.Dumper(collection, output_file='documents_authors.csv')
+        self.documents_dates = documents_dates.Dumper(collection, output_file='documents_dates.csv')
 
     def run(self):
 
@@ -59,14 +63,15 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
-                self.counts.write(self.counts.fmt_csv(data))
-                self.affiliations.write(self.affiliations.fmt_csv(data))
-                self.languages.write(self.languages.fmt_csv(data))
-                self.licenses.write(self.licenses.fmt_csv(data))
-                self.authors.write(self.authors.fmt_csv(data))
-                self.dates.write(self.dates.fmt_csv(data))
+                self.documents_counts.write(self.documents_counts.fmt_csv(data))
+                self.documents_affiliations.write(self.documents_affiliations.fmt_csv(data))
+                self.documents_languages.write(self.documents_languages.fmt_csv(data))
+                self.documents_licenses.write(self.documents_licenses.fmt_csv(data))
+                self.documents_authors.write(self.documents_authors.fmt_csv(data))
+                self.documents_dates.write(self.documents_dates.fmt_csv(data))
 
         logger.info('Export finished')
+
 
 def main():
 

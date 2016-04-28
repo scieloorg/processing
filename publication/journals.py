@@ -2,17 +2,15 @@
 """
 Este processamento gera uma tabulação com contagens, soma, mediana de alguns
 elementos do artigo: total de autores, total de citações, total de páginas
-
-Formato de saída:
-"issn scielo","issn impresso","issn eletrônico","título","área temática","bases WOS","áreas WOS","status","ano de inclusão","licença de uso padrão"
 """
 
 import argparse
 import logging
 import codecs
-from datetime import date
+import datetime
 
 import utils
+import choices
 
 from clients.analytics import Analytics
 
@@ -64,98 +62,84 @@ def interruption_status(history):
 
 class Dumper(object):
 
-    def __init__(self, collection, issns=None, output_file=None, years=5):
+    def __init__(self, collection, issns=None, output_file=None, years=6):
         self._articlemeta = utils.articlemeta_server()
         self._publicationstats = utils.publicationstats_server()
         self._analytics = Analytics()
         self.collection = collection
         self.issns = issns
         self._years = years
-        self._header = []
         self._lines = []
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        self._build_header()
-
-    def _build_header(self):
-
-        now = date.today().year
+        now = datetime.date.today().year
         years_range = [i for i in range(now, now-self._years, -1)]
-
-        self._header = [
-            u"issn scielo",
-            u"issn impresso",
-            u"issn eletrônico",
-            u"nome do publicador",
-            u"título",
-            u"título e subtitulo",
-            u"título abreviado",
-            u"título abreviado sob norma ISO",
-            u"título nlm",
-            u"periodicidade descritiva",
-            u"periodicidade numérica (em meses)",
-            u"área temática",
-            u"bases WOS",
-            u"áreas temáticas WOS",
-            u"situação atual",
-            u"ano de inclusão",
-            u"ano de paralização",
-            u"motivo de paralização",
-            u"licença de uso padrão",
-            u"data do primeiro documento",
-            u"volume do primeiro documento",
-            u"número do primeiro documento",
-            u"data do último documento",
-            u"volúme do último  documento",
-            u"número do último documento",
-            u"issues todos os anos"
-        ]
-        self._header += [u"issues em %s" % str(i) for i in years_range]
-        self._header.append(u"documentos todos os anos")
-        self._header += [u"documentos em %s" % str(i) for i in years_range]
-        self._header.append(u"artigos originais e de revisão todos os anos")
-        self._header += [u"artigos originais e de revisão em %s" % str(i) for i in years_range]
+        header = []
+        header.append(u"extraction date")
+        header.append(u"study unit")
+        header.append(u"collection")
+        header.append(u"ISSN SciELO")
+        header.append(u"ISSN\'s")
+        header.append(u"title at SciELO")
+        header.append(u"title thematic areas")
+        for area in choices.THEMATIC_AREAS:
+            header.append(u"title is %s" % area.lower())
+        header.append(u"title current status")
+        header.append(u"title + subtitle SciELO")
+        header.append(u"short title SciELO")
+        header.append(u"short title ISO")
+        header.append(u"title PubMed")
+        header.append(u"publisher name")
+        header.append(u"use license")
+        header.append(u"alpha frequency")
+        header.append(u"numeric frequency (in months)")
+        header.append(u"inclusion year at SciELO")
+        header.append(u"stopping year at SciELO")
+        header.append(u"stopping reason")
+        header.append(u"date of the first document")
+        header.append(u"volume of the first document")
+        header.append(u"issue of the first document")
+        header.append(u"date of the last document")
+        header.append(u"volume of the last document")
+        header.append(u"issue of the last document")
+        header.append(u"total of issues")
+        header += [u"issues at %s" % str(i) for i in years_range]
+        header.append(u"total of regular issues")
+        header += [u"regular issues at %s" % str(i) for i in years_range]
+        header.append(u"total of documents")
+        header += [u"documents at %s" % str(i) for i in years_range]
+        header.append(u"citable documents")
+        header += [u"citable documents at %s" % str(i) for i in years_range]
         for year in years_range:
-            self._header += [
-                u'documentos em português em %s ' % year,
-                u'documento em espanhol em %s ' % year,
-                u'documentos em inglês em %s ' % year,
-                'documentos em outros idiomas em %s ' % year
-            ]
-
+            header.append(u'portuguese documents at %s ' % year)
         for year in years_range:
-            self._header.append(u'índice de imediatez, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 1 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 2 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 3 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 4 ano, ano base (%s)' % year)
-            self._header.append(u'fator de impacto 5 ano, ano base (%s)' % year)
-
-        self.write(','.join(['"%s"' % i.replace('"', '""') for i in self._header]))
+            header.append(u'spanish documents at %s ' % year)
+        for year in years_range:
+            header.append(u'english documents at %s ' % year)
+        for year in years_range:
+            header.append(u'other language documents at %s ' % year)
+        self.write(','.join(header))
 
     def _documents_languages_by_year(self, issn, collection, years=None):
 
-        if years is None:
-            years = self._years
+        years = self._years if years == None else years
 
         languages = self._publicationstats.documents_languages_by_year(
             issn, collection, years=years)
 
         return languages
 
-    def _number_of_issues_by_year(self, issn, collection, years=None):
+    def _number_of_issues_by_year(self, issn, collection, years=None, type=None):
 
-        if years is None:
-            years = self._years
+        years = self._years if years == None else years
 
         issues = self._publicationstats.number_of_issues_by_year(
-            issn, collection, years=years)
+            issn, collection, years=years, type=type)
 
         return issues
 
     def _number_of_articles_by_year(self, issn, collection, years=None, document_types=None):
 
-        if years is None:
-            years = self._years
+        years = self._years if years == None else years
 
         issues = self._publicationstats.number_of_articles_by_year(
             issn, collection, document_types=document_types, years=years)
@@ -188,7 +172,7 @@ class Dumper(object):
 
     def _impact_factor(self, issn, collection):
 
-        current_year = date.today().year
+        current_year = datetime.date.today().year
 
         itens = {str(i): (0.0, 0.0, 0.0, 0.0, 0.0, 0.0) for i in range(
             current_year, current_year-self._years, -1)}
@@ -210,11 +194,7 @@ class Dumper(object):
 
     def run(self):
         for item in self.items():
-            self._lines.append(item)
-
-        for item in self._lines:
             self.write(item)
-
         logger.info('Export finished')
 
     def items(self):
@@ -235,44 +215,49 @@ class Dumper(object):
 
         interruption = interruption_status(data.status_history)
 
-        line = [
+        issns = []
+        if data.print_issn:
+            issns.append(data.print_issn)
+        if data.electronic_issn:
+            issns.append(data.electronic_issn)
+
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append(u'journal')
+        line.append(data.collection_acronym)
+        line.append(data.scielo_issn)
+        line.append(u';'.join(issns))
+        line.append(data.title)
+        line.append(u';'.join(data.subject_areas))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data.subject_areas]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append(data.current_status)
+        line.append(u' '.join([data.title or u'', data.subtitle or u'']))
+        line.append(data.abbreviated_title or u'')
+        line.append(data.abbreviated_iso_title or u'')
+        line.append(data.title_nlm or u'')
+        line.append(u'; '.join(data.publisher_name or []))
+        line.append(data.permissions.get('id', u'') if data.permissions else u'')
+        line.append(data.periodicity[1] or u'')
+        line.append(data.periodicity_in_months or u'')
+        line.append(data.creation_date[:4])
+        line.append(interruption[0][:4] if interruption else u'')
+        line.append(interruption[2][:4] if interruption else u'')
+        line.append(first_document.publication_date or u'' if first_document else u'')
+        line.append(first_document.issue.volume or u'' if first_document else u'')
+        line.append(first_document.issue.number or u'' if first_document else u'')
+        line.append(last_document.publication_date or u'' if last_document else u'')
+        line.append(last_document.issue.volume or u'' if last_document else u'')
+        line.append(last_document.issue.number or u'' if last_document else u'')
+
+        line.append(unicode(self._number_of_issues_by_year(
             data.scielo_issn,
-            data.print_issn or "",
-            data.electronic_issn or "",
-            data.publisher_name or "",
-            data.title,
-            data.fulltitle,
-            data.abbreviated_title or "",
-            data.abbreviated_iso_title or "",
-            data.title_nlm or "",
-            data.periodicity or "",
-            data.periodicity_in_months or "",
-            ','.join(data.subject_areas or []),
-            ','.join(data.wos_citation_indexes or []),
-            ','.join(data.wos_subject_areas or []),
-            data.current_status,
-            data.creation_date[:4],
-            interruption[0] if interruption else '',
-            interruption[2] if interruption else ''
-        ]
-
-        if data.permissions:
-            line.append(data.permissions.get('id', "") or "")
-        else:
-            line.append("")
-
-        line.append(
-            first_document.publication_date or '' if first_document else '')
-        line.append(first_document.issue.volume or '' if first_document else '')
-        line.append(first_document.issue.number or '' if first_document else '')
-        line.append(
-            last_document.publication_date or '' if last_document else '')
-        line.append(last_document.issue.volume or '' if last_document else '')
-        line.append(last_document.issue.number or '' if last_document else '')
-
-        line.append(
-            str(self._number_of_issues_by_year(
-                data.scielo_issn, data.collection_acronym, years=0))
+            data.collection_acronym,
+            years=0
+            ))
         )
 
         issues = self._number_of_issues_by_year(
@@ -281,7 +266,26 @@ class Dumper(object):
             years=self._years
         )
 
-        line += [str(i[1]) for i in issues]
+        for issue in issues:
+            line.append(unicode(issue[1]))
+
+        line.append(unicode(self._number_of_issues_by_year(
+            data.scielo_issn,
+            data.collection_acronym,
+            years=0,
+            type='regular'
+            ))
+        )
+
+        regular_issues = self._number_of_issues_by_year(
+            data.scielo_issn,
+            data.collection_acronym,
+            years=self._years,
+            type='regular'
+        )
+
+        for issue in regular_issues:
+            line.append(unicode(issue[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
@@ -295,21 +299,25 @@ class Dumper(object):
             years=self._years
         )
 
-        line += [str(i[1]) for i in documents]
+        for document in documents:
+            line.append(unicode(document[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
             data.collection_acronym,
-            document_types=['research-article', 'review-article'],
+            document_types=choices.CITABLE_THEMATIC_AREAS,
             years=0))
         )
 
-        line += [str(i[1]) for i in self._number_of_articles_by_year(
+        documents = [str(i[1]) for i in self._number_of_articles_by_year(
             data.scielo_issn,
             data.collection_acronym,
-            document_types=['research-article', 'review-article'],
+            document_types=choices.CITABLE_THEMATIC_AREAS,
             years=self._years
         )]
+
+        for document in documents:
+            line.append(unicode(document))
 
         languages = self._documents_languages_by_year(
             data.scielo_issn,
@@ -318,20 +326,15 @@ class Dumper(object):
         )
 
         for years, values in sorted(languages.items(), reverse=True):
-            line += [
-                str(values['pt']),
-                str(values['es']),
-                str(values['en']),
-                str(values['other'])
-            ]
+            line.append(unicode(values['pt']))
+        for years, values in sorted(languages.items(), reverse=True):
+            line.append(unicode(values['es']))
+        for years, values in sorted(languages.items(), reverse=True):
+            line.append(unicode(values['en']))
+        for years, values in sorted(languages.items(), reverse=True):
+            line.append(unicode(values['other']))
 
-        impact_factor = self._impact_factor(
-            data.scielo_issn, self.collection)
-
-        for year, values in sorted(impact_factor.items(), reverse=True):
-            line += [str(i) for i in values]
-
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 
         return joined_line
 
@@ -339,7 +342,7 @@ class Dumper(object):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump general journals indicators'
     )
 
     parser.add_argument(
