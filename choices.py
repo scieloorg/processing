@@ -11,7 +11,7 @@ THEMATIC_AREAS = sorted([
     u"literature and arts",
 ])
 
-CITABLE_THEMATIC_AREAS = (
+CITABLE_DOCUMENT_TYPES = (
     u'article-commentary',
     u'brief-report',
     u'case-report',

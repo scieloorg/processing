@@ -108,9 +108,9 @@ class Dumper(object):
         line.append(data.scielo_issn)
         line.append(u';'.join(issns))
         line.append(data.title)
-        line.append(u';'.join(data.subject_areas))
+        line.append(u';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
-            if area.lower() in [i.lower() for i in data.subject_areas]:
+            if area.lower() in [i.lower() for i in data.subject_areas or []]:
                 line.append(u'1')
             else:
                 line.append(u'0')
