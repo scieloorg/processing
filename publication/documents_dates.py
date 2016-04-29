@@ -136,7 +136,7 @@ class Dumper(object):
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
         line.append(data.receive_date or '')
         receive_splited = utils.split_date(data.receive_date or '')
         line.append(receive_splited[0])  # year
