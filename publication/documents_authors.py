@@ -121,9 +121,9 @@ class Dumper(object):
         line.append(data.journal.scielo_issn)
         line.append(u';'.join(issns))
         line.append(data.journal.title)
-        line.append(u';'.join(data.journal.subject_areas))
+        line.append(u';'.join(data.journal.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
-            if area.lower() in [i.lower() for i in data.journal.subject_areas]:
+            if area.lower() in [i.lower() for i in data.journal.subject_areas or []]:
                 line.append(u'1')
             else:
                 line.append(u'0')
@@ -131,7 +131,7 @@ class Dumper(object):
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
-        line.append(u'1' if data.document_type.lower() in choices.CITABLE_THEMATIC_AREAS else '0')
+        line.append(u'1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
         if data.authors:
             for author in data.authors:
                 author_line = [' '.join([author.get('given_names', ''), author.get('surname', '')])]

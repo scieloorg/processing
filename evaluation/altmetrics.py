@@ -164,9 +164,9 @@ class Dumper(object):
         line.append(data.scielo_issn)
         line.append(u';'.join(issns))
         line.append(data.title)
-        line.append(u';'.join(data.subject_areas))
+        line.append(u';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
-            if area.lower() in [i.lower() for i in data.subject_areas]:
+            if area.lower() in [i.lower() for i in data.subject_areas or []]:
                 line.append(u'1')
             else:
                 line.append(u'0')
@@ -180,7 +180,7 @@ class Dumper(object):
         if document_type == u'not define':
             line.append(document_type)
         else:
-            line.append(u'1' if document_type.lower() in choices.CITABLE_THEMATIC_AREAS else u'0')
+            line.append(u'1' if document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else u'0')
         line.append(str(score) or u'0')
         line.append(details_url or u'not defined')
 
