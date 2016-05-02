@@ -351,7 +351,7 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * estado de afiliação do documento (**document affiliation state**)
     * cidade de afiliação do documento (**document affiliation city**)
 
-_ ..hint:
+.. hint::
 
     Os dados de afiliação não estão disponíveis para todos os documentos. Por
     se tratar de um processo com alto índice de trabalho manual, é reconhecida,
@@ -403,7 +403,7 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * 3 autores (**3 authors**)
     * 4 autores (**4 authors**)
     * 5 autores (**5 authors**)
-    * +6 autores  (**+6 authors**)
+    * +6 autores  (**\+6 authors**)
     * total de páginas (**pages**)
     * total de referências (**references**)
 
