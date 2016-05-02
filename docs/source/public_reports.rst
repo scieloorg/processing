@@ -261,13 +261,13 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * situação corrente do título (**title current status**)
     * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
     * ano de publicação do documento (**document publishing year**)
-    * tipo de documento (**document type**)
-    * documento citável (**document is citable**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, :ref:`citable documents`)
     * pontuação (**score**)
     * url altmetrics (**altmetrics url**)
 
 
-..hint::
+.. hint::
 
     Os dados das colunas abaixo, poderão vir sem informação pois é necessário que
     o identificador fornecido pelo Altmetrics seja um identificador válido no 
@@ -313,7 +313,7 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 Relatório de afiliações dos documentos
 ======================================
 
-**nome do arquivo:** affiliations.csv
+**nome do arquivo:** documents_affiliations.csv
 
 **finalidade:** Relatório com autores dos documentos, para extração
 de indicadores de publicação.
@@ -325,24 +325,49 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 **Formato CSV**
 
-    * PID
-    * ISSN
-    * título
-    * área temática
-    * ano de publicação
-    * tipo de documento
-    * paises de afiliação (separado por "," virgula)
-    * exclusivo nacional
-    * exclusivo estrangeiro
-    * nacional + estrangeiro
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, , :ref:`citable documents`)
+    * instituição de Afiliação do documento (**document affiliation institution**)
+    * país de afiliação do documento (**document affiliation country**)
+    * país de afiliação do documento ISO-3166 (**document addiliation country ISO-3166**, :ref:`languages`)
+    * estado de afiliação do documento (**document affiliation state**)
+    * cidade de afiliação do documento (**document affiliation city**)
+
+_ ..hint:
+
+    Os dados de afiliação não estão disponíveis para todos os documentos. Por
+    se tratar de um processo com alto índice de trabalho manual, é reconhecida,
+    mesmo que em baixas proporções, a existência de metadados errados ou não
+    normalizados. A qualidade dos metadados podem variar de uma coleção para outra
+    devido aos processos estabelecidos por cada uma delas para a garantia de 
+    qualidade de seus metadados.
 
 Relatório de contagens gerais relacionadas aos dos documentos
 =============================================================
 
-**nome do arquivo:** counts.csv
+**nome do arquivo:** documents_counts.csv
 
 **finalidade:** Relatório com contagens de dos documentos, para extração
-de indicadores de publicação.
+de indicadores de publicação. Neste relatório existem contagens de autores por
+documento, páginas por documento e referências bibliográficas por documento.
 
 Formatos de saída
 -----------------
@@ -351,27 +376,41 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 **Formato CSV**
 
-    * PID
-    * issn
-    * título da revista
-    * área temática
-    * ano de publicação
-    * tipo de documento
-    * total autores
-    * 0 autores
-    * 1 autor
-    * 2 autores
-    * 3 autores
-    * 4 autores
-    * 5 autores
-    * +6 autores
-    * total páginas
-    * total referências
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, , :ref:`citable documents`)
+    * total de autores (**authors**)
+    * 0 autores (**0 authors**)
+    * 1 autor (**1 author**)
+    * 2 autores (**2 authors**)
+    * 3 autores (**3 authors**)
+    * 4 autores (**4 authors**)
+    * 5 autores (**5 authors**)
+    * +6 autores  (**+6 authors**)
+    * total de páginas (**pages**)
+    * total de referências (**references**)
 
 Relatório de datas do documento
 ===============================
 
-**nome do arquivo:** dates.csv
+**nome do arquivo:** documents_dates.csv
 
 **finalidade:** Relatório com datas do documento.
 
@@ -382,23 +421,55 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 **Formato CSV**
 
-    * PID
-    * ISSN
-    * título
-    * área temática
-    * ano de publicação
-    * tipo de documento
-    * recebido
-    * revisado
-    * aceito
-    * publicado
-    * entrada no SciELO
-    * atualização no SciELO
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, , :ref:`citable documents`)
+    * documento enviado em (document submitted at)
+    * documento enviado no ano (document submitted at year)
+    * documento enviado no mês (document submitted at month)
+    * documento enviado no dia (document submitted at day)
+    * documento aceito em (document accepted at)
+    * documento aceito no ano (document accepted at year)
+    * documento aceito no mês (document accepted at month)
+    * documento aceito no dia (document accepted at day)
+    * documento revisado em (document reviewed at)
+    * documento revisado no ano (document reviewed at year)
+    * documento revisado no mês (document reviewed at month)
+    * documento revisado no dia (document reviewed at day)
+    * documento publicado em (published reviewed at)
+    * documento publicado no ano (document published at year)
+    * documento publicado no mês (document published at month)
+    * documento publicado no dia (document published at day)
+    * documento publicado no SciELO em (published in SciELO at)
+    * documento publicado no SciELO no ano (document published in SciELO at year)
+    * documento publicado no SciELO no mês (document published in SciELO at month)
+    * documento publicado no SciELO no dia (document published in SciELO at day)
+    * documento atualizado no SciELO em (updated in SciELO at)
+    * documento atualizado no SciELO no ano (document updated in SciELO at year)
+    * documento atualizado no SciELO no mês (document updated in SciELO at month)
+    * documento atualizado no SciELO no dia (document updated in SciELO at day)
 
 Relatório de idiomas de publicação dos documentos
 =================================================
 
-**nome do arquivo:** languages.csv
+**nome do arquivo:** documents_languages.csv
 
 **finalidade:** Relatório de idiomas de publicação dos documentos.
 
@@ -409,28 +480,36 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 **Formato CSV**
 
-    * PID
-    * ISSN
-    * título
-    * área temática
-    * ano de publicação
-    * tipo de documento
-    * idiomas (separado por "," virgula)
-    * pt
-    * es
-    * en
-    * other
-    * pt-es
-    * pt-en
-    * en-es
-    * exclusivo nacional
-    * exclusivo estrangeiro
-    * nacional + estrangeiro
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, , :ref:`citable documents`)
+    * idiomas do documento (separado por ";" virgula) (document languages, :ref:`languages`)
+    * documento em pt (document pt)
+    * documento em es (document es)
+    * documento em en (document en)
+    * documento em outros idiomas (document other languages)
 
 Relatório de licenças de uso dos documentos
 ===========================================
 
-**nome do arquivo:** licenses.csv
+**nome do arquivo:** documents_licenses.csv
 
 **finalidade:** Relatório de licnças de uso dos documentos.
 
@@ -441,13 +520,27 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 
 **Formato CSV**
 
-    * PID
-    * ISSN
-    * título
-    * área temática
-    * ano de publicação
-    * tipo de documento
-    * license
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, , :ref:`citable documents`)
+    * licença de uso do documento (document license)
 
 -----------------
 Listas auxiliares
@@ -575,6 +668,17 @@ Elas podem ser:
     * human sciences
     * literature and arts
 
+.. _document types:
+
+--------------
+Document Types
+--------------
+
+A lista de tipos de documentos segue a lista do SciELO Publishing Schema e é 
+utilizada para classificar o tipo de cada documento publicado.
+
+Verificar a lista completa em: http://docs.scielo.org/projects/scielo-publishing-schema/pt_BR/latest/tagset/elemento-article.html#article
+
 .. _citable documents:
 
 -----------------
@@ -583,7 +687,11 @@ Citable Documents
 
 A lista de tipos de **documentos citáveis** (citable documents) é utilizada para
 contabilizar quais documentos são considerados citáveis ou não para fins de 
-computação de indicadores bibliométricos tais como Fator de Impacto.
+computação de indicadores bibliométricos tais como Fator de Impacto. A lista
+de tipos de documentos citáveis é um subset da lista de tipos de documentos
+do SciELO Publishing Schema.
+
+Verificar a lista completa em: http://docs.scielo.org/projects/scielo-publishing-schema/pt_BR/latest/tagset/elemento-article.html#article
 
 Os tipo de documentos citáveis são:
 
