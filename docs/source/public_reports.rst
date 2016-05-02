@@ -24,15 +24,15 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * data de extração (**extraction date**)
-    * unidade de estudo (**:ref:`study unity`**)
-    * coleção (**:ref:`collection`**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
     * ISSN SciELO (**ISSN SciELO**)
     * ISSN's (**ISSN's**)
     * título na SciELO (**title at SciELO**)
-    * areas temáticas do título (**:ref:`title thematic areas`**)
+    * areas temáticas do título (:ref:`title thematic areas`)
     * título é de ciências agrárias (**agricultural sciences**)
     * título é de ciências sociais aplicadas (**applied social sciences**)
     * título é de ciências biológicas (**biological sciences**)
@@ -47,7 +47,7 @@ Formato CSV::
     * título abreviado no PubMed (**short title PubMed**)
     * nome do publicador (**publisher name**)
     * licença de uso (**use license**)
-    * frequencia alpha (**alpha frequency**)
+    * frequencia alpha (:ref:`alpha frequency`)
     * ano de inclusão na SciELO (**inclusion year at SciELO**)
     * ano de paralização na SciELO (**stopping year at SciELO**)
     * motivo de paralização (**stopping reason**)
@@ -103,7 +103,6 @@ Formato CSV::
     * documentos em outros idiomas em <ano corrente - 4> (**other languages documents at <current year - 4>**)
     * documentos em outros idiomas em <ano corrente - 5> (**other languages documents at <current year - 5>**)
 
-
 Relatório de histórico de mudanças de status dos periódicos
 ===========================================================
 
@@ -117,15 +116,15 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * data de extração (**extraction date**)
-    * unidade de estudo (**:ref:`study unity`**)
-    * coleção (**:ref:`collection`**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
     * ISSN SciELO (**ISSN SciELO**)
     * ISSN's (**ISSN's**)
     * título na SciELO (**title at SciELO**)
-    * areas temáticas do título (**:ref:`title thematic areas`**)
+    * areas temáticas do título (:ref:`title thematic areas`)
     * título é de ciências agrárias (**agricultural sciences**)
     * título é de ciências sociais aplicadas (**applied social sciences**)
     * título é de ciências biológicas (**biological sciences**)
@@ -155,15 +154,15 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * data de extração (**extraction date**)
-    * unidade de estudo (**:ref:`study unity`**)
-    * coleção (**:ref:`collection`**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
     * ISSN SciELO (**ISSN SciELO**)
     * ISSN's (**ISSN's**)
     * título na SciELO (**title at SciELO**)
-    * areas temáticas do título (**:ref:`title thematic areas`**)
+    * areas temáticas do título (:ref:`title thematic areas`)
     * título é de ciências agrárias (**agricultural sciences**)
     * título é de ciências sociais aplicadas (**applied social sciences**)
     * título é de ciências biológicas (**biological sciences**)
@@ -193,7 +192,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * Título do Periódico (**publication_title**)
     * ISSN impresso (**print_identifier**)
@@ -232,7 +231,7 @@ Relatório de pontuação de documentos no altmetrics
 
 **finalidade:** Relatório geral pontuação dos documentos SciELO no Altmetrics,
 
-.. note::
+.. hint::
 
     os metadados deste relatório estão condicionados a qualidade dos metadados 
     disponíveis no altmetrics.
@@ -242,15 +241,15 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * data de extração (**extraction date**)
-    * unidade de estudo (**:ref:`study unity`**)
-    * coleção (**:ref:`collection`**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
     * ISSN SciELO (**ISSN SciELO**)
     * ISSN's (**ISSN's**)
     * título na SciELO (**title at SciELO**)
-    * areas temáticas do título (**:ref:`title thematic areas`**)
+    * areas temáticas do título (:ref:`title thematic areas`)
     * título é de ciências agrárias (**agricultural sciences**)
     * título é de ciências sociais aplicadas (**applied social sciences**)
     * título é de ciências biológicas (**biological sciences**)
@@ -293,7 +292,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * acrônimo da coleção
     * PID
@@ -324,7 +323,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * PID
     * ISSN
@@ -350,7 +349,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * PID
     * issn
@@ -381,7 +380,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * PID
     * ISSN
@@ -408,7 +407,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * PID
     * ISSN
@@ -440,7 +439,7 @@ Formatos de saída
 
 Os formatos de saída disponíveis para este relatório são: CSV.
 
-Formato CSV::
+**Formato CSV**
 
     * PID
     * ISSN
@@ -459,9 +458,9 @@ campos da tabulações de periódicos, documentos e coleções.
 
 .. _study unity:
 
------------------
-Unidade de estudo
------------------
+-----------
+Study Unity
+-----------
 
 A lista de **unidade de estudo** (study unity) indica a únidade dos metadados de
 cada linha das tabulações.
@@ -525,11 +524,42 @@ Elas podem ser:
 +-----------------+-------------------+
 
 
-.. _title thematic area:
+.. _alpha frequency:
 
--------------
-Área Temática
--------------
+---------------
+Alpha Frequency
+---------------
+
+A lista de **frequencia alpha** indica a frequencia de publicação entre um 
+fascículo e outro.
+
+Elas podem ser:
+
++------------------------------+----------------------+ 
+| Fequência Alpha              |  Frequencia Numérica |
++==============================+======================+
+| Monthly                      |  12                  | 
++------------------------------+----------------------+
+| Bimonthly (every two months) |  6                   |
++------------------------------+----------------------+
+| Quarterly                    |  4                   |
++------------------------------+----------------------+
+| Three times a year           |  3                   |
++------------------------------+----------------------+
+| Semiannual (twice a year)    |  2                   |
++------------------------------+----------------------+
+| Annual                       |  1                   |
++------------------------------+----------------------+
+| Irregular (know to be so)    |  undefined           |
++------------------------------+----------------------+
+| Other frequencies            |  undefined           |
++------------------------------+----------------------+
+
+.. _title thematic areas:
+
+--------------------
+Title Thematic Areas
+--------------------
 
 A lista de **áreas temáticas** indica as possíveis áreas de um título. Esse
 dado é apresentado na columa área temática do título (title temathic area).
@@ -547,9 +577,9 @@ Elas podem ser:
 
 .. _citable documents:
 
--------------------
-Documentos citáveis
--------------------
+-----------------
+Citable Documents
+-----------------
 
 A lista de tipos de **documentos citáveis** (citable documents) é utilizada para
 contabilizar quais documentos são considerados citáveis ou não para fins de 
@@ -578,9 +608,9 @@ SciELO, são:
 
 .. _languages:
 
--------
-Idiomas
--------
+---------
+Languages
+---------
 
 A lista de **idiomas** (languages) utilizada para classificar os campos
 relacionados com o idioma dos documentos.
