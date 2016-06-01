@@ -79,7 +79,8 @@ class Dumper(object):
             u"tipo de acesso (access_type)"
 
         ]
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def _first_included_document_by_journal(self, issn, collection):
 

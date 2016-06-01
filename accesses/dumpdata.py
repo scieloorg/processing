@@ -144,6 +144,7 @@ def issuelabel(document):
 
     return ', '.join(itens)
 
+
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data = {}

@@ -78,7 +78,8 @@ class Dumper(object):
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         header = [u"coleção",u"issn scielo",u"issn impresso",u"issn eletrônico",u"título",u"ID no DOAJ",u"Provider no DOAJ",u"Status no DOAJ"]
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def get_doaj_journal(self, issns):
         data = {}

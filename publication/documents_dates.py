@@ -89,7 +89,8 @@ class Dumper(object):
         header.append(u"document updated in SciELO at year")
         header.append(u"document updated in SciELO at month")
         header.append(u"document updated in SciELO at day")
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:

@@ -68,7 +68,8 @@ class Dumper(object):
         header.append(u"SciELO impact 3 years")
         header.append(u"SciELO impact 4 years")
         header.append(u"SciELO impact 5 years")
-        self.write(u','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:

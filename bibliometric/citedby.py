@@ -70,7 +70,8 @@ class Dumper(object):
         header.append(u"document is citable")
 
         header = [u"PID", u"ISSN", u"título", u"área temática", u"ano de publicação", u"tipo de documento", u"título do documento", u"citado por PID", u"citado por ISSN", u"citado por título", u"citado por título do documento"]
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:

@@ -5,10 +5,10 @@ THEMATIC_AREAS = sorted([
     u"applied social sciences",
     u"biological sciences",
     u"engineering",
-    u"exact and earth science",
+    u"exact and earth sciences",
     u"health sciences",
     u"human sciences",
-    u"literature and arts",
+    u"linguistics, letters and arts",
 ])
 
 CITABLE_DOCUMENT_TYPES = (

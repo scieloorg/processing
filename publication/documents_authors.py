@@ -70,7 +70,8 @@ class Dumper(object):
         header.append(u"document author affiliation country")
         header.append(u"document author affiliation state")
         header.append(u"document author affiliation city")
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, lines):
 

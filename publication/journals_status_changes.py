@@ -68,7 +68,8 @@ class Dumper(object):
         header.append(u"status change day")
         header.append(u"status changed to")
         header.append(u"status change reason")
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:

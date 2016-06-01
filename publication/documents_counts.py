@@ -89,7 +89,8 @@ class Dumper(object):
         header.append(u"+6 authors")
         header.append(u"pages")
         header.append(u"references")
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:

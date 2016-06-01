@@ -117,7 +117,8 @@ class Dumper(object):
             header.append(u'english documents at %s ' % year)
         for year in years_range:
             header.append(u'other language documents at %s ' % year)
-        self.write(','.join(header))
+
+        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def _documents_languages_by_year(self, issn, collection, years=None):
 
@@ -228,10 +229,7 @@ class Dumper(object):
         line.append(data.scielo_issn)
         line.append(u';'.join(issns))
         line.append(data.title)
-        try:
-            line.append(u';'.join(data.subject_areas or []))
-        except:
-            import pdb; pdb.set_trace()
+        line.append(u';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data.subject_areas or []]:
                 line.append(u'1')
