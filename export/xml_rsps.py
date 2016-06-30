@@ -18,6 +18,7 @@ import utils
 os.environ['XML_CATALOG_FILES'] = XML_CATALOG
 logger = logging.getLogger(__name__)
 
+
 def _config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
@@ -44,6 +45,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
     return logger
 
+
 def summarize(validator):
 
     def _make_err_message(err):
@@ -65,7 +67,6 @@ def summarize(validator):
 
         return err_msg
 
-
     dtd_is_valid, dtd_errors = validator.validate()
     sps_is_valid, sps_errors = validator.validate_style()
 
@@ -80,6 +81,7 @@ def summarize(validator):
 
     return summary
 
+
 def analyze_xml(xml, document):
     """Analyzes `file` against packtools' XMLValidator.
     """
@@ -87,9 +89,9 @@ def analyze_xml(xml, document):
     f = StringIO(xml)
 
     try:
-        xml = packtools.XMLValidator(f)
-    except:
-        logger.error('Could not read file %s' % document.publisher_id)
+        xml = packtools.XMLValidator.parse(f, sps_version='sps-1.1')
+    except packtools.exceptions.PacktoolsError as e:
+        logger.exception(e)
         summary = {}
         summary['dtd_is_valid'] = False
         summary['sps_is_valid'] = False
@@ -114,7 +116,7 @@ class Dumper(object):
         fmt = {}
 
         fmt['code'] = data.publisher_id
-        fmt['collection'] =  data.collection_acronym
+        fmt['collection'] = data.collection_acronym
         fmt['id'] = '_'.join([data.collection_acronym, data.publisher_id])
         fmt['document_type'] = data.document_type
         fmt['publication_year'] = data.publication_date[0:4]
