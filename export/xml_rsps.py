@@ -129,11 +129,10 @@ class Dumper(object):
 
         return fmt
 
-    def prepare_queue(self, q):
+    def prepare_queue(self, issn, q):
 
-        for issn in self.issns:
-            for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-                q.put(self.fmt_json(document))
+        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
+            q.put(self.fmt_json(document))
 
     def summaryze_xml_validation(self, pid, collection_acronym, output_format):
 
@@ -166,17 +165,19 @@ class Dumper(object):
 
         job_queue = Queue()
 
-        self.prepare_queue(job_queue)
+        for issn in self.issns:
 
-        jobs = []
+            self.prepare_queue(issn, job_queue)
 
-        max_threads = multiprocessing.cpu_count() * 2
+            jobs = []
 
-        for t in range(max_threads):
-            thread = threading.Thread(target=self._worker, args=(job_queue, t))
-            jobs.append(thread)
-            thread.start()
-            logger.info('Thread running %s' % thread)
+            max_threads = multiprocessing.cpu_count() * 2
+
+            for t in range(max_threads):
+                thread = threading.Thread(target=self._worker, args=(job_queue, t))
+                jobs.append(thread)
+                thread.start()
+                logger.info('Thread running %s' % thread)
 
         for job in jobs:
             job.join()
