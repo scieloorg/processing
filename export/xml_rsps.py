@@ -195,6 +195,13 @@ def main():
     )
 
     parser.add_argument(
+        '--issns_file',
+        '-i',
+        default=None,
+        help='Full path to a txt file within a list of ISSNs to be exported'
+    )
+
+    parser.add_argument(
         '--collection',
         '-c',
         help='Collection Acronym'
@@ -221,6 +228,16 @@ def main():
     issns = None
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
+
+    issns_from_file = None
+    if args.issns_file:
+        with open(args.issns_file, 'r') as f:
+            issns_from_file = utils.ckeck_given_issns([i.strip() for i in f])
+
+    if issns:
+        issns += issns_from_file if issns_from_file else []
+    else:
+        issns = issns_from_file if issns_from_file else []
 
     dumper = Dumper(args.collection, issns)
 
