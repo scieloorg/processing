@@ -8,6 +8,9 @@ import argparse
 import logging
 import codecs
 import json
+import threading
+import multiprocessing
+from Queue import Queue, Empty
 from io import StringIO
 
 import packtools
@@ -82,7 +85,7 @@ def summarize(validator):
     return summary
 
 
-def analyze_xml(xml, document):
+def analyze_xml(xml):
     """Analyzes `file` against packtools' XMLValidator.
     """
 
@@ -100,6 +103,7 @@ def analyze_xml(xml, document):
         return summary
     else:
         summary = summarize(xml)
+
         return summary
 
 
@@ -111,7 +115,7 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns or [None]
 
-    def fmt_json(self, data, xml_result):
+    def fmt_json(self, data):
 
         fmt = {}
 
@@ -122,21 +126,60 @@ class Dumper(object):
         fmt['publication_year'] = data.publication_date[0:4]
         fmt['document_type'] = data.document_type
         fmt['data_version'] = 'legacy' if data.data_model_version == 'html' else 'xml'
-        fmt.update(xml_result)
-        return json.dumps(fmt)
 
-    def run(self):
+        return fmt
+
+    def prepare_queue(self, q):
+
         for issn in self.issns:
             for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-                try:
-                    xml = self._articlemeta.document(document.publisher_id, document.collection_acronym, fmt='xmlrsps')
-                except Exception as e:
-                    logger.exception(e)
-                    logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
-                    xml = u''
-                logger.debug('Reading document: %s' % document.publisher_id)
-                validation_result = analyze_xml(xml, document)
-                print(self.fmt_json(document, validation_result))
+                q.put(self.fmt_json(document))
+
+    def summaryze_xml_validation(self, pid, collection_acronym, output_format):
+
+        try:
+            xml = self._articlemeta.document(pid, collection_acronym, fmt='xmlrsps')
+        except Exception as e:
+            logger.exception(e)
+            logger.error('Fail to read document: %s_%s' % (pid, collection_acronym))
+            xml = u''
+
+        logger.debug('Reading document: %s' % pid)
+
+        output_format.update(analyze_xml(xml))
+
+        print(json.dumps(output_format))
+
+    def _worker(self, q, t):
+
+        while True:
+
+            try:
+                doc = q.get(timeout=0.5)
+            except Empty:
+                return
+
+            logger.debug('Running thread %s' % t)
+            self.summaryze_xml_validation(doc['code'], doc['collection'], doc)
+
+    def run(self):
+
+        job_queue = Queue()
+
+        self.prepare_queue(job_queue)
+
+        jobs = []
+
+        max_threads = multiprocessing.cpu_count() * 2
+
+        for t in range(max_threads):
+            thread = threading.Thread(target=self._worker, args=(job_queue, t))
+            jobs.append(thread)
+            thread.start()
+            logger.info('Thread running %s' % thread)
+
+        for job in jobs:
+            job.join()
 
 
 def main():
