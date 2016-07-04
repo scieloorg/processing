@@ -104,6 +104,8 @@ def analyze_xml(xml):
     else:
         summary = summarize(xml)
 
+        del xml
+
         return summary
 
 
@@ -148,6 +150,10 @@ class Dumper(object):
         output_format.update(analyze_xml(xml))
 
         print(json.dumps(output_format))
+
+        del xml
+        for key in output_format.keys():
+            del(output_format[key])
 
     def _worker(self, q, t):
 
