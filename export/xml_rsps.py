@@ -15,7 +15,7 @@ from io import StringIO
 
 import packtools
 from packtools.catalogs import XML_CATALOG
-
+from lxml.etree import XMLSyntaxError
 import utils
 
 os.environ['XML_CATALOG_FILES'] = XML_CATALOG
@@ -100,6 +100,18 @@ def analyze_xml(xml):
         summary['sps_is_valid'] = False
         summary['is_valid'] = False
         summary['parsing_error'] = True
+        summary['dtd_errors'] = []
+        summary['sps_errors'] = []
+        return summary
+    except XMLSyntaxError as e:
+        logger.exception(e)
+        summary = {}
+        summary['dtd_is_valid'] = False
+        summary['sps_is_valid'] = False
+        summary['is_valid'] = False
+        summary['parsing_error'] = True
+        summary['dtd_errors'] = [e.message]
+        summary['sps_errors'] = []
         return summary
     else:
         summary = summarize(xml)
@@ -167,7 +179,7 @@ class Dumper(object):
             logger.debug('Running thread %s' % t)
             self.summaryze_xml_validation(doc['code'], doc['collection'], doc)
 
-    def run(self):
+    def run(self, processes):
 
         job_queue = Queue()
 
@@ -177,7 +189,7 @@ class Dumper(object):
 
             jobs = []
 
-            max_threads = multiprocessing.cpu_count() * 2
+            max_threads = multiprocessing.cpu_count() * processes
 
             for t in range(max_threads):
                 thread = threading.Thread(target=self._worker, args=(job_queue, t))
@@ -215,6 +227,14 @@ def main():
     )
 
     parser.add_argument(
+        '--processes',
+        '-p',
+        type=int,
+        default=1,
+        help='Number of processes per CPU'
+    )
+
+    parser.add_argument(
         '--logging_file',
         '-o',
         help='Full path to the log file'
@@ -248,4 +268,4 @@ def main():
 
     dumper = Dumper(args.collection, issns)
 
-    dumper.run()
+    dumper.run(args.processes)
