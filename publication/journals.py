@@ -83,6 +83,7 @@ class Dumper(object):
         header.append(u"title thematic areas")
         for area in choices.THEMATIC_AREAS:
             header.append(u"title is %s" % area.lower())
+        header.append(u"title is multidisciplinary")
         header.append(u"title current status")
         header.append(u"title + subtitle SciELO")
         header.append(u"short title SciELO")
@@ -235,6 +236,7 @@ class Dumper(object):
                 line.append(u'1')
             else:
                 line.append(u'0')
+        line.append('1' if len(data.subject_areas or []) > 1 else '0')
         line.append(data.current_status)
         line.append(u' '.join([data.title or u'', data.subtitle or u'']))
         line.append(data.abbreviated_title or u'')

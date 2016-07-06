@@ -74,6 +74,7 @@ class Dumper(object):
         header.append(u"title thematic areas")
         for area in choices.THEMATIC_AREAS:
             header.append(u"title is %s" % area.lower())
+        header.append(u"title is multidisciplinary")
         header.append(u"title current status")
         header.append(u"document publishing ID (PID SciELO)")
         header.append(u"document publishing year")
@@ -140,6 +141,7 @@ class Dumper(object):
                 line.append(u'1')
             else:
                 line.append(u'0')
+        line.append('1' if len(data.journal.subject_areas or []) > 1 else '0')
         line.append(data.journal.current_status)
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])

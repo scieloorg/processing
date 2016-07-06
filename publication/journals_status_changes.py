@@ -61,6 +61,7 @@ class Dumper(object):
         header.append(u"title thematic areas")
         for area in choices.THEMATIC_AREAS:
             header.append(u"title is %s" % area.lower())
+        header.append(u"title is multidisciplinary")
         header.append(u"title current status")
         header.append(u"status change date")
         header.append(u"status change year")
@@ -115,6 +116,7 @@ class Dumper(object):
                 line.append(u'1')
             else:
                 line.append(u'0')
+        line.append('1' if len(data.subject_areas or []) > 1 else '0')
         line.append(data.current_status)
         line.append(hist)
         hist_splited = utils.split_date(hist or '')
