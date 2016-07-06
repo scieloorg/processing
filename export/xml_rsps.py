@@ -6,12 +6,11 @@ Este processamento realiza a exportação de registros SciELO para o formato RSP
 import os
 import argparse
 import logging
-import codecs
 import json
 import threading
 import multiprocessing
-from Queue import Queue, Empty
 from io import StringIO
+import itertools
 
 import packtools
 from packtools.catalogs import XML_CATALOG
@@ -78,9 +77,9 @@ def summarize(validator):
         'sps_errors': [_make_err_message(err) for err in sps_errors],
     }
 
-    summary['dtd_is_valid'] = validator.validate()[0]
-    summary['sps_is_valid'] = validator.validate_style()[0]
-    summary['is_valid'] = bool(validator.validate()[0] and validator.validate_style()[0])
+    summary['dtd_is_valid'] = dtd_is_valid
+    summary['sps_is_valid'] = sps_is_valid
+    summary['is_valid'] = bool(dtd_is_valid and sps_is_valid)
 
     return summary
 
@@ -116,9 +115,24 @@ def analyze_xml(xml):
     else:
         summary = summarize(xml)
 
-        del xml
-
         return summary
+
+
+class ThreadSafeIter(object):
+    """Wraps an iterable for safe use in a threaded environment.
+    """
+    def __init__(self, it):
+        self.it = iter(it)
+        self.lock = threading.Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.it)
+
+    next = __next__
 
 
 class Dumper(object):
@@ -163,39 +177,33 @@ class Dumper(object):
 
         print(json.dumps(output_format))
 
-        del xml
-        for key in output_format.keys():
-            del(output_format[key])
-
-    def _worker(self, q, t):
-
-        while True:
-
-            try:
-                doc = q.get(timeout=0.5)
-            except Empty:
-                return
-
+    def _worker(self, docs, t):
+        for doc in docs:
             logger.debug('Running thread %s' % t)
             self.summaryze_xml_validation(doc['code'], doc['collection'], doc)
 
     def run(self, processes):
+        max_threads = multiprocessing.cpu_count() * processes
 
-        job_queue = Queue()
+        def _gen_iterdocs():
+            """Produz um gerador de geradores de documentos.
+            """
+            for issn in self.issns:
+                iterdocs = (self.fmt_json(doc)
+                            for doc in self._articlemeta.documents(
+                                collection=self.collection, issn=issn))
+                yield iterdocs
 
-        for issn in self.issns:
+        iterdocs = itertools.chain.from_iterable(_gen_iterdocs())
+        safe_iterdocs = ThreadSafeIter(iterdocs)
 
-            self.prepare_queue(issn, job_queue)
-
-            jobs = []
-
-            max_threads = multiprocessing.cpu_count() * processes
-
-            for t in range(max_threads):
-                thread = threading.Thread(target=self._worker, args=(job_queue, t))
-                jobs.append(thread)
-                thread.start()
-                logger.info('Thread running %s' % thread)
+        jobs = []
+        for t in range(max_threads):
+            thread = threading.Thread(target=self._worker,
+                                      args=(safe_iterdocs, t))
+            jobs.append(thread)
+            thread.start()
+            logger.info('Thread running %s' % thread)
 
         for job in jobs:
             job.join()
