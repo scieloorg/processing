@@ -17,10 +17,13 @@ logger = logging.getLogger(__name__)
 API_DOMAIN = utils.settings.get('app:main', {}).get(
     'solr_search_scielo_org', 'localhost:8080')
 
+API_INDEX = utils.settings.get('app:main', {}).get(
+    'solr_search_scielo_org_index', 'search-scielo')
+
 
 class Search(object):
 
-    UPDATE_ENDPOINT = 'http://%s/solr/scielo-articles/update' % API_DOMAIN
+    UPDATE_ENDPOINT = 'http://%s/solr/%s/update' % (API_DOMAIN, API_INDEX)
 
     def _do_request(self, url, params=None, data=None, headers=None):
         """
