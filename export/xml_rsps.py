@@ -152,7 +152,10 @@ class Dumper(object):
         fmt['id'] = '_'.join([data.collection_acronym, data.publisher_id])
         fmt['document_type'] = data.document_type
         fmt['publication_year'] = data.publication_date[0:4]
-        fmt['document_type'] = data.document_type
+        fmt['journal'] = data.journal.title
+        fmt['issn'] = data.journal.scielo_issn
+        fmt['issue_label'] = data.issue.label
+        fmt['subject_areas'] = data.journal.subject_areas
         fmt['data_version'] = 'legacy' if data.data_model_version == 'html' else 'xml'
 
         return fmt
