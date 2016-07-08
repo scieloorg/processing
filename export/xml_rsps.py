@@ -160,11 +160,6 @@ class Dumper(object):
 
         return fmt
 
-    def prepare_queue(self, issn, q):
-
-        for document in self._articlemeta.documents(collection=self.collection, issn=issn):
-            q.put(self.fmt_json(document))
-
     def summaryze_xml_validation(self, pid, collection_acronym, output_format):
 
         try:
