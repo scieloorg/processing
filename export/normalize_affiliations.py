@@ -74,13 +74,17 @@ class Dumper(object):
 
     def fmt_csv(self, data):
 
+        issue_label = ''
+        if data.issue:
+            issue_label = data.issue.label or ''
+
         line = [
             data.collection_acronym,
             data.publisher_id,
             data.publication_date[0:4],
             data.document_type,
             data.journal.title,
-            data.issue_label or ''
+            issue_label
         ]
 
         if len(data.mixed_affiliations) == 0:
