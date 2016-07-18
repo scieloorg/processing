@@ -64,7 +64,7 @@ class Dumper(object):
         header.append(u"title current status")
         header.append(u"document publishing ID (PID SciELO)")
         header.append(u"document publishing year")
-        header.append(u'docuemnt is citable')
+        header.append(u'document is citable')
         header.append(u"document type")
         header.append(u"document languages")
         header.append(u"document pt")
