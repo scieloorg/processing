@@ -91,7 +91,7 @@ def analyze_xml(xml):
     f = StringIO(xml)
 
     try:
-        xml = packtools.XMLValidator.parse(f, sps_version='sps-1.1')
+        xml = packtools.XMLValidator.parse(f, sps_version='sps-1.4')
     except packtools.exceptions.PacktoolsError as e:
         logger.exception(e)
         summary = {}
