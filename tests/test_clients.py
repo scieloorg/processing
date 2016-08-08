@@ -6,6 +6,89 @@ from utils import accessstats_server, publicationstats_server
 
 class ThirftClientsTest(unittest.TestCase):
 
+
+    def test_compute_number_of_articles_by_year(self):
+
+        publicationtats = publicationstats_server()
+
+        query_result = {
+            "hits": {
+                "hits": [],
+                "total": 2211,
+                "max_score": 0.0
+            },
+            "timed_out": False,
+            "took": 5,
+            "aggregations": {
+                "publication_year": {
+                    "buckets": [
+                        {
+                            "id": {
+                                "value": 82
+                            },
+                            "key": "2016",
+                            "doc_count": 82
+                        },
+                        {
+                            "id": {
+                                "value": 125
+                            },
+                            "key": "2015",
+                            "doc_count": 124
+                        },
+                        {
+                            "id": {
+                                "value": 179
+                            },
+                            "key": "2014",
+                            "doc_count": 167
+                        },
+                        {
+                            "id": {
+                                "value": 155
+                            },
+                            "key": "2013",
+                            "doc_count": 153
+                        },
+                        {
+                            "id": {
+                                "value": 154
+                            },
+                            "key": "2012",
+                            "doc_count": 161
+                        },
+                        {
+                            "id": {
+                                "value": 139
+                            },
+                            "key": "2011",
+                            "doc_count": 136
+                        }
+                    ],
+                    "doc_count_error_upper_bound": 0,
+                    "sum_other_doc_count": 1388
+                }
+            },
+            "_shards": {
+                "successful": 5,
+                "failed": 0,
+                "total": 5
+            }
+        }
+
+        expected = [
+            ('2016', 82),
+            ('2015', 124),
+            ('2014', 167),
+            ('2013', 153),
+            ('2012', 161)
+        ]
+
+        result = publicationtats._compute_number_of_articles_by_year(
+            query_result, years=5)
+
+        self.assertEqual(expected, result)
+
     def test_compute_documents_languages_by_year(self):
 
         publicationtats = publicationstats_server()

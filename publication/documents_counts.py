@@ -141,7 +141,7 @@ class Dumper(object):
                 line.append(u'1')
             else:
                 line.append(u'0')
-        line.append('1' if len(data.journal.subject_areas or []) > 1 else '0')
+        line.append('2' if len(data.journal.subject_areas or []) > 1 else '0')
         line.append(data.journal.current_status)
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
