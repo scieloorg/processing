@@ -8,7 +8,8 @@ install_requires = [
     'django>=1.8.3',
     'requests',
     'lxml>=3.4.4',
-    'doaj_client'
+    'doaj_client',
+    'scieloh5m5>=1.0.4'
 ]
 
 tests_require = []

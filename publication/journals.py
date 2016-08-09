@@ -13,6 +13,7 @@ import utils
 import choices
 
 from clients.analytics import Analytics
+from scieloh5m5 import h5m5
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ class Dumper(object):
         self._lines = []
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         now = datetime.date.today().year
-        years_range = [i for i in range(now, now-self._years, -1)]
+        self.years_range = [i for i in range(now, now-self._years, -1)]
         header = []
         header.append(u"extraction date")
         header.append(u"study unit")
@@ -103,21 +104,25 @@ class Dumper(object):
         header.append(u"volume of the last document")
         header.append(u"issue of the last document")
         header.append(u"total of issues")
-        header += [u"issues at %s" % str(i) for i in years_range]
+        header += [u"issues at %s" % str(i) for i in self.years_range]
         header.append(u"total of regular issues")
-        header += [u"regular issues at %s" % str(i) for i in years_range]
+        header += [u"regular issues at %s" % str(i) for i in self.years_range]
         header.append(u"total of documents")
-        header += [u"documents at %s" % str(i) for i in years_range]
+        header += [u"documents at %s" % str(i) for i in self.years_range]
         header.append(u"citable documents")
-        header += [u"citable documents at %s" % str(i) for i in years_range]
-        for year in years_range:
+        header += [u"citable documents at %s" % str(i) for i in self.years_range]
+        for year in self.years_range:
             header.append(u'portuguese documents at %s ' % year)
-        for year in years_range:
+        for year in self.years_range:
             header.append(u'spanish documents at %s ' % year)
-        for year in years_range:
+        for year in self.years_range:
             header.append(u'english documents at %s ' % year)
-        for year in years_range:
+        for year in self.years_range:
             header.append(u'other language documents at %s ' % year)
+        for year in self.years_range:
+            header.append(u'google scholar h5 %s ' % year)
+        for year in self.years_range:
+            header.append(u'google scholar m5 %s ' % year)
 
         self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
@@ -336,6 +341,16 @@ class Dumper(object):
             line.append(unicode(values['en']))
         for years, values in sorted(languages.items(), reverse=True):
             line.append(unicode(values['other']))
+
+        for year in self.years_range:
+            h5 = h5m5.get(data.scielo_issn, str(year))
+            h5 = h5.get('h5', None) if h5 else None
+            line.append(h5 or '')
+
+        for year in self.years_range:
+            m5 = h5m5.get(data.scielo_issn, str(year))
+            m5 = m5.get('m5', None) if m5 else None
+            line.append(m5 or '')
 
         joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 
