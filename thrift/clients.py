@@ -265,7 +265,7 @@ class PublicationStats(object):
             if not item['key'] in years:
                 continue
 
-            years[item['key']] = item.get('id', {}).get('value', 0)
+            years[item['key']] = item.get('doc_count', 0)
 
         return [(k, v) for k, v in sorted(years.items(), reverse=True)]
 
@@ -625,8 +625,10 @@ class ArticleMeta(object):
 
     def journals(self, collection=None, issn=None):
         offset = 0
+
         while True:
             identifiers = self.client.get_journal_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
+
             if len(identifiers) == 0:
                 raise StopIteration
 

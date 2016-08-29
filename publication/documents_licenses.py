@@ -63,10 +63,10 @@ class Dumper(object):
         header.append(u"title is multidisciplinary")
         header.append(u"title current status")
         header.append(u"document publishing ID (PID SciELO)")
-        header.append(u"docuemnt publishing year")
+        header.append(u"document publishing year")
         header.append(u"document type")
         header.append(u"document is citable")
-        header.append(u"docuemnt license")
+        header.append(u"document license")
 
         self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 

@@ -71,8 +71,12 @@ class Dumper(object):
                 for data in self.get_data(issn=issn):
                     for item in self.fmt_csv(data):
                         f.write('%s\r\n' % item)
-        
+
     def fmt_csv(self, data):
+
+        issue_label = ''
+        if data.issue:
+            issue_label = data.issue.label or ''
 
         line = [
             data.collection_acronym,
@@ -80,7 +84,7 @@ class Dumper(object):
             data.publication_date[0:4],
             data.document_type,
             data.journal.title,
-            data.issue_label
+            issue_label
         ]
 
         if len(data.mixed_affiliations) == 0:

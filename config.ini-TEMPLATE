@@ -5,3 +5,4 @@ accessstats_thriftserver = 127.0.0.1:11660
 citedby_thriftserver = 127.0.0.1:11610
 publicationstats_thriftserver = 127.0.0.1:11620
 solr_search_scielo_org = 127.0.0.1:8080
+solr_search_scielo_org_index = search-scielo

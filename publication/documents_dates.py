@@ -66,10 +66,10 @@ class Dumper(object):
         header.append(u"document publishing year")
         header.append(u"document type")
         header.append(u"document is citable")
-        header.append(u"document submited at")
-        header.append(u"document submited at year")
-        header.append(u"document submited at month")
-        header.append(u"document submited at day")
+        header.append(u"document submitted at")
+        header.append(u"document submitted at year")
+        header.append(u"document submitted at month")
+        header.append(u"document submitted at day")
         header.append(u"document accepted at")
         header.append(u"document accepted at year")
         header.append(u"document accepted at month")
@@ -78,6 +78,10 @@ class Dumper(object):
         header.append(u"document reviewed at year")
         header.append(u"document reviewed at month")
         header.append(u"document reviewed at day")
+        header.append(u"document published as ahead of print at")
+        header.append(u"document published as ahead of print at year")
+        header.append(u"document published as ahead of print at month")
+        header.append(u"document published as ahead of print at day")
         header.append(u"document published at")
         header.append(u"document published at year")
         header.append(u"document published at month")
@@ -155,6 +159,11 @@ class Dumper(object):
         line.append(review_splited[0])  # year
         line.append(review_splited[1])  # month
         line.append(review_splited[2])  # day
+        line.append(data.ahead_publication_date or '')
+        ahead_publication_date_splited = utils.split_date(data.ahead_publication_date or '')
+        line.append(ahead_publication_date_splited[0])  # year
+        line.append(ahead_publication_date_splited[1])  # month
+        line.append(ahead_publication_date_splited[2])  # day
         line.append(data.publication_date or '')
         publication_splited = utils.split_date(data.publication_date or '')
         line.append(publication_splited[0])  # year

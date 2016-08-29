@@ -8,14 +8,15 @@ install_requires = [
     'django>=1.8.3',
     'requests',
     'lxml>=3.4.4',
-    'doaj_client'
+    'doaj_client',
+    'scieloh5m5>=1.2.4'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="0.3.1",
+    version="1.6.1",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -31,7 +32,7 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+https://git@github.com/scieloorg/xylose.git@v1.0.1#egg=xylose",
+        "git+https://git@github.com/scieloorg/xylose.git@v1.15.5#egg=xylose",
         "git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client"
     ],
     tests_require=tests_require,
