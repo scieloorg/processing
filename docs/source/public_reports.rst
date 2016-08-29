@@ -5,7 +5,7 @@ Relatórios Públicos
 Alguns relatórios são produzidos mensalmente e publicados on-line para que usuários,
 instituições e outros interessados possam fazer download.
 
-Para o download desses relatórios acessar: http://analytics.scielo.org/w/downloads
+Para o download desses relatórios acessar: http://analytics.scielo.org/w/reports
 
 ------------------------
 Relatórios de Periódicos
@@ -39,25 +39,27 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * título é de engenharias (**engineering**)
     * título é de ciências exatas e da terra (**exact and earth science**)
     * título é de ciências da saúde (**health sciences**)
-    * título é de ciências humanas(**humanities**)
-    * título é de linguistica, letras e artes (**literature and arts**)
+    * título é de ciências humanas(**human sciences**)
+    * título é de linguistica, letras e artes (**linguistics, literature and arts**)
     * título é multidisciplinar (**title is multidisciplinary**)
     * situação corrente do título (**title current status**)
     * título + sub-título na SciELO (**title + subtitle at SciELO**)
     * título abreviado na SciELO (**short title SciELO**)
+    * título abreviado conforme norma ISO (**short title ISO**)
     * título abreviado no PubMed (**short title PubMed**)
     * nome do publicador (**publisher name**)
     * licença de uso (**use license**)
     * frequencia alpha (:ref:`alpha frequency`)
+    * periodicidade numérica (em meses) (**numeric frequency (in months)**)
     * ano de inclusão na SciELO (**inclusion year at SciELO**)
     * ano de paralização na SciELO (**stopping year at SciELO**)
     * motivo de paralização (**stopping reason**)
     * data do primeiro documento (**date of the first document**)
     * volume do primeiro documento (**volume of the first document**)
-    * número do primeiro documento (**número of the first document**)
+    * número do primeiro documento (**issue of the first document**)
     * data do último documento (**date of the last document**)
     * volume do último documento (**volume of the last document**)
-    * número do último documento (**número of the last document**)
+    * número do último documento (**issue of the last document**)
     * total de fascículos (**total of issues**)
     * fascículos em <ano corrente> (**issues at <current year>**)
     * fascículos em <ano corrente - 1> (**issues at <current year - 1>**)
@@ -79,6 +81,13 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * documentos em <ano corrente - 3> (**documents at <current year - 3>**)
     * documentos em <ano corrente - 4> (**documents at <current year - 4>**)
     * documentos em <ano corrente - 5> (**documents at <current year - 5>**)
+    * documentos citáveis (**citable documents**)
+    * documentos citáveis em <ano corrente> (**citable at <current year>**)
+    * documentos citáveis em <ano corrente -1> (**citable at <current year - 1>**)
+    * documentos citáveis em <ano corrente -2> (**citable at <current year - 2>**)
+    * documentos citáveis em <ano corrente -3> (**citable at <current year - 3>**)
+    * documentos citáveis em <ano corrente -4> (**citable at <current year - 4>**)
+    * documentos citáveis em <ano corrente -5> (**citable at <current year - 5>**)
     * documentos em português em <ano corrente> (**portuguese documents at <current year>**)
     * documentos em português em <ano corrente - 1> (**portuguese documents at <current year - 1>**)
     * documentos em português em <ano corrente - 2> (**portuguese documents at <current year - 2>**)
@@ -103,6 +112,19 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * documentos em outros idiomas em <ano corrente - 3> (**other language documents at <current year - 3>**)
     * documentos em outros idiomas em <ano corrente - 4> (**other languages documents at <current year - 4>**)
     * documentos em outros idiomas em <ano corrente - 5> (**other languages documents at <current year - 5>**)
+    * google scholar h5 <ano corrente> (**google scholar h5 <current year>**)
+    * google scholar h5 <ano corrente -1> (**google scholar h5 <current year - 1>**)
+    * google scholar h5 <ano corrente -2> (**google scholar h5 <current year - 2>**)
+    * google scholar h5 <ano corrente -3> (**google scholar h5 <current year - 3>**)
+    * google scholar h5 <ano corrente -4> (**google scholar h5 <current year - 4>**)
+    * google scholar h5 <ano corrente -5> (**google scholar h5 <current year - 5>**)
+    * google scholar m5 <ano corrente> (**google scholar h5 <current year>**)
+    * google scholar m5 <ano corrente -1> (**google scholar m5 <current year - 1>**)
+    * google scholar m5 <ano corrente -2> (**google scholar m5 <current year - 2>**)
+    * google scholar m5 <ano corrente -3> (**google scholar m5 <current year - 3>**)
+    * google scholar m5 <ano corrente -4> (**google scholar m5 <current year - 4>**)
+    * google scholar m5 <ano corrente -5> (**google scholar m5 <current year - 5>**)
+
 
 Relatório de histórico de mudanças de status dos periódicos
 ===========================================================
