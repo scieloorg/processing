@@ -272,7 +272,6 @@ class Dumper(object):
 
 
     def get_accesses(self, issn):
-
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
             accesses = []
             keys = eligible_match_keys(document)
@@ -408,7 +407,7 @@ def main():
     args = parser.parse_args()
     _config_logging(args.logging_level, args.logging_file)
     logger.info('Dumping data for: %s' % args.collection)
- 
+
     issns = None
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)

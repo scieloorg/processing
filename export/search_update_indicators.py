@@ -56,6 +56,7 @@ class Dumper(object):
 
     def _load_citations_by_pid(self, item):
 
+        attempt = 0
         response = self._cited_by.citedby_pid(item.publisher_id)
 
         try:

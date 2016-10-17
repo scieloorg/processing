@@ -104,7 +104,7 @@ def publicationstats_server():
         port = int(server[1])
     except:
         logger.warning('Error defining PublicationStats thrift server, assuming default server publicationstats.scielo.org:11620')
-        host = 'publicationstats.scielo.org'
+        host = 'publication.scielo.org'
         port = 11620
 
     return clients.PublicationStats(host, port)
@@ -144,7 +144,7 @@ def articlemeta_server():
     except:
         logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11720')
         host = 'articlemeta.scielo.org'
-        port = 11720
+        port = 11620
 
     return clients.ArticleMeta(host, port)
 
