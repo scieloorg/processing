@@ -333,7 +333,7 @@ class DumpDataTest(unittest.TestCase):
             'html': 1,
             'pdf': 10
         }
-    
+
         result = dumpdata.join_metadata_with_accesses(article, '2012-01-08', accesses)
 
         expected = {
@@ -343,7 +343,7 @@ class DumpDataTest(unittest.TestCase):
                 'document_type': 'research-article',
                 'aff_countries': ['undefined'],
                 'document_title': 'An\u00e1lise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em opera\u00e7\u00f5es anorretais',
-                'issue_title': 'ABCD, arq. bras. cir. dig., n.22 v.3, 2009',
+                'issue_title': 'v22n3',
                 'access_total': 14,
                 'access_abstract': 3,
                 'access_html': 1,
@@ -360,7 +360,7 @@ class DumpDataTest(unittest.TestCase):
                 'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\u00e3o Paulo)',
                 'processing_date': '2010-05-14',
                 'publication_date': '2009-09',
-                'issue': 'S0102-672020090003'
+                'issue': '0102-672020090003'
             }
 
         self.assertEqual(sorted([k+str(v) for k, v in expected.items()]), sorted([k+str(v) for k, v in result.items()]))
