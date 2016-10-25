@@ -116,35 +116,6 @@ def get_date_timestamp(date):
     return date
 
 
-def issuelabel(document):
-    label_volume = document.issue.volume if document.issue.volume else ''
-    label_issue = document.issue.number if document.issue.number else ''
-
-    label_suppl_issue = ' suppl %s' % document.issue.supplement_number if document.issue.supplement_number else ''
-
-    if label_suppl_issue:
-        label_issue += label_suppl_issue
-
-    label_suppl_volume = ' suppl %s' % document.issue.supplement_volume if document.issue.supplement_volume else ''
-
-    if label_suppl_volume:
-        label_issue += label_suppl_volume
-
-    label_issue = SUPPLBEG_REGEX.sub('', label_issue)
-    label_issue = SUPPLEND_REGEX.sub('', label_issue)
-
-    label_volume = 'n.' + label_volume
-    label_issue = 'v.' + label_issue
-
-    itens = [
-        document.journal.abbreviated_title,
-        ' '.join([label_volume, label_issue]),
-        document.publication_date[0:4]
-        ]
-
-    return ', '.join(itens)
-
-
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data = {}
@@ -152,7 +123,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['pid'] = document.publisher_id
     data['issn'] = document.journal.scielo_issn
     data['journal_title'] = document.journal.title
-    data['issue'] = document.publisher_id[0:18]
+    data['issue'] = document.issue.publisher_id
     data['document_title'] = ''
     if document.original_title():
         data['document_title'] = document.original_title()
@@ -162,8 +133,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
                 data['document_title'] = title
                 break
 
-
-    data['issue_title'] = issuelabel(document)
+    data['issue_title'] = document.issue.label
     data['processing_date'] = document.processing_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
@@ -270,7 +240,6 @@ class Dumper(object):
         if fmt == 'json':
             self.fmt = self.fmt_json
 
-
     def get_accesses(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
             accesses = []
@@ -286,7 +255,10 @@ class Dumper(object):
                 self.dayly_granularity)
 
             for adate, adata in joined_accesses.items():
-                yield join_metadata_with_accesses(document, adate, adata)
+                try:
+                    yield join_metadata_with_accesses(document, adate, adata)
+                except Exception as e:
+                    logger.exception(e)
 
     def fmt_json(self, data):
         return json.dumps(data)
