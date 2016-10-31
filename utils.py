@@ -6,8 +6,6 @@ import re
 import unicodedata
 import logging
 
-from django.utils.text import slugify
-
 from thrift import clients
 
 try:
@@ -20,9 +18,21 @@ logger = logging.getLogger(__name__)
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 
 
-def call_django_slugify(value):
+def slugify(value, allow_unicode=False):
+    """
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
+    Remove characters that aren't alphanumerics, underscores, or hyphens.
+    Convert to lowercase. Also strip leading and trailing whitespace.
+    """
+    value = force_text(value)
+    if allow_unicode:
+        value = unicodedata.normalize('NFKC', value)
+        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
 
-    return slugify(value)
+    return mark_safe(re.sub(r'[-\s]+', '-', value))
 
 
 class SingletonMixin(object):
@@ -138,15 +148,12 @@ def ratchet_server():
 
 def articlemeta_server():
     try:
-        server = settings['app:main']['articlemeta_thriftserver'].split(':')
-        host = server[0]
-        port = int(server[1])
+        server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11620')
     except:
         logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11720')
-        host = 'articlemeta.scielo.org'
-        port = 11620
+        server = 'articlemeta.scielo.org:11620'
 
-    return clients.ArticleMeta(host, port)
+    return clients.ArticleMeta(domain=server)
 
 
 def accessstats_server():

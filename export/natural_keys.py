@@ -141,7 +141,7 @@ class Dumper(object):
         text_values = (value if value else 'none' for value in values)
         joined_values = '_'.join(text_values)
 
-        return utils.call_django_slugify(joined_values)
+        return utils.slugify(joined_values)
 
     def run(self):
         for issn in self.issns:
