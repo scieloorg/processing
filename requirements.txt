@@ -5,4 +5,4 @@ scieloh5m5==1.2.4
 xylose==1.16.5
 articlemetaapi==1.4.10
 -e git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client
--e git+https://github.com/scieloorg/processing@1.7.2#egg=processing
+-e git+https://github.com/scieloorg/processing@1.8.2#egg=processing
