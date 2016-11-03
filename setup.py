@@ -3,14 +3,13 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'thriftpy==0.3.1',
-    'xylose',
     'packtools',
-    'requests',
+    'requests>=2.8.1',
     'lxml>=3.4.4',
     'doaj_client',
     'scieloh5m5>=1.2.4',
-    'xylose==1.16.5',
-    'articlemetaapi==1.4.10'
+    'xylose>=1.16.5',
+    'articlemetaapi>=1.4.10'
 ]
 
 tests_require = []
@@ -33,7 +32,7 @@ setup(
         "Programming Language :: Python :: 2.7",
     ],
     dependency_links=[
-        "git+https://github.com/fabiobatalha/doaj_client@0.1#egg=doaj_client"
+        "git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client"
     ],
     tests_require=tests_require,
     test_suite='tests',

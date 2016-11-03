@@ -114,7 +114,7 @@ class Dumper(object):
                 line.append(u'1')
             else:
                 line.append(u'0')
-        line.append('1' if len(data.subject_areas or []) > 1 else '0')
+        line.append('1' if len(data.journal.subject_areas or []) > 2 else '0')
         line.append(data.current_status)
 
         acessos = self._accessstats.access_lifetime(data.scielo_issn, self.collection)
