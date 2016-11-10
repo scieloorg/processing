@@ -133,7 +133,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
                 data['document_title'] = title
                 break
 
-    data['issue_title'] = document.issue.label
+    data['issue_title'] = ', '.join([document.journal.abbreviated_title, document.issue.publication_date[:4], document.issue.label])
     data['processing_date'] = document.processing_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
