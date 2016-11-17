@@ -343,7 +343,7 @@ class DumpDataTest(unittest.TestCase):
                 'document_type': 'research-article',
                 'aff_countries': ['undefined'],
                 'document_title': 'An\u00e1lise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em opera\u00e7\u00f5es anorretais',
-                'issue_title': 'v22n3',
+                'issue_title': 'ABCD, arq. bras. cir. dig., 2009, v22n3',
                 'access_total': 14,
                 'access_abstract': 3,
                 'access_html': 1,

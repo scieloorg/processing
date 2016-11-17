@@ -148,9 +148,10 @@ class Dumper(object):
         if doi:
             article = self._articlemeta.document(doi.upper(), self.collection)
 
-        publication_date = article.publication_date if article else u'not defined'
-        publisher_id = article.publisher_id if article else u'not defined'
-        document_type = article.document_type if article else u'not defined'
+        publication_date = article.publication_date if article and article.data else u'not defined'
+        publisher_id = article.publisher_id if article and article.data else u'not defined'
+        document_type = article.document_type if article and article.data else u'not defined'
+
         score = altmetrics.get('score', None)
 
         issns = []
