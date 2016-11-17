@@ -7,8 +7,13 @@ import argparse
 import logging
 import codecs
 import requests
-import urlparse
 import datetime
+
+# Python 3 and 2 Compatibilility
+try:
+    import urlparse as parse  # Python 2
+except:
+    from urllib import parse  # Python3
 
 import utils
 import choices
@@ -143,7 +148,7 @@ class Dumper(object):
         title = altmetrics.get('title', '').replace('\n', '')
         doi = altmetrics.get('doi', get_doi_from_url(url))
         details_url = altmetrics.get('details_url', None)
-        pid = urlparse.parse_qs(urlparse.urlparse(url).query).get('pid', None) if url else None
+        pid = parse.parse_qs(parse.urlparse(url).query).get('pid', None) if url else None
 
         if doi:
             article = self._articlemeta.document(doi.upper(), self.collection)
