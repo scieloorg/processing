@@ -16,6 +16,8 @@ import choices
 
 logger = logging.getLogger(__name__)
 
+OUTPUT_FORMAT = 'csv'
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -46,31 +48,39 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
 class Dumper(object):
 
-    def __init__(self, collection, issns=None, output_file=None):
+    def __init__(self, collection, issns=None, output_file=None, output_format=OUTPUT_FORMAT):
 
         self._citedby = utils.citedby_server()
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
         self.issns = issns
+        self.output_format = output_format
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = []
-        header.append(u"extraction date")
-        header.append(u"study unit")
-        header.append(u"collection")
-        header.append(u"ISSN SciELO")
-        header.append(u"ISSN\'s")
-        header.append(u"title at SciELO")
-        header.append(u"title thematic areas")
-        for area in choices.THEMATIC_AREAS:
-            header.append(u"title is %s" % area.lower())
-        header.append(u"title is multidisciplinary")
-        header.append(u"title current status")
-        header.append(u"document publishing ID (PID SciELO)")
-        header.append(u"document publishing year")
-        header.append(u"document type")
-        header.append(u"document is citable")
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        if output_format != 'json':
+            header = []
+            header.append(u"extraction date")
+            header.append(u"study unit")
+            header.append(u"collection")
+            header.append(u"ISSN SciELO")
+            header.append(u"ISSN\'s")
+            header.append(u"title at SciELO")
+            header.append(u"title thematic areas")
+            for area in choices.THEMATIC_AREAS:
+                header.append(u"title is %s" % area.lower())
+            header.append(u"title is multidisciplinary")
+            header.append(u"title current status")
+            header.append(u"document publishing ID (PID SciELO)")
+            header.append(u"document publishing year")
+            header.append(u"document type")
+            header.append(u"document is citable")
+            header.append(u"document title")
+            header.append(u"cited by pid")
+            header.append(u"cited by issn")
+            header.append(u"cited by journal")
+            header.append(u"cited by document title")
+
+            self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:
@@ -82,13 +92,6 @@ class Dumper(object):
         for item in self.items():
             self.write(item)
 
-    def citedby(self, pid):
-        data = self._citedby.citedby_pid(pid, False)
-        dataj = json.loads(data)
-        if isinstance(dataj, dict):
-            for item in dataj.get('cited_by', []):
-                yield item
-
     def items(self):
 
         if not self.issns:
@@ -97,10 +100,24 @@ class Dumper(object):
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
                 logger.debug('Reading document: %s' % data.publisher_id)
-                for item in self.citedby(data.publisher_id):
-                    yield self.fmt_csv(data, item)
 
-    def fmt_csv(self, data, citedby):
+                citedby = self._citedby.citedby_pid(data.publisher_id, metaonly=False)
+                dataj = json.loads(citedby)
+                if self.output_format == 'json' and isinstance(dataj, dict):
+                    yield self.fmt_json(dataj)
+                    continue
+
+                for item in dataj.get('cited_by', []):
+                    yield self.fmt_csv((data, item))
+
+    def fmt_json(self, content):
+
+        return json.dumps(content)
+
+    def fmt_csv(self, content):
+
+        data, citedby = content
+
         know_languages = set(['pt', 'es', 'en'])
         languages = set(data.languages())
 
@@ -163,6 +180,14 @@ def main():
     )
 
     parser.add_argument(
+        '--output_format',
+        '-f',
+        choices=['json', 'csv'],
+        default=OUTPUT_FORMAT,
+        help='Output format'
+    )
+
+    parser.add_argument(
         '--output_file',
         '-r',
         help='File to receive the dumped data'
@@ -190,6 +215,6 @@ def main():
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
 
-    dumper = Dumper(args.collection, issns, args.output_file)
+    dumper = Dumper(args.collection, issns, args.output_file, args.output_format)
 
     dumper.run()

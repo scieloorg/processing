@@ -232,7 +232,7 @@ class Dumper(object):
         self.from_date = from_date
         self.until_date = until_date
         self.dayly_granularity = dayly_granularity
-        self.output_file=output_file
+        self.output_file = output_file
         self.issns = issns
         self.collection = collection
 
