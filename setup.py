@@ -4,19 +4,20 @@ from setuptools import setup, find_packages
 install_requires = [
     'thriftpy==0.3.1',
     'packtools',
-    'requests>=2.8.1',
+    'requests>=2.11.1',
     'lxml>=3.4.4',
     'doaj_client',
     'scieloh5m5>=1.4.4',
     'xylose>=1.16.5',
     'articlemetaapi>=1.5.10'
+    'citedbyapi>=1.2.4'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="1.10.3",
+    version="1.10.4",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
