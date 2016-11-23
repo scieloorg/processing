@@ -7,17 +7,17 @@ install_requires = [
     'requests>=2.11.1',
     'lxml>=3.4.4',
     'doaj_client',
-    'scieloh5m5>=1.4.4',
+    'scieloh5m5>=1.5.4',
     'xylose>=1.16.5',
     'articlemetaapi>=1.5.10'
-    'citedbyapi>=1.2.4'
+    'citedbyapi>=1.3.7'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="1.10.4",
+    version="1.11.4",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -60,7 +60,8 @@ setup(
     processing_export_doaj_journals=export.doaj_journals:main
     processing_export_kbart=export.kbart:main
     processing_export_search_update_indicators=export.search_update_indicators:main
-    processing_bibliometric_citedby=bibliometric.citedby:main
+    processing_bibliometric_citedby_document=bibliometric.citedby_document:main
+    processing_bibliometric_citedby_journal=bibliometric.citedby_journal:main
     processing_bibliometric_impact_factor=bibliometric.impact_factor:main
     """
 )

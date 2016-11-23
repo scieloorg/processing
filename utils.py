@@ -5,6 +5,7 @@ import datetime
 import re
 import unicodedata
 import logging
+import string
 
 from thrift import clients
 
@@ -16,6 +17,23 @@ except:
 logger = logging.getLogger(__name__)
 
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
+TAG_RE = re.compile(r'<[^>]+>')
+
+
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+
+def cleanup_string(text):
+
+    try:
+        nfd_form = unicodedata.normalize('NFD', text.strip().lower())
+    except TypeError:
+        nfd_form = unicodedata.normalize('NFD', unicode(text.strip().lower()))
+
+    cleaned_str = u''.join(x for x in nfd_form if x in string.ascii_letters or x == ' ')
+
+    return remove_tags(cleaned_str).lower()
 
 
 def slugify(value, allow_unicode=False):
@@ -122,15 +140,12 @@ def publicationstats_server():
 
 def citedby_server():
     try:
-        server = settings['app:main']['citedby_thriftserver'].split(':')
-        host = server[0]
-        port = int(server[1])
+        server = settings['app:main'].get('citedby_thriftserver', 'citedby.scielo.org:11610')
     except:
         logger.warning('Error defining Citedby thrift server, assuming default server citedby.scielo.org:11610')
-        host = 'citedby.scielo.org'
-        port = 11610
+        server = 'citedby.scielo.org:11610'
 
-    return clients.Citedby(host, port)
+    return clients.Citedby(domain=server)
 
 
 def ratchet_server():

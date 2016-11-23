@@ -70,14 +70,15 @@ class Dumper(object):
                 header.append(u"title is %s" % area.lower())
             header.append(u"title is multidisciplinary")
             header.append(u"title current status")
-            header.append(u"document publishing ID (PID SciELO)")
-            header.append(u"document publishing year")
+            header.append(u"document publication ID (PID SciELO)")
+            header.append(u"document publication year")
             header.append(u"document type")
             header.append(u"document is citable")
             header.append(u"document title")
-            header.append(u"cited by pid")
+            header.append(u"cited publication ID (PID SciELO)")
             header.append(u"cited by issn")
             header.append(u"cited by journal")
+            header.append(u"cited by document publication year")
             header.append(u"cited by document title")
 
             self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
@@ -91,6 +92,7 @@ class Dumper(object):
     def run(self):
         for item in self.items():
             self.write(item)
+        logger.info('Export finished')
 
     def items(self):
 
@@ -102,12 +104,11 @@ class Dumper(object):
                 logger.debug('Reading document: %s' % data.publisher_id)
 
                 citedby = self._citedby.citedby_pid(data.publisher_id, metaonly=False)
-                dataj = json.loads(citedby)
-                if self.output_format == 'json' and isinstance(dataj, dict):
-                    yield self.fmt_json(dataj)
+                if self.output_format == 'json' and isinstance(citedby, dict):
+                    yield self.fmt_json(citedby)
                     continue
 
-                for item in dataj.get('cited_by', []):
+                for item in citedby.get('cited_by', []):
                     yield self.fmt_csv((data, item))
 
     def fmt_json(self, content):
@@ -150,6 +151,10 @@ class Dumper(object):
         line.append(citedby.get('code', ''))
         line.append(citedby.get('issn', ''))
         line.append(citedby.get('source', ''))
+
+        citedby_publication_year = citedby.get('code', None)
+        citedby_publication_year = citedby_publication_year[10:14] if citedby_publication_year else ''
+        line.append(citedby_publication_year)
 
         if 'titles' in citedby and len(citedby['titles']) > 0:
             line.append(citedby['titles'][0])

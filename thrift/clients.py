@@ -5,9 +5,13 @@ import json
 import logging
 from datetime import date
 
-from articlemeta.client import ThriftClient
+from articlemeta.client import ThriftClient as ArticleMetaThriftClient
+from citedby.client import ThriftClient as CitedByThriftClient
+from citedby.custom_query import journal_titles
 from thriftpy.rpc import make_client
 from xylose.scielodocument import Article, Journal
+
+import utils
 
 LIMIT = 1000
 
@@ -15,9 +19,6 @@ logger = logging.getLogger(__name__)
 
 ratchet_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/ratchet.thrift')
-
-citedby_thrift = thriftpy.load(
-    os.path.join(os.path.dirname(__file__))+'/citedby.thrift')
 
 accessstats_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/access_stats.thrift')
@@ -536,44 +537,139 @@ class PublicationStats(object):
         return self._compute_last_included_document_by_journal(query_result)
 
 
-class Citedby(object):
+class Citedby(CitedByThriftClient):
 
-    def __init__(self, address, port):
+    def publication_and_citing_years(self, issn, titles, py_range=None):
+
+        body = {"query": {"filtered": {}}}
+
+        fltr = {
+            "filter": {
+                "bool": {
+                    "must": []
+
+                }
+            }
+        }
+
+        if py_range:
+            fltr["filter"]["bool"]['must'].append(
+                {
+                    "range": {
+                        "publication_year": {
+                            "gte": py_range[0],
+                            "lte": py_range[1]
+                        }
+                    }
+                }
+            )
+
+        query = {
+            "query": {
+                "bool": {
+                    "should": [],
+                    "must_not": []
+                }
+            }
+        }
+
+        aggs = {
+            "aggs": {
+                "publication_year": {
+                    "terms": {
+                        "field": "publication_year",
+                        "size": 0
+                    },
+                    "aggs": {
+                        "reference_publication_year": {
+                            "terms": {
+                                "field": "reference_publication_year",
+                                "size": 0,
+                                "order": {
+                                    "_term": "desc"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for item in self._fuzzy_custom_query(issn, titles):
+            query['query']['bool']['should'].append(item)
+
+        for item in self._must_not_custom_query(issn):
+            query['query']['bool']['must_not'].append(item)
+
+        body['query']['filtered'].update(fltr)
+        body['query']['filtered'].update(query)
+        body.update(aggs)
+
+        query_parameters = [
+            self.CITEDBY_THRIFT.kwargs('size', '0'),
+            self.CITEDBY_THRIFT.kwargs('search_type', 'count')
+        ]
+
+        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+
+        return query_result
+
+    def has_optmized_journal_queries(self, issn):
+
+        if journal_titles.load(issn):
+            return True
+
+        return False
+
+    @staticmethod
+    def _must_not_custom_query(issn):
         """
-        Cliente thrift para o Citedby.
-        """
-        self._address = address
-        self._port = port
-
-    @property
-    def client(self):
-        client = make_client(
-            citedby_thrift.Citedby,
-            self._address,
-            self._port
-        )
-
-        return client
-
-    def citedby_pid(self, code, metaonly=False):
-        """
-        Metodo que faz a interface com o metodo de mesmo nome na interface
-        thrift, atribuindo metaonly default como FALSE.
+            Este metodo constroi a lista de filtros por título de periódico que
+            será aplicada na pesquisa boleana como restrição "must_not".
+            A lista de filtros é coletada do template de pesquisa customizada
+            do periódico, quanto este template existir.
         """
 
-        data = self.client.citedby_pid(code, metaonly)
+        custom_queries = set([utils.cleanup_string(i) for i in journal_titles.load(issn).get('must_not', [])])
 
-        return data
+        for item in custom_queries:
 
-    def citedby_meta(self, title, author_surname, year, metaonly=False):
+            query = {
+                "match": {
+                    "reference_source_cleaned": item
+                }
+            }
+
+            yield query
+
+    @staticmethod
+    def _fuzzy_custom_query(issn, titles):
         """
-        Metodo que faz a interface com o metodo de mesmo nome na interface
-        thrift, atribuindo metaonly default como FALSE.
+            Este metodo constroi a lista de filtros por título de periódico que
+            será aplicada na pesquisa boleana como match por similaridade "should".
+            A lista de filtros é coletada do template de pesquisa customizada
+            do periódico, quanto este template existir.
         """
+        custom_queries = journal_titles.load(issn).get('should', [])
+        titles = [{'title': i} for i in titles if i not in [x['title'] for x in custom_queries]]
+        titles.extend(custom_queries)
 
-        data = self.client.citedby_meta(title, author_surname, year, metaonly)
+        for item in titles:
 
-        return data
+            if len(item['title'].strip()) == 0:
+                continue
+
+            query = {
+                "fuzzy": {
+                    "reference_source_cleaned": {
+                        "value": utils.cleanup_string(item['title']),
+                        "fuzziness": item.get('fuzziness', 3),
+                        "max_expansions": 50
+                    }
+                }
+            }
+
+            yield query
 
 
 class Ratchet(object):
@@ -602,5 +698,5 @@ class Ratchet(object):
         return data
 
 
-class ArticleMeta(ThriftClient):
+class ArticleMeta(ArticleMetaThriftClient):
     pass
