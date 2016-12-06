@@ -168,7 +168,9 @@ def articlemeta_server():
         logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11720')
         server = 'articlemeta.scielo.org:11620'
 
-    return clients.ArticleMeta(domain=server)
+    admintoken = settings['app:main'].get('articlemeta_admintoken', None)
+
+    return clients.ArticleMeta(domain=server, admintoken=admintoken)
 
 
 def accessstats_server():
