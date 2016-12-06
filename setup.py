@@ -9,7 +9,7 @@ install_requires = [
     'doaj_client',
     'scieloh5m5>=1.5.4',
     'xylose>=1.16.5',
-    'articlemetaapi>=1.5.10'
+    'articlemetaapi>=1.5.10',
     'citedbyapi>=1.3.7'
 ]
 
