@@ -191,7 +191,7 @@ class Dumper(object):
             logger.debug('Fail to send document to DOAJ')
             return False
 
-        if u'successfully uploaded' in response.text:
+        if u'File uploaded and waiting to be processed' in response.text:
             logger.info('Document Sent')
             return True
         else:
