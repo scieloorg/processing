@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 install_requires = [
     'thriftpy==0.3.1',
     'packtools',
-    'requests>=2.11.1',
+    'requests==2.11.1',
     'lxml>=3.4.4',
     'doaj_client',
     'scieloh5m5>=1.5.4',
