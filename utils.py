@@ -94,7 +94,7 @@ class Configuration(SingletonMixin):
     @classmethod
     def from_env(cls):
         try:
-            filepath =  os.environ['PROCESSING_SETTINGS_FILE']
+            filepath = os.environ['PROCESSING_SETTINGS_FILE']
         except KeyError:
             raise ValueError('missing env variable PROCESSING_SETTINGS_FILE')
 

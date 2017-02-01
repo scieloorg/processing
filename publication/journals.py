@@ -163,6 +163,9 @@ class Dumper(object):
 
         document = self._articlemeta.document(fid['pid'], fid['collection'])
 
+        if not document.data:
+            return None
+
         return document
 
     def _last_included_document_by_journal(self, issn, collection):
@@ -174,6 +177,9 @@ class Dumper(object):
             return None
 
         document = self._articlemeta.document(lid['pid'], lid['collection'])
+
+        if not document.data:
+            return None
 
         return document
 
@@ -255,11 +261,11 @@ class Dumper(object):
         line.append(interruption[0][:4] if interruption else u'')
         line.append(interruption[2][:4] if interruption else u'')
         line.append(first_document.publication_date or u'' if first_document else u'')
-        line.append(first_document.issue.volume or u'' if first_document else u'')
-        line.append(first_document.issue.number or u'' if first_document else u'')
+        line.append(first_document.issue.volume or u'' if first_document and first_document.issue else u'')
+        line.append(first_document.issue.number or u'' if first_document and first_document.issue else u'')
         line.append(last_document.publication_date or u'' if last_document else u'')
-        line.append(last_document.issue.volume or u'' if last_document else u'')
-        line.append(last_document.issue.number or u'' if last_document else u'')
+        line.append(last_document.issue.volume or u'' if last_document and last_document.issue else u'')
+        line.append(last_document.issue.number or u'' if last_document and last_document.issue else u'')
 
         line.append(unicode(self._number_of_issues_by_year(
             data.scielo_issn,
