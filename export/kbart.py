@@ -92,6 +92,9 @@ class Dumper(object):
 
         document = self._articlemeta.document(fid['pid'], fid['collection'])
 
+        if not document.data:
+            return None
+
         return document
 
     def _last_included_document_by_journal(self, issn, collection):
@@ -103,6 +106,9 @@ class Dumper(object):
             return None
 
         document = self._articlemeta.document(lid['pid'], lid['collection'])
+
+        if not document.data:
+            return None
 
         return document
 
@@ -137,16 +143,16 @@ class Dumper(object):
         line.append(
             first_document.publication_date or '' if first_document else '')
         line.append(
-            first_document.issue.volume or '' if first_document else '')
+            first_document.issue.volume or '' if first_document and first_document.issue else '')
         line.append(
-            first_document.issue.number or '' if first_document else '')
+            first_document.issue.number or '' if first_document and first_document.issue else '')
         if data.current_status != 'current':
             line.append(
                 last_document.publication_date or '' if last_document else '')
             line.append(
-                last_document.issue.volume or '' if last_document else '')
+                last_document.issue.volume or '' if last_document and last_document.issue else '')
             line.append(
-                last_document.issue.number or '' if last_document else '')
+                last_document.issue.number or '' if last_document and last_document.issue else '')
         else:
             line += ['', '', '']
         line.append(data.url().replace('sci_serial', 'sci_issues'))
