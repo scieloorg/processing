@@ -253,6 +253,7 @@ class PublicationStats(object):
 
     def _compute_number_of_articles_by_year(self, query_result, years=0):
 
+
         if years == 0:
             return query_result['aggregations']['id']['value']
 
