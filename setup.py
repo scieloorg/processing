@@ -9,8 +9,8 @@ install_requires = [
     'doaj_client',
     'scieloh5m5==1.5.4',
     'xylose==1.16.5',
-    'articlemetaapi==1.6.12',
-    'citedbyapi==1.3.7'
+    'articlemetaapi==1.6.15',
+    'citedbyapi==1.3.10'
 ]
 
 tests_require = []
