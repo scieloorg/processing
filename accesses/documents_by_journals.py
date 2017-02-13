@@ -129,7 +129,7 @@ class Dumper(object):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Dump languages distribution by article'
+        description='Dump accesses distribution by journals'
     )
 
     parser.add_argument(

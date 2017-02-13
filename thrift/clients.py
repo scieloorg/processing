@@ -157,6 +157,189 @@ class AccessStats(object):
 
         return query_result if raw else computed
 
+    def journal_access_monthnyear(self, issn):
+
+        body = {
+            "query": {
+                "match": {
+                    "issn": issn
+                }
+            },
+            "aggs": {
+                "access_year": {
+                    "terms": {
+                        "field": "access_year",
+                        "size": 0
+                    },
+                    "aggs": {
+                        "access_month": {
+                            "terms": {
+                                "field": "access_month",
+                                "size": 0
+                            },
+                            "aggs": {
+                                "access_total": {
+                                    "sum": {
+                                        "field": "access_total"
+                                    }
+                                },
+                                "access_epdf": {
+                                    "sum": {
+                                        "field": "access_epdf"
+                                    }
+                                },
+                                "access_pdf": {
+                                    "sum": {
+                                        "field": "access_pdf"
+                                    }
+                                },
+                                "access_html": {
+                                    "sum": {
+                                        "field": "access_html"
+                                    }
+                                },
+                                "access_abstract": {
+                                    "sum": {
+                                        "field": "access_abstract"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        query_parameters = [
+            accessstats_thrift.kwargs('size', '1000')
+        ]
+
+        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+
+        return query_result
+
+    def collection_access_monthnyear(self, collection):
+
+        body = {
+            "query": {
+                "match": {
+                    "collection": collection
+                }
+            },
+            "aggs": {
+                "access_year": {
+                    "terms": {
+                        "field": "access_year",
+                        "size": 0
+                    },
+                    "aggs": {
+                        "access_month": {
+                            "terms": {
+                                "field": "access_month",
+                                "size": 0
+                            },
+                            "aggs": {
+                                "access_total": {
+                                    "sum": {
+                                        "field": "access_total"
+                                    }
+                                },
+                                "access_epdf": {
+                                    "sum": {
+                                        "field": "access_epdf"
+                                    }
+                                },
+                                "access_pdf": {
+                                    "sum": {
+                                        "field": "access_pdf"
+                                    }
+                                },
+                                "access_html": {
+                                    "sum": {
+                                        "field": "access_html"
+                                    }
+                                },
+                                "access_abstract": {
+                                    "sum": {
+                                        "field": "access_abstract"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        query_parameters = [
+            accessstats_thrift.kwargs('size', '1000')
+        ]
+
+        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+
+        return query_result
+
+    def document_access_monthnyear(self, code):
+
+        body = {
+            "query": {
+                "match": {
+                    "id": code
+                }
+            },
+            "aggs": {
+                "access_year": {
+                    "terms": {
+                        "field": "access_year",
+                        "size": 0
+                    },
+                    "aggs": {
+                        "access_month": {
+                            "terms": {
+                                "field": "access_month",
+                                "size": 0
+                            },
+                            "aggs": {
+                                "access_total": {
+                                    "sum": {
+                                        "field": "access_total"
+                                    }
+                                },
+                                "access_epdf": {
+                                    "sum": {
+                                        "field": "access_epdf"
+                                    }
+                                },
+                                "access_pdf": {
+                                    "sum": {
+                                        "field": "access_pdf"
+                                    }
+                                },
+                                "access_html": {
+                                    "sum": {
+                                        "field": "access_html"
+                                    }
+                                },
+                                "access_abstract": {
+                                    "sum": {
+                                        "field": "access_abstract"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        query_parameters = [
+            accessstats_thrift.kwargs('size', '0')
+        ]
+
+        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+
+        return query_result
+
 
 class PublicationStats(object):
 
