@@ -118,11 +118,20 @@ def get_date_timestamp(date):
 
 def join_metadata_with_accesses(document, accesses_date, accesses):
 
+    issns = set()
+    issns.add(document.journal.scielo_issn)
+    if document.journal.print_issn:
+        issns.add(document.journal.print_issn)
+    if document.journal.electronic_issn:
+        issns.add(document.journal.electronic_issn)
+
     data = {}
     data['id'] = '_'.join([document.collection_acronym, document.publisher_id])
     data['pid'] = document.publisher_id
     data['issn'] = document.journal.scielo_issn
+    data['issns'] = issns
     data['journal_title'] = document.journal.title
+    data['journal_current_status'] = document.journal.current_status
     data['issue'] = document.issue.publisher_id
     data['document_title'] = ''
     if document.original_title():
@@ -232,13 +241,45 @@ class Dumper(object):
         self.from_date = from_date
         self.until_date = until_date
         self.dayly_granularity = dayly_granularity
-        self.output_file = output_file
+        self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         self.issns = issns
         self.collection = collection
 
-        self.fmt = self.fmt_csv
+        
         if fmt == 'json':
             self.fmt = self.fmt_json
+        else:
+            self.fmt = self.fmt_csv
+            header = []
+            header.append(u"extraction date")
+            header.append(u"study unit")
+            header.append(u"collection")
+            header.append(u"ISSN SciELO")
+            header.append(u"ISSN\'s")
+            header.append(u"title at SciELO")
+            header.append(u"title thematic areas")
+            for area in choices.THEMATIC_AREAS:
+                header.append(u"title is %s" % area.lower())
+            header.append(u"title is multidisciplinary")
+            header.append(u"title current status")
+            header.append(u"document publishing ID (PID SciELO)")
+            header.append(u"document publishing year")
+            header.append(u"document type")
+            header.append(u'document is citable')
+            header.append(u"issue")
+            header.append(u"issue title")
+            header.append(u"document title")
+            header.append(u"processing date")
+            header.append(u"publication date")
+            header.append(u"access year")
+            header.append(u"access month")
+            header.append(u"access to abstract")
+            header.append(u"access to html")
+            header.append(u"access to pdf")
+            header.append(u"access to epdf")
+            header.append(u"access total")
+
+            self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def get_accesses(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
@@ -260,38 +301,53 @@ class Dumper(object):
                 except Exception as e:
                     logger.exception(e)
 
+    def write(self, line):
+        if not self.output_file:
+            print(line.encode('utf-8'))
+        else:
+            self.output_file.write('%s\r\n' % line)
+
     def fmt_json(self, data):
+        del(data['issns'])
+        del(data['journal_current_status'])
+
         return json.dumps(data)
 
     def fmt_csv(self, data):
 
-        line = [
-            data['collection'],
-            data['pid'],
-            data['issn'],
-            data['journal_title'],
-            data['issue'],
-            data['issue_title'],
-            data['document_title'],
-            data['processing_date'],
-            data['publication_date'],
-            data['publication_year'],
-            data['document_type'],
-            ', '.join(data['subject_areas']),
-            ', '.join(data['languages']),
-            ', '.join(data['aff_countries']),
-            data['access_date'],
-            data['access_date'][:4],
-            data['access_date'][5:7],
-            data['access_date'][8:],
-            data.get('access_abstract', 0),
-            data.get('access_html', 0),
-            data.get('access_pdf', 0),
-            data.get('access_epdf', 0),
-            data['access_total']
-        ]
+        line = []
+        line.append(datetime.datetime.now().isoformat()[0:10])
+        line.append('document')
+        line.append(data['collection'])
+        line.append(data['issn'])
+        line.append(u';'.join(data['issns']))
+        line.append(data['journal_title'])
+        line.append(', '.join(data['subject_areas']))
+        for area in choices.THEMATIC_AREAS:
+            if area.lower() in [i.lower() for i in data['subject_areas'] or []]:
+                line.append(u'1')
+            else:
+                line.append(u'0')
+        line.append('1' if len(data['subject_areas'] or []) > 2 else '0')
+        line.append(data['journal_current_status'])
+        line.append(data['pid'])
+        line.append(data['publication_year'])
+        line.append(data['document_type'])
+        line.append(u'1' if data['document_type'].lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
+        line.append(data['issue'])
+        line.append(data['issue_title'])
+        line.append(data['document_title'])
+        line.append(data['processing_date'])
+        line.append(data['publication_date'])
+        line.append(data['access_year'])
+        line.append(data['access_month'])
+        line.append(data.get('access_abstract', 0))
+        line.append(data.get('access_html', 0))
+        line.append(data.get('access_pdf', 0))
+        line.append(data.get('access_epdf', 0))
+        line.append(data['access_total'])
 
-        return ','.join(['"%s"' % i for i in line])
+        return ','.join(['"%s"' % str(i).replace('"', '""') for i in line])
 
     def run(self):
 
@@ -304,10 +360,9 @@ class Dumper(object):
                     print(self.fmt(data))
             exit()
 
-        with codecs.open(self.output_file, 'w', encoding='utf-8') as f:
-            for issn in self.issns:
-                for data in self.get_accesses(issn=issn):
-                    f.write(u'%s\r\n' % self.fmt(data))
+        for issn in self.issns:
+            for data in self.get_accesses(issn=issn):
+                self.write(self.fmt(data))
 
 
 def main():

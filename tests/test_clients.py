@@ -241,7 +241,6 @@ class ThirftClientsTest(unittest.TestCase):
 
         self.assertEqual(expected, result)
 
-
     def test_compute_access_lifetime(self):
 
         accessstats = accessstats_server()
