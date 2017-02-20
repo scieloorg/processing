@@ -156,7 +156,7 @@ class Dumper(object):
         line.append(u'1' if tot_authors == 5 else u'0')  # total de autores
         line.append(u'1' if tot_authors >= 6 else u'0')  # total de autores
         line.append(unicode(pages(data.start_page, data.end_page))),  # total de páginas
-        line.append(unicode(len(data.citations or []))) # total de citações
+        line.append(unicode(len(data.citations or [])))  # total de citações
 
         joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 

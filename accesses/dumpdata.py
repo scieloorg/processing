@@ -341,13 +341,13 @@ class Dumper(object):
         line.append(data['publication_date'])
         line.append(data['access_year'])
         line.append(data['access_month'])
-        line.append(data.get('access_abstract', 0))
-        line.append(data.get('access_html', 0))
-        line.append(data.get('access_pdf', 0))
-        line.append(data.get('access_epdf', 0))
-        line.append(data['access_total'])
+        line.append(unicode(data.get('access_abstract', 0)))
+        line.append(unicode(data.get('access_html', 0)))
+        line.append(unicode(data.get('access_pdf', 0)))
+        line.append(unicode(data.get('access_epdf', 0)))
+        line.append(unicode(data['access_total']))
 
-        return ','.join(['"%s"' % str(i).replace('"', '""') for i in line])
+        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
     def run(self):
 
