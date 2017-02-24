@@ -163,10 +163,10 @@ def ratchet_server():
 
 def articlemeta_server():
     try:
-        server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11620')
+        server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11621')
     except:
-        logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11720')
-        server = 'articlemeta.scielo.org:11620'
+        logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11621')
+        server = 'articlemeta.scielo.org:11621'
 
     admintoken = settings['app:main'].get('articlemeta_admintoken', None)
 
