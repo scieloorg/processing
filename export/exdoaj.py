@@ -20,7 +20,7 @@ import utils
 FROM = datetime.now() - timedelta(days=30)
 FROM = FROM.isoformat()[:10]
 
-DOAJ_XSD = open(os.path.dirname(__file__)+'/xsd/doajArticles.xsd', 'r').read()
+DOAJ_XSD = open(os.path.dirname(__file__)+'/xsd/doaj/doajArticles.xsd', 'r').read()
 logger = logging.getLogger(__name__)
 
 
