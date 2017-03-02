@@ -426,10 +426,10 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * documento citável (**document is citable**, :ref:`citable documents`)
     * nacionalidade de referência (**home nationality ISO-3166**)
     * total de affiliações do documento
-    * é nacional
-    * é extrangeira
-    * é indefinada
-    * é inexistente
+    * total nacional
+    * total extrangeira
+    * total indefinada
+    * total inexistente
 
 .. hint::
 
