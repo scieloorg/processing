@@ -341,7 +341,7 @@ Relatório de afiliações dos documentos
 
 **nome do arquivo:** documents_affiliations.csv
 
-**finalidade:** Relatório com autores dos documentos, para extração
+**finalidade:** Relatório com afiliação dos documentos, para extração
 de indicadores de publicação.
 
 Formatos de saída
@@ -374,7 +374,7 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     * documento citável (**document is citable**, :ref:`citable documents`)
     * instituição de Afiliação do documento (**document affiliation institution**)
     * país de afiliação do documento (**document affiliation country**)
-    * país de afiliação do documento ISO-3166 (**document addiliation country ISO-3166**, :ref:`languages`)
+    * país de afiliação do documento ISO-3166 (**document affiliation country ISO-3166**)
     * estado de afiliação do documento (**document affiliation state**)
     * cidade de afiliação do documento (**document affiliation city**)
 
@@ -386,6 +386,66 @@ Os formatos de saída disponíveis para este relatório são: CSV.
     normalizados. A qualidade dos metadados podem variar de uma coleção para outra
     devido aos processos estabelecidos por cada uma delas para a garantia de 
     qualidade de seus metadados.
+
+
+Relatório de nacionalidade de afiliações dos documentos
+=======================================================
+
+**nome do arquivo:** documents_affiliations_nationality.csv
+
+**finalidade:** Relatório com contagem de nacionalidade dos documentos com base
+em uma nacionalidade de origem, para extração de indicadores de publicação.
+
+Formatos de saída
+-----------------
+
+Os formatos de saída disponíveis para este relatório são: CSV.
+
+**Formato CSV**
+
+    * data de extração (**extraction date**)
+    * unidade de estudo (:ref:`study unity`)
+    * coleção (:ref:`collection`)
+    * ISSN SciELO (**ISSN SciELO**)
+    * ISSN's (**ISSN's**)
+    * título na SciELO (**title at SciELO**)
+    * areas temáticas do título (:ref:`title thematic areas`)
+    * título é de ciências agrárias (**agricultural sciences**)
+    * título é de ciências sociais aplicadas (**applied social sciences**)
+    * título é de ciências biológicas (**biological sciences**)
+    * título é de engenharias (**engineering**)
+    * título é de ciências exatas e da terra (**exact and earth science**)
+    * título é de ciências da saúde (**health sciences**)
+    * título é de ciências humanas(**humanities**)
+    * título é de linguistica, letras e artes (**literature and arts**)
+    * título é multidisciplinar (**title is multidisciplinary**)
+    * situação corrente do título (**title current status**)
+    * ID de publicação do documento (PID SciELO) (**document publishing ID (PID SciELO)**)
+    * ano de publicação do documento (**document publishing year**)
+    * tipo de documento (:ref:`document type`)
+    * documento citável (**document is citable**, :ref:`citable documents`)
+    * nacionalidade de referência (**home nationality ISO-3166**)
+    * total de affiliações do documento
+    * é nacional
+    * é extrangeira
+    * é indefinada
+    * é inexistente
+
+.. hint::
+
+    Os dados de afiliação não estão disponíveis para todos os documentos. Por
+    se tratar de um processo com alto índice de trabalho manual, é reconhecida,
+    mesmo que em baixas proporções, a existência de metadados errados ou não
+    normalizados. A qualidade dos metadados podem variar de uma coleção para outra
+    devido aos processos estabelecidos por cada uma delas para a garantia de 
+    qualidade de seus metadados.
+
+
+.. hint::
+
+    A definição de afiliação nacional ou extrageira é produzida comparando os
+    dados de país de afiliação dos documentos com o dado definido como **nacionalidade
+    de referência** no momento da extração do relatório.
 
 Relatório de contagens gerais relacionadas aos dos documentos
 =============================================================
