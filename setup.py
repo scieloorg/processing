@@ -8,7 +8,7 @@ install_requires = [
     'lxml>=3.4.4',
     'doaj_client',
     'scieloh5m5>=1.10.4',
-    'xylose>=1.18.6',
+    'xylose>=1.20.6',
     'articlemetaapi>=1.14.19',
     'citedbyapi>=1.3.10'
 ]
