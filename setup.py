@@ -4,20 +4,20 @@ from setuptools import setup, find_packages
 install_requires = [
     'thriftpy==0.3.1',
     'packtools',
-    'requests==2.11.1',
+    'requests>=2.11.1',
     'lxml>=3.4.4',
     'doaj_client',
-    'scieloh5m5==1.5.4',
-    'xylose==1.18.6',
-    'articlemetaapi==1.11.16',
-    'citedbyapi==1.3.10'
+    'scieloh5m5>=1.20.6',
+    'xylose>=1.18.6',
+    'articlemetaapi>=1.14.19',
+    'citedbyapi>=1.3.10'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="1.15.10",
+    version="1.16.10",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -57,6 +57,7 @@ setup(
     processing_export_xmlrsps=export.xml_rsps:main
     processing_export_normalize_affiliations=export.normalize_affiliations:main
     processing_export_natural_keys=export.natural_keys:main
+    processing_export_crossref=export.crossref:main
     processing_export_doaj=export.exdoaj:main
     processing_export_doaj_journals=export.doaj_journals:main
     processing_export_kbart=export.kbart:main
