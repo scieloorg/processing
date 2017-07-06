@@ -7,7 +7,7 @@ install_requires = [
     'requests>=2.11.1',
     'lxml>=3.4.4',
     'doaj_client',
-    'scieloh5m5>=1.20.6',
+    'scieloh5m5>=1.10.4',
     'xylose>=1.18.6',
     'articlemetaapi>=1.14.19',
     'citedbyapi>=1.3.10'
