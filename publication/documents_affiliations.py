@@ -91,7 +91,7 @@ class Dumper(object):
         logger.info('Export finished')
 
     def items(self):
-        
+
         if not self.issns:
             self.issns = [None]
 
@@ -103,7 +103,7 @@ class Dumper(object):
 
     def join_line(self, line):
 
-        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        return u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 
     def fmt_csv(self, data):
         issns = []
