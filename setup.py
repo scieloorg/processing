@@ -10,14 +10,14 @@ install_requires = [
     'scieloh5m5>=1.10.4',
     'xylose>=1.20.6',
     'articlemetaapi>=1.14.19',
-    'citedbyapi>=1.3.10'
+    'citedbyapi>=1.4.10'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="1.17.10",
+    version="1.19.10",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
