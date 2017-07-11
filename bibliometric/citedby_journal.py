@@ -59,7 +59,7 @@ def compute_citations(raw_data):
 
 class Dumper(object):
 
-    def __init__(self, collection, issns=None, output_file=None, output_format=OUTPUT_FORMAT):
+    def __init__(self, collection, issns=None, output_file=None, output_format=OUTPUT_FORMAT, with_ref_links=False):
 
         self._citedby = utils.citedby_server()
         self._articlemeta = utils.articlemeta_server()
@@ -177,6 +177,13 @@ def main():
     )
 
     parser.add_argument(
+        '--with_ref_links',
+        '-x',
+        store="False",
+        help='Include reference links for citing documents. It increase drastically the size of the report'
+    )
+
+    parser.add_argument(
         '--output_format',
         '-f',
         choices=['json', 'csv'],
@@ -212,6 +219,6 @@ def main():
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
 
-    dumper = Dumper(args.collection, issns, args.output_file, args.output_format)
+    dumper = Dumper(args.collection, issns, args.output_file, args.output_format, args.with_ref_links)
 
     dumper.run()
