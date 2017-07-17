@@ -81,7 +81,7 @@ class Dumper(object):
         }
 
         # legendarium natural_url
-        natural_url = str(URLegendarium(
+        natural_url = URLegendarium(
             item['journal_acronym'],
             item['publication_year'],
             item['volume'],
@@ -90,7 +90,7 @@ class Dumper(object):
             item['last_page'],
             item['elocation'],
             item['supplement']
-        ))
+        ).url_article
 
         natural_key = self.build_key([
             item['journal_acronym'],
@@ -99,6 +99,7 @@ class Dumper(object):
             item['supplement'],
             item['publication_year'],
             item['first_page'],
+            item['first_page_seq'],
             item['last_page'],
             item['elocation'],
             ])
@@ -126,7 +127,7 @@ class Dumper(object):
         ]
 
         # legendarium natural_url
-        natural_url = str(URLegendarium(
+        natural_url = URLegendarium(
             data.journal.acronym,
             data.publication_date[:4],
             data.issue.volume,
@@ -135,7 +136,7 @@ class Dumper(object):
             data.end_page or '',
             data.elocation or '',
             (data.issue.supplement_volume or '') + (data.issue.supplement_number or ''),
-        ))
+        ).url_article
 
         natural_key = self.build_key(line[3:])
 
