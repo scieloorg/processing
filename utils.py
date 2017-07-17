@@ -42,7 +42,7 @@ def slugify(value, allow_unicode=False):
     Remove characters that aren't alphanumerics, underscores, or hyphens.
     Convert to lowercase. Also strip leading and trailing whitespace.
     """
-    value = str(value)
+    value
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
     else:
