@@ -42,15 +42,14 @@ def slugify(value, allow_unicode=False):
     Remove characters that aren't alphanumerics, underscores, or hyphens.
     Convert to lowercase. Also strip leading and trailing whitespace.
     """
-    value = force_text(value)
+    value = str(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
 
-    return mark_safe(re.sub(r'[-\s]+', '-', value))
+    return re.sub(r'[-\s]+', '-', value)
 
 
 class SingletonMixin(object):

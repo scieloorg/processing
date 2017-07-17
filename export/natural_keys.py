@@ -15,12 +15,9 @@ import json
 
 from io import StringIO
 
-import packtools
-from packtools.catalogs import XML_CATALOG
-
+from legendarium.urlegendarium import URLegendarium
 import utils
 
-os.environ['XML_CATALOG_FILES'] = XML_CATALOG
 logger = logging.getLogger(__name__)
 
 
@@ -59,9 +56,6 @@ class Dumper(object):
         self.collection = collection
         self.issns = issns or [None]
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"coleção", u"pid", u"título", u"volume", u"número", u"ano de publicação", u"primeira página", u"primeria página seq" u"última página", u"e-location", u"ahead of print id", u"chave"]
-
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
 
     def write(self, line):
         if not self.output_file:
@@ -69,71 +63,88 @@ class Dumper(object):
         else:
             self.output_file.write('%s\r\n' % line)
 
-    def fmt_json(self, data, xml_etree):
+    def fmt_json(self, data):
 
-        parsed_xml = xml_etree.lxml
+        item = {
+            'collection_acronym': data.collection_acronym,
+            'publisher_id': data.publisher_id,
+            'journal_title': data.journal.title,
+            'journal_acronym': data.journal.acronym,
+            'volume': data.issue.volume,
+            'number': data.issue.number,
+            'supplement': (data.issue.supplement_volume or '') + (data.issue.supplement_number or ''),
+            'publication_year': data.publication_date[:4],
+            'first_page': data.start_page or '',
+            'first_page_seq': data.start_page_sequence or '',
+            'last_page': data.end_page or '',
+            'elocation': data.elocation or ''
+        }
 
-        def get_value(expression):
-            try:
-                first_occ = parsed_xml.xpath(expression)[0]
-            except IndexError:
-                return None
+        # legendarium natural_url
+        natural_url = str(URLegendarium(
+            item['journal_acronym'],
+            item['publication_year'],
+            item['volume'],
+            item['number'],
+            item['first_page'],
+            item['last_page'],
+            item['elocation'],
+            item['supplement']
+        ))
 
-            try:
-                value = first_occ.text
-            except AttributeError:
-                # valor de atributo
-                value = first_occ
+        natural_key = self.build_key([
+            item['journal_acronym'],
+            item['volume'],
+            item['number'],
+            item['supplement'],
+            item['publication_year'],
+            item['first_page'],
+            item['last_page'],
+            item['elocation'],
+            ])
 
-            try:
-                return value.strip()
-            except AttributeError:
-                return value
+        item['natural_key'] = natural_key
+        item['natural_url'] = natural_url
 
-        line = []
+        return json.dumps(item)
 
-        journal_title = get_value('/article/front/journal-meta/journal-title-group/journal-title')
-        volume = get_value('/article/front/article-meta/volume')
-        issue = get_value('/article/front/article-meta/issue')
-        year = get_value('/article/front/article-meta/pub-date/year')
-        fpage = get_value('/article/front/article-meta/fpage')
-        fpage_seq = get_value('/article/article/front/article-meta/fpage/@seq')
-        lpage = get_value('/article/front/article-meta/lpage')
-        elocation = get_value('/article/front/article-meta/elocation')
-        aop_id = get_value('/article/front/article-meta/article-id[@pub-id-type="other"]')
+    def fmt_csv(self, data):
 
         line = [
             data.collection_acronym,
             data.publisher_id,
-            journal_title if journal_title else '',
-            volume if volume else '',
-            issue if issue else '',
-            year if year else '',
-            fpage if fpage else '',
-            fpage_seq if fpage_seq else '',
-            lpage if lpage else '',
-            elocation if elocation else '',
-            aop_id if aop_id else ''
+            data.journal.title,
+            data.journal.acronym,
+            data.issue.volume,
+            data.issue.number,
+            (data.issue.supplement_volume or '') + (data.issue.supplement_number or ''),
+            data.publication_date[:4],
+            data.start_page or '',
+            data.start_page_sequence or '',
+            data.end_page or '',
+            data.elocation or ''
         ]
 
-        natural_key = self.build_key(line[2:])
+        # legendarium natural_url
+        natural_url = str(URLegendarium(
+            data.journal.acronym,
+            data.publication_date[:4],
+            data.issue.volume,
+            data.issue.number,
+            data.start_page or '',
+            data.end_page or '',
+            data.elocation or '',
+            (data.issue.supplement_volume or '') + (data.issue.supplement_number or ''),
+        ))
+
+        natural_key = self.build_key(line[3:])
 
         line.append(natural_key)
+        line.append(natural_url)
 
         joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
-
-    def parse(self, xml):
-        f = StringIO(xml)
-        try:
-            tree = packtools.XMLValidator(f)
-        except Exception as e:
-            logger.exception(e)
-            logger.error('Fail to parse XML')
-            tree = None
-
-        return tree
 
     def build_key(self, data):
 
@@ -143,30 +154,42 @@ class Dumper(object):
 
         return utils.slugify(joined_values)
 
-    def run(self):
+    def run(self, output_fmt='json'):
+
+        if output_fmt == 'csv':
+            header = [
+                u"coleção",
+                u"pid",
+                u"título",
+                "acrônimo do título",
+                u"volume",
+                u"número",
+                u"suplemento",
+                u"ano de publicação",
+                u"primeira página",
+                u"primeria página seq"
+                u"última página",
+                u"e-location",
+                u"chave natural",
+                u"url natural"
+            ]
+            self.write(
+                u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header])
+            )
+
         for issn in self.issns:
             for document in self._articlemeta.documents(
-                    collection=self.collection, issn=issn):
+                collection=self.collection, issn=issn
+            ):
+
                 logger.debug('Reading document: %s' % document.publisher_id)
 
-                try:
-                    xml = self._articlemeta.document(
-                        document.publisher_id, document.collection_acronym,
-                        fmt='xmlrsps')
-                except Exception as e:
-                    logger.exception(e)
-                    logger.error('Fail to read document: %s_%s' % (
-                        document.publisher_id, document.collection_acronym))
-                    xml = u''
+                if output_fmt == 'csv':
+                    output_fmt = self.fmt_csv
+                else:
+                    output_fmt = self.fmt_json
 
-                et = self.parse(xml)
-
-                if not et:
-                    logger.error('Fail to parse xml document: %s_%s' % (
-                        document.publisher_id, document.collection_acronym))
-                    continue
-
-                self.write(self.fmt_json(document, et))
+                self.write(output_fmt(document))
 
 
 def main():
@@ -184,6 +207,14 @@ def main():
     parser.add_argument(
         '--collection',
         '-c',
+        help='Collection Acronym'
+    )
+
+    parser.add_argument(
+        '--format',
+        '-f',
+        choices=['json', 'csv'],
+        default='json',
         help='Collection Acronym'
     )
 
@@ -217,4 +248,4 @@ def main():
 
     dumper = Dumper(args.collection, issns, args.output_file)
 
-    dumper.run()
+    dumper.run(args.format)
