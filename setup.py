@@ -11,14 +11,14 @@ install_requires = [
     'xylose>=1.24.0',
     'articlemetaapi>=1.14.19',
     'citedbyapi>=1.4.10',
-    'legendarium>=1.4.0'
+    'legendarium>=2.0.0'
 ]
 
 tests_require = []
 
 setup(
     name="processing",
-    version="1.21.2",
+    version="1.22.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",

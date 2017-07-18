@@ -4,7 +4,7 @@ requests==2.11.1
 xylose==1.24.0
 articlemetaapi==1.14.19
 scieloh5m5==1.10.4
-legendarium==1.4.0
+legendarium==2.0.0
 citedbyapi==1.4.10
 -e git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client
--e git+https://github.com/scieloorg/processing@1.21.0#egg=processing
+-e git+https://github.com/scieloorg/processing@1.22.0#egg=processing
