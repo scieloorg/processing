@@ -87,6 +87,7 @@ class Dumper(object):
             item['volume'],
             item['number'],
             item['first_page'],
+            item['first_page_seq'],
             item['last_page'],
             item['elocation'],
             item['supplement']
@@ -133,6 +134,7 @@ class Dumper(object):
             data.issue.volume,
             data.issue.number,
             data.start_page or '',
+            data.start_page_sequence or '',
             data.end_page or '',
             data.elocation or '',
             (data.issue.supplement_volume or '') + (data.issue.supplement_number or ''),
@@ -178,17 +180,17 @@ class Dumper(object):
                 u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header])
             )
 
+        if output_fmt == 'csv':
+            output_fmt = self.fmt_csv
+        else:
+            output_fmt = self.fmt_json
+
         for issn in self.issns:
             for document in self._articlemeta.documents(
                 collection=self.collection, issn=issn
             ):
 
                 logger.debug('Reading document: %s' % document.publisher_id)
-
-                if output_fmt == 'csv':
-                    output_fmt = self.fmt_csv
-                else:
-                    output_fmt = self.fmt_json
 
                 self.write(output_fmt(document))
 
