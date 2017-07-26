@@ -311,6 +311,9 @@ class Dumper(object):
         del(data['issns'])
         del(data['journal_current_status'])
 
+        if len(data['subject_areas']) > 2:
+            data['subject_areas'] = ['Multidisciplinary']
+
         return json.dumps(data)
 
     def fmt_csv(self, data):

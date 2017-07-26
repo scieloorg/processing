@@ -9,6 +9,7 @@ THEMATIC_AREAS = sorted([
     u"health sciences",
     u"human sciences",
     u"linguistics, letters and arts",
+    u"multidisciplinary"
 ])
 
 CITABLE_DOCUMENT_TYPES = (
