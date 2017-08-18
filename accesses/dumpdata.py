@@ -10,8 +10,9 @@ import json
 import codecs
 import datetime
 
-import choices
+from legendarium.urlegendarium import URLegendarium
 
+import choices
 import utils
 
 __version__ = 0.1
@@ -92,6 +93,27 @@ def eligible_match_keys(document):
     if document.doi:
         keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
+
+    suppl = ''.join([document.issue.supplement_volume or '', document.issue.supplement_number or '']).strip()
+
+    leg = URLegendarium(
+        acron=document.journal.acronym,
+        year_pub=document.publication_date[:4],
+        volume=document.issue.volume,
+        number=document.issue.number,
+        fpage=document.start_page,
+        fpage_sequence=document.start_page_sequence,
+        lpage=document.end_page,
+        article_id=document.elocation,
+        suppl_number=suppl,
+        doi=document.doi,
+        order=document.issue.order
+    )
+
+    url_code = '/%s/' % leg.url_article
+
+    if url_code:
+        keys.append(url_code.upper())
 
     return keys
 
