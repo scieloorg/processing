@@ -77,7 +77,9 @@ class Dumper(object):
             'first_page': data.start_page or '',
             'first_page_seq': data.start_page_sequence or '',
             'last_page': data.end_page or '',
-            'elocation': data.elocation or ''
+            'elocation': data.elocation or '',
+            'doi': data.doi or '',
+            'order': data.internal_sequence_id or ''
         }
 
         # legendarium natural_url
@@ -90,7 +92,9 @@ class Dumper(object):
             item['first_page_seq'],
             item['last_page'],
             item['elocation'],
-            item['supplement']
+            item['supplement'],
+            item['doi'],
+            item['order']
         ).url_article
 
         natural_key = self.build_key([
