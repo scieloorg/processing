@@ -18,7 +18,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version="1.26.0",
+    version="1.27.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -62,6 +62,7 @@ setup(
     processing_export_doaj=export.exdoaj:main
     processing_export_doaj_journals=export.doaj_journals:main
     processing_export_kbart=export.kbart:main
+    processing_export_dumparticles=export.dump_articles:main
     processing_export_search_update_indicators=export.search_update_indicators:main
     processing_bibliometric_citedby_document=bibliometric.citedby_document:main
     processing_bibliometric_citedby_journal=bibliometric.citedby_journal:main
