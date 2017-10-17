@@ -133,7 +133,7 @@ class Dumper(object):
                 jissns.add(data.scielo_issn)
                 in_doaj = self.get_doaj_journal(list(jissns))
                 yield self.fmt_csv(data, in_doaj)
-        
+
     def fmt_csv(self, data, in_doaj):
 
         line = [
@@ -197,6 +197,6 @@ def main():
     if len(args.issns) > 0:
         issns = utils.ckeck_given_issns(args.issns)
 
-    dumper = Dumper(args.collection, issns, args.output_file)
+    dumper = Dumper(args.collection, issns)
 
     dumper.run()
