@@ -168,8 +168,8 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['processing_date'] = document.processing_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
-    subject_areas = document.journal.subject_areas or ['undefined']
-    data['subject_areas'] = [i for i in subject_areas]
+    data['subject_areas'] = document.journal.subject_areas or ['undefined']
+    data['subject_areas'] = ['multidisciplinary'] if len(data['subject_areas']) > 2 else data['subject_areas']
     data['collection'] = document.collection_acronym
     data['document_type'] = document.document_type
     data['languages'] = list(set([i for i in document.languages()]+[document.original_language() or 'undefined']))
@@ -267,7 +267,6 @@ class Dumper(object):
         self.issns = issns
         self.collection = collection
 
-        
         if fmt == 'json':
             self.fmt = self.fmt_json
         else:
@@ -333,9 +332,6 @@ class Dumper(object):
     def fmt_json(self, data):
         del(data['issns'])
         del(data['journal_current_status'])
-
-        if len(data['subject_areas']) > 2:
-            data['subject_areas'] = ['Multidisciplinary']
 
         return json.dumps(data)
 
