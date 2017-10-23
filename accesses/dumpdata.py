@@ -169,7 +169,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
     data['subject_areas'] = document.journal.subject_areas or ['undefined']
-    data['subject_areas'] = ['multidisciplinary'] if len(data['subject_areas']) > 2 else data['subject_areas']
+    data['subject_areas'] = ['Multidisciplinary'] if len(data['subject_areas']) > 2 else data['subject_areas']
     data['collection'] = document.collection_acronym
     data['document_type'] = document.document_type
     data['languages'] = list(set([i for i in document.languages()]+[document.original_language() or 'undefined']))
