@@ -179,7 +179,7 @@ def main():
     parser.add_argument(
         '--with_ref_links',
         '-x',
-        store="False",
+        action="store_false",
         help='Include reference links for citing documents. It increase drastically the size of the report'
     )
 

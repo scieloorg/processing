@@ -1,7 +1,7 @@
 # coding: utf-8
 """
 Este processamento gera uma tabulação de acessos por periódico, ano de publicação e ano de
-acesso para o texto completo em HTML, resumo em HTML, PDF e EPDF. 
+acesso para o texto completo em HTML, resumo em HTML, PDF e EPDF.
 """
 
 import argparse
