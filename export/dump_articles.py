@@ -87,6 +87,7 @@ class Dumper(object):
 
         with zipfile.ZipFile(self.zip_name, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as thezip:
             for pid, collection, document in self.items():
+                logger.debug('Loading XML file for %s', '_'.join([collection, pid]))
                 collection = trans_acronym.get(collection, collection)
                 issn = pid[1:10]
                 xml_file = '{0}/{1}/{2}.xml'.format(collection, issn, pid)
@@ -102,7 +103,8 @@ class Dumper(object):
                 if xsd:
                     thezip.writestr("schema/ThomsonReuters_publishing.xsd", bytes(xsd.encode('utf-8')))
 
-        logging.info('Zip created: %s', self.zip_name)
+        logger.info('Zip created: %s', self.zip_name)
+        logger.info('Processing finished')
 
 
 def main():
