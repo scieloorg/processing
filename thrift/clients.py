@@ -127,10 +127,10 @@ class AccessStats(AccessesThriftClient):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         computed = self._compute_access_lifetime(query_result)
 
@@ -190,10 +190,10 @@ class AccessStats(AccessesThriftClient):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '1000')
+            ('size', '1000')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
@@ -251,10 +251,10 @@ class AccessStats(AccessesThriftClient):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '1000')
+            ('size', '1000')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
@@ -312,10 +312,10 @@ class AccessStats(AccessesThriftClient):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
