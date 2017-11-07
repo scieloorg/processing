@@ -125,64 +125,31 @@ settings = dict(config.items())
 
 
 def publicationstats_server():
-    try:
-        server = settings['app:main']['publicationstats_thriftserver'].split(':')
-        host = server[0]
-        port = int(server[1])
-    except:
-        logger.warning('Error defining PublicationStats thrift server, assuming default server publicationstats.scielo.org:11620')
-        host = 'publication.scielo.org'
-        port = 11620
-
-    return clients.PublicationStats(host, port)
+    server = settings['app:main'].get('publicationstats_thriftserver', 'publication.scielo.org:11620')
+    return clients.PublicationStats(server)
 
 
 def citedby_server():
-    try:
-        server = settings['app:main'].get('citedby_thriftserver', 'citedby.scielo.org:11610')
-    except:
-        logger.warning('Error defining Citedby thrift server, assuming default server citedby.scielo.org:11610')
-        server = 'citedby.scielo.org:11610'
-
+    server = settings['app:main'].get('citedby_thriftserver', 'citedby.scielo.org:11610')
     return clients.Citedby(domain=server)
 
 
 def ratchet_server():
-    try:
-        server = settings['app:main']['ratchet_thriftserver'].split(':')
-        host = server[0]
-        port = int(server[1])
-    except:
-        logger.warning('Error defining Ratchet thrift server, assuming default server ratchet.scielo.org:11630')
-        host = 'ratchet.scielo.org'
-        port = 11630
-
+    server = settings['app:main'].get('ratchet_thriftserver', 'ratchet.scielo.org:11630').split(':')
+    host = server[0]
+    port = int(server[1])
     return clients.Ratchet(host, port)
 
 
 def articlemeta_server():
-    try:
-        server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11621')
-    except:
-        logger.warning('Error defining Article Meta thrift server, assuming default server articlemeta.scielo.org:11621')
-        server = 'articlemeta.scielo.org:11621'
-
+    server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11621')
     admintoken = settings['app:main'].get('articlemeta_admintoken', None)
-
     return clients.ArticleMeta(domain=server, admintoken=admintoken)
 
 
 def accessstats_server():
-    try:
-        server = settings['app:main']['accessesstats_thriftserver'].split(':')
-        host = server[0]
-        port = int(server[1])
-    except:
-        logger.warning('Error defining Access Stats thrift server, assuming default server accessstats.scielo.org:11660')
-        host = 'ratchet.scielo.org'
-        port = 11660
-
-    return clients.AccessStats(host, port)
+    server = settings['app:main'].get('accessesstats_thriftserver', 'ratchet.scielo.org:11660')
+    return clients.AccessStats(server)
 
 
 def is_valid_date(value):

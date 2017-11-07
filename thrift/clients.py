@@ -7,6 +7,8 @@ from datetime import date
 
 from articlemeta.client import ThriftClient as ArticleMetaThriftClient
 from citedby.client import ThriftClient as CitedByThriftClient
+from accessstats.client import ThriftClient as AccessesThriftClient
+from publicationstats.client import ThriftClient as PublicationThriftClient
 from citedby.custom_query import journal_titles
 from thriftpy.rpc import make_client
 from xylose.scielodocument import Article, Journal
@@ -20,12 +22,6 @@ logger = logging.getLogger(__name__)
 ratchet_thrift = thriftpy.load(
     os.path.join(os.path.dirname(__file__))+'/ratchet.thrift')
 
-accessstats_thrift = thriftpy.load(
-    os.path.join(os.path.dirname(__file__))+'/access_stats.thrift')
-
-publication_stats_thrift = thriftpy.load(
-    os.path.join(os.path.dirname(__file__))+'/publication_stats.thrift')
-
 
 class ServerError(Exception):
     def __init__(self, message=None):
@@ -35,24 +31,7 @@ class ServerError(Exception):
         return repr(self.message)
 
 
-class AccessStats(object):
-
-    def __init__(self, address, port):
-        """
-        Cliente thrift para o Access Stats.
-        """
-        self._address = address
-        self._port = port
-
-    @property
-    def client(self):
-
-        client = make_client(
-            accessstats_thrift.AccessStats,
-            self._address,
-            self._port
-        )
-        return client
+class AccessStats(AccessesThriftClient):
 
     def _compute_access_lifetime(self, query_result):
 
@@ -148,10 +127,10 @@ class AccessStats(object):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         computed = self._compute_access_lifetime(query_result)
 
@@ -211,10 +190,10 @@ class AccessStats(object):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '1000')
+            ('size', '1000')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
@@ -272,10 +251,10 @@ class AccessStats(object):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '1000')
+            ('size', '1000')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
@@ -333,32 +312,15 @@ class AccessStats(object):
         }
 
         query_parameters = [
-            accessstats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
 
-class PublicationStats(object):
-
-    def __init__(self, address, port):
-        """
-        Cliente thrift para o PublicationStats.
-        """
-        self._address = address
-        self._port = port
-
-    @property
-    def client(self):
-        client = make_client(
-            publication_stats_thrift.PublicationStats,
-            self._address,
-            self._port
-        )
-
-        return client
+class PublicationStats(PublicationThriftClient):
 
     def _compute_documents_languages_by_year(self, query_result, years=0):
 
@@ -427,10 +389,10 @@ class PublicationStats(object):
         }
 
         query_parameters = [
-            publication_stats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+        query_result = self.search('article', json.dumps(body), query_parameters)
 
         return self._compute_documents_languages_by_year(query_result, years=years)
 
@@ -523,10 +485,10 @@ class PublicationStats(object):
             }
 
         query_parameters = [
-            publication_stats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+        query_result = self.search('article', json.dumps(body), query_parameters)
 
         return self._compute_number_of_articles_by_year(query_result, years=years)
 
@@ -602,11 +564,12 @@ class PublicationStats(object):
             }
 
         query_parameters = [
-            publication_stats_thrift.kwargs('size', '0')
+            ('size', '0')
         ]
 
-        query_result = json.loads(self.client.search(
-            'article', json.dumps(body), query_parameters))
+        query_result = self.search(
+            'article', json.dumps(body), query_parameters
+        )
 
         return self._compute_number_of_issues_by_year(
             query_result, years=years)
@@ -656,10 +619,10 @@ class PublicationStats(object):
         }
 
         query_parameters = [
-            publication_stats_thrift.kwargs('size', '1')
+            ('size', '1')
         ]
 
-        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+        query_result = self.search('article', json.dumps(body), query_parameters)
 
         return self._compute_first_included_document_by_journal(query_result)
 
@@ -713,10 +676,10 @@ class PublicationStats(object):
         }
 
         query_parameters = [
-            publication_stats_thrift.kwargs('size', '1')
+            ('size', '1')
         ]
 
-        query_result = json.loads(self.client.search('article', json.dumps(body), query_parameters))
+        query_result = self.search('article', json.dumps(body), query_parameters)
 
         return self._compute_last_included_document_by_journal(query_result)
 
@@ -790,11 +753,11 @@ class Citedby(CitedByThriftClient):
         body.update(aggs)
 
         query_parameters = [
-            self.CITEDBY_THRIFT.kwargs('size', '0'),
-            self.CITEDBY_THRIFT.kwargs('search_type', 'count')
+            ('size', '0'),
+            ('search_type', 'count')
         ]
 
-        query_result = json.loads(self.client.search(json.dumps(body), query_parameters))
+        query_result = self.search(json.dumps(body), query_parameters)
 
         return query_result
 
