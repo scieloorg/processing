@@ -306,8 +306,15 @@ class Dumper(object):
     def get_accesses(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
             accesses = []
-            keys = eligible_match_keys(document)
-            logger.debug('keys to join for %s: %s' % (document.publisher_id, str(keys)))
+
+            try:
+                keys = eligible_match_keys(document)
+            except Exception as e:
+                logger.error('Error ao ler: %s_%s', document.collection_acronym, document.publisher_id)
+                logger.exception(e)
+                continue
+
+            logger.debug('keys to join for %s: %s', document.publisher_id, str(keys))
             for key in keys:
                 data = self._ratchet.document(key)
                 jdata = json.loads(data)
