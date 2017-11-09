@@ -96,21 +96,29 @@ def eligible_match_keys(document):
 
     suppl = ''.join([document.issue.supplement_volume or '', document.issue.supplement_number or '']).strip()
 
-    leg = URLegendarium(
-        acron=document.journal.acronym,
-        year_pub=document.publication_date[:4],
-        volume=document.issue.volume,
-        number=document.issue.number,
-        fpage=document.start_page,
-        fpage_sequence=document.start_page_sequence,
-        lpage=document.end_page,
-        article_id=document.elocation,
-        suppl_number=suppl,
-        doi=document.doi,
-        order=document.issue.order
-    )
+    try:
+        leg = URLegendarium(
+            acron=document.journal.acronym,
+            year_pub=document.publication_date[:4],
+            volume=document.issue.volume,
+            number=document.issue.number,
+            fpage=document.start_page,
+            fpage_sequence=document.start_page_sequence,
+            lpage=document.end_page,
+            article_id=document.elocation,
+            suppl_number=suppl,
+            doi=document.doi,
+            order=document.issue.order
+        )
+    except ValueError as e:
+        logger.error(
+            'Fail to build legendarium eligible match key for %s_%s',
+            document.collection_acronym, document.publisher_id
+        )
+        logger.exception(e)
+        leg = ''
 
-    url_code = '/%s/' % leg.url_article
+    url_code = '/%s/' % leg.url_article if leg else ''
 
     if url_code:
         keys.append(url_code.upper())
