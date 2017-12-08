@@ -8,11 +8,11 @@ install_requires = [
     'lxml>=3.4.4',
     'doaj_client',
     'scieloh5m5>=1.11.0',
-    'xylose>=1.30.0',
-    'articlemetaapi>=1.23.0',
+    'xylose>=1.31.0',
+    'articlemetaapi>=1.24.0',
     'publicationstatsapi>=1.2.0',
     'accessstatsapi>=1.2.0',
-    'citedbyapi>=1.8.0',
+    'citedbyapi>=1.11.1',
     'legendarium>=2.0.2'
 ]
 
@@ -20,7 +20,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version="1.30.0",
+    version="1.31.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",

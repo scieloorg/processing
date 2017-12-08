@@ -174,6 +174,8 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data['issue_title'] = ', '.join([document.journal.abbreviated_title, document.issue.publication_date[:4], document.issue.label])
     data['processing_date'] = document.processing_date
+    import pdb; pdb.set_trace()
+    data['publication_date_at_scielo'] = document.creation_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
     data['subject_areas'] = document.journal.subject_areas or ['undefined']
@@ -299,6 +301,7 @@ class Dumper(object):
             header.append(u"issue title")
             header.append(u"document title")
             header.append(u"processing date")
+            header.append(u"publication date at SciELO")
             header.append(u"publication date")
             header.append(u"access date")
             header.append(u"access year")
@@ -375,6 +378,7 @@ class Dumper(object):
         line.append(data['issue_title'])
         line.append(data['document_title'])
         line.append(data['processing_date'])
+        line.append(data['publication_date_at_scielo'])
         line.append(data['publication_date'])
         line.append(data['access_date'])
         line.append(data['access_year'])
