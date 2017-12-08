@@ -174,7 +174,6 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
 
     data['issue_title'] = ', '.join([document.journal.abbreviated_title, document.issue.publication_date[:4], document.issue.label])
     data['processing_date'] = document.processing_date
-    import pdb; pdb.set_trace()
     data['publication_date_at_scielo'] = document.creation_date
     data['publication_date'] = document.publication_date
     data['publication_year'] = document.publication_date[0:4]
