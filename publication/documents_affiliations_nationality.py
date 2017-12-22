@@ -184,7 +184,7 @@ def main():
         '--home_nationality',
         '-n',
         required=True,
-        help='ISO 3166 three letters country code which will be considered as the home nationality.'
+        help='ISO 3166 two letters country code which will be considered as the home nationality.'
     )
 
     parser.add_argument(
