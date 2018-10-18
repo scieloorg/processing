@@ -2,7 +2,6 @@
 """
 Esse processamento condença os metadados de documentos com os dados de acessos.
 """
-import sys
 import argparse
 import logging
 import re
@@ -65,7 +64,7 @@ def pdf_keys(fulltexts):
     for language, url in fulltexts['pdf'].items():
         path = REGEX_PDF_PATH.search(url)
         if path:
-            keys.append(path.group().upper())
+            keys.append(path.group())
 
     return keys
 
@@ -94,10 +93,10 @@ def eligible_match_keys(document):
         keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
 
-    suppl = ''.join([document.issue.supplement_volume or '', document.issue.supplement_number or '']).strip()
-
-    try:
-        leg = URLegendarium(
+    suppl = document.issue.supplement_volume or \
+            document.issue.supplement_number or ''
+    keys.extend(
+        website_2018_urls(
             acron=document.journal.acronym,
             year_pub=document.publication_date[:4],
             volume=document.issue.volume,
@@ -108,22 +107,24 @@ def eligible_match_keys(document):
             article_id=document.elocation,
             suppl_number=suppl,
             doi=document.doi,
-            order=document.issue.order
-        )
+            order=document.issue.order) or [])
+    return keys
+
+
+def website_2018_urls(acron, year_pub, volume, number, fpage, fpage_sequence,
+                      lpage, article_id, suppl_number, doi, order):
+    try:
+        leg = URLegendarium(
+                      acron, year_pub, volume, number, fpage,
+                      fpage_sequence,
+                      lpage, article_id, suppl_number, doi, order)
+        return ['/article/%s/' % leg.url_article, '/pdf/%s/' % leg.url_article]
     except ValueError as e:
         logger.error(
             'Fail to build legendarium eligible match key for %s_%s',
-            document.collection_acronym, document.publisher_id
+             document.collection_acronym, document.publisher_id
         )
         logger.exception(e)
-        leg = ''
-
-    url_code = '/%s/' % leg.url_article if leg else ''
-
-    if url_code:
-        keys.append(url_code.upper())
-
-    return keys
 
 
 def country(country):

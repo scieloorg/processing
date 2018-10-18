@@ -7,6 +7,18 @@ from xylose.scielodocument import Article
 
 class DumpDataTest(unittest.TestCase):
 
+    def test_website_2018_urls(self):
+        result = dumpdata.website_2018_urls(
+                    acron='abcd', year_pub='2018',
+                    volume='22', number='3', fpage='10', fpage_sequence=None,
+                    lpage='11', article_id='e707', suppl_number='0',
+                    doi='doi1510.bla1', order='12345')
+        self.assertEqual(
+            result,
+            [u'/article/abcd/2018.v22n3suppl0/e707/',
+                u'/pdf/abcd/2018.v22n3suppl0/e707/']
+        )
+
     def test_pdf_keys(self):
         data = {
             'html': {
@@ -21,8 +33,8 @@ class DumpDataTest(unittest.TestCase):
         result = dumpdata.pdf_keys(data)
 
         self.assertEqual(
-            sorted(result), 
-            sorted(['/PDF/ABCD/V22N3/EN_V22N3A01.PDF', '/PDF/ABCD/V22N3/V22N3A01.PDF'])
+            sorted(result),
+            sorted(['/pdf/abcd/v22n3/v22n3a01.pdf', '/pdf/abcd/v22n3/en_v22n3a01.pdf'])
         )
 
     def test_pdf_keys_without_pdf(self):
