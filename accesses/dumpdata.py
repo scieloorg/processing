@@ -92,11 +92,15 @@ def eligible_match_keys(document):
     if document.doi:
         keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
+    keys.extend(website_2018_urls(document) or [])
+    return keys
 
-    suppl = document.issue.supplement_volume or \
+
+def website_2018_urls(document):
+    try:
+        suppl = document.issue.supplement_volume or \
             document.issue.supplement_number or ''
-    keys.extend(
-        website_2018_urls(
+        leg = URLegendarium(
             acron=document.journal.acronym,
             year_pub=document.publication_date[:4],
             volume=document.issue.volume,
@@ -107,22 +111,12 @@ def eligible_match_keys(document):
             article_id=document.elocation,
             suppl_number=suppl,
             doi=document.doi,
-            order=document.issue.order) or [])
-    return keys
-
-
-def website_2018_urls(acron, year_pub, volume, number, fpage, fpage_sequence,
-                      lpage, article_id, suppl_number, doi, order):
-    try:
-        leg = URLegendarium(
-                      acron, year_pub, volume, number, fpage,
-                      fpage_sequence,
-                      lpage, article_id, suppl_number, doi, order)
+            order=document.issue.order)
         return ['/article/%s/' % leg.url_article, '/pdf/%s/' % leg.url_article]
     except ValueError as e:
         logger.error(
             'Fail to build legendarium eligible match key for %s_%s',
-             document.collection_acronym, document.publisher_id
+            document.collection_acronym, document.publisher_id
         )
         logger.exception(e)
 

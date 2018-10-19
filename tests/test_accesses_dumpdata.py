@@ -1,6 +1,7 @@
 # coding: utf-8
 import unittest
 
+# from unittest.mock import MagicMock
 from accesses import dumpdata
 from xylose.scielodocument import Article
 
@@ -8,11 +9,40 @@ from xylose.scielodocument import Article
 class DumpDataTest(unittest.TestCase):
 
     def test_website_2018_urls(self):
-        result = dumpdata.website_2018_urls(
-                    acron='abcd', year_pub='2018',
-                    volume='22', number='3', fpage='10', fpage_sequence=None,
-                    lpage='11', article_id='e707', suppl_number='0',
-                    doi='doi1510.bla1', order='12345')
+
+        class Journal(object):
+            def __init__(self):
+                self.acron = None
+
+        class Issue(object):
+            def __init__(self):
+                self.volume = None
+                self.number = None
+                self.supplement_volume = None
+                self.supplement_number = None
+
+        class Document(object):
+            def __init__(self):
+                self.journal = Journal()
+                self.issue = Issue()
+                self.start_page = None
+                self.start_page_sequence = None
+                self.end_page = None
+                self.elocation = None
+                self.doi = None
+                self.publication_date = None
+        document = Document()
+        document.journal.acronym = 'abcd'
+        document.publication_date = '2018'
+        document.issue.volume = '22'
+        document.issue.number = '3'
+        document.issue.supplement_number = '0'
+        document.start_page = '10'
+        document.end_page = '11'
+        document.elocation = 'e707'
+        document.doi = 'doi1510.bla1'
+        document.issue.order = '12345'
+        result = dumpdata.website_2018_urls(document)
         self.assertEqual(
             result,
             [u'/article/abcd/2018.v22n3suppl0/e707/',
