@@ -1,7 +1,6 @@
 # coding: utf-8
 import unittest
 
-# from unittest.mock import MagicMock
 from accesses import dumpdata
 from xylose.scielodocument import Article
 

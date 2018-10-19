@@ -92,7 +92,7 @@ def eligible_match_keys(document):
     if document.doi:
         keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
-    keys.extend(website_2018_urls(document) or [])
+    keys.extend(website_2018_urls(document))
     return keys
 
 
@@ -119,6 +119,7 @@ def website_2018_urls(document):
             document.collection_acronym, document.publisher_id
         )
         logger.exception(e)
+    return []
 
 
 def country(country):
