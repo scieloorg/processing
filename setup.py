@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'thriftpy==0.3.1',
+    'thriftpy>==0.3.9',
     'packtools',
     'requests>=2.11.1',
     'lxml>=3.4.4',
@@ -10,9 +10,9 @@ install_requires = [
     'scieloh5m5>=1.11.0',
     'xylose>=1.31.0',
     'articlemetaapi>=1.24.0',
-    'publicationstatsapi>=1.2.0',
-    'accessstatsapi>=1.2.0',
-    'citedbyapi>=1.11.1',
+    'publicationstatsapi>=1.2.1',
+    'accessstatsapi>=1.2.1',
+    'citedbyapi>=1.11.3',
     'legendarium>=2.0.2'
 ]
 
@@ -24,8 +24,6 @@ setup(
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
-    maintainer="Fabio Batalha",
-    maintainer_email="fabio.batalha@scielo.org",
     url="http://github.com/scieloorg/processing",
     packages=find_packages(),
     include_package_data=True,

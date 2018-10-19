@@ -1,10 +1,13 @@
-thriftpy==0.3.1
+thriftpy==0.3.9
 packtools
 requests==2.11.1
-xylose==1.24.0
-articlemetaapi==1.14.19
-scieloh5m5==1.10.4
-legendarium==2.0.0
-citedbyapi==1.4.10
+lxml==3.4.4
+xylose==1.31.0
+articlemetaapi==1.24.0
+scieloh5m5==1.11.0
+publicationstatsapi==1.2.1
+accessstatsapi==1.2.1
+citedbyapi==1.11.3
+legendarium==2.0.2
 -e git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client
--e git+https://github.com/scieloorg/processing@1.22.0#egg=processing
+-e git+https://github.com/scieloorg/processing@1.33.0#egg=processing

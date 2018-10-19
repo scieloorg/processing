@@ -7,6 +7,47 @@ from xylose.scielodocument import Article
 
 class DumpDataTest(unittest.TestCase):
 
+    def test_website_2018_urls(self):
+
+        class Journal(object):
+            def __init__(self):
+                self.acron = None
+
+        class Issue(object):
+            def __init__(self):
+                self.volume = None
+                self.number = None
+                self.supplement_volume = None
+                self.supplement_number = None
+
+        class Document(object):
+            def __init__(self):
+                self.journal = Journal()
+                self.issue = Issue()
+                self.start_page = None
+                self.start_page_sequence = None
+                self.end_page = None
+                self.elocation = None
+                self.doi = None
+                self.publication_date = None
+        document = Document()
+        document.journal.acronym = 'abcd'
+        document.publication_date = '2018'
+        document.issue.volume = '22'
+        document.issue.number = '3'
+        document.issue.supplement_number = '0'
+        document.start_page = '10'
+        document.end_page = '11'
+        document.elocation = 'e707'
+        document.doi = 'doi1510.bla1'
+        document.issue.order = '12345'
+        result = dumpdata.website_2018_urls(document)
+        self.assertEqual(
+            result,
+            [u'/article/abcd/2018.v22n3suppl0/e707/',
+                u'/pdf/abcd/2018.v22n3suppl0/e707/']
+        )
+
     def test_pdf_keys(self):
         data = {
             'html': {
@@ -21,8 +62,8 @@ class DumpDataTest(unittest.TestCase):
         result = dumpdata.pdf_keys(data)
 
         self.assertEqual(
-            sorted(result), 
-            sorted(['/PDF/ABCD/V22N3/EN_V22N3A01.PDF', '/PDF/ABCD/V22N3/V22N3A01.PDF'])
+            sorted(result),
+            sorted(['/pdf/abcd/v22n3/v22n3a01.pdf', '/pdf/abcd/v22n3/en_v22n3a01.pdf'])
         )
 
     def test_pdf_keys_without_pdf(self):
