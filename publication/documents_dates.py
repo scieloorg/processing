@@ -119,6 +119,19 @@ class Dumper(object):
                 yield self.fmt_csv(data)
 
     def fmt_csv(self, data):
+        document_publication_date = (
+            data.document_publication_date or
+            data.creation_date or
+            data.update_date or
+            ''
+        )
+        document_publication_date_splitted = utils.split_date(
+            document_publication_date)
+
+        issue_publication_date = data.issue_publication_date
+        issue_publication_date_splitted = utils.split_date(
+            issue_publication_date)
+
         issns = []
         if data.journal.print_issn:
             issns.append(data.journal.print_issn)
@@ -141,7 +154,7 @@ class Dumper(object):
         line.append('1' if len(data.journal.subject_areas or []) > 2 else '0')
         line.append(data.journal.current_status)
         line.append(data.publisher_id)
-        line.append(data.publication_date[0:4])
+        line.append(document_publication_date_splitted[0])
         line.append(data.document_type)
         line.append(u'1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
         line.append(data.receive_date or '')
@@ -164,16 +177,19 @@ class Dumper(object):
         line.append(ahead_publication_date_splited[0])  # year
         line.append(ahead_publication_date_splited[1])  # month
         line.append(ahead_publication_date_splited[2])  # day
-        line.append(data.publication_date or '')
-        publication_splited = utils.split_date(data.publication_date or '')
-        line.append(publication_splited[0])  # year
-        line.append(publication_splited[1])  # month
-        line.append(publication_splited[2])  # day
-        line.append(data.creation_date or '')
-        creation_splited = utils.split_date(data.creation_date or '')
-        line.append(creation_splited[0])  # year
-        line.append(creation_splited[1])  # month
-        line.append(creation_splited[2])  # day
+
+        # u"document published at" (collection ou issue)
+        line.append(issue_publication_date)
+        line.append(issue_publication_date_splitted[0])  # year
+        line.append(issue_publication_date_splitted[1])  # month
+        line.append(issue_publication_date_splitted[2])  # day
+
+        #u"document published in SciELO at" (pub, ou creation, ou last update)
+        line.append(document_publication_date)
+        line.append(document_publication_date_splitted[0])  # year
+        line.append(document_publication_date_splitted[1])  # month
+        line.append(document_publication_date_splitted[2])  # day
+
         line.append(data.update_date or '')
         update_splited = utils.split_date(data.update_date or '')
         line.append(update_splited[0])  # year
