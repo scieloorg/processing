@@ -9,5 +9,5 @@ accessstatsapi==1.2.1
 citedbyapi==1.11.3
 legendarium==2.0.2
 -e git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client
--e git+https://github.com/scieloorg/processing@1.32.4#egg=processing
+-e git+https://github.com/scieloorg/processing@1.32.5#egg=processing
 -e git+https://github.com/scieloorg/xylose@1.35.8#egg=xylose
