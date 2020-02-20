@@ -2,18 +2,18 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'thriftpy>==0.3.9',
-    'packtools',
-    'requests>=2.11.1',
-    'lxml>=4.5',
+    'thriftpy',
+    'packtools<=2.5.3',
+    'requests',
+    'lxml',
     'doaj_client',
-    'scieloh5m5>=1.11.0',
+    'scieloh5m5',
     'xylose',
-    'articlemetaapi>=1.24.0',
+    'articlemetaapi<=1.26.5',
     'publicationstatsapi>=1.2.1',
     'accessstatsapi>=1.2.1',
     'citedbyapi>=1.11.3',
-    'legendarium>=2.0.2'
+    'legendarium>=2.0.2',
 ]
 
 tests_require = []
