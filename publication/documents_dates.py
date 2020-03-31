@@ -8,6 +8,8 @@ import logging
 import codecs
 import datetime
 
+import xylose.scielodocument
+
 import utils
 import choices
 
@@ -172,8 +174,14 @@ class Dumper(object):
         line.append(review_splited[0])  # year
         line.append(review_splited[1])  # month
         line.append(review_splited[2])  # day
-        line.append(data.ahead_publication_date or '')
-        ahead_publication_date_splited = utils.split_date(data.ahead_publication_date or '')
+        
+        try:
+            aop_pubdate = data.ahead_publication_date or ''
+        except xylose.scielodocument.UnavailableMetadataException:
+            aop_pubdate = ''
+            
+        line.append(aop_pubdate)
+        ahead_publication_date_splited = utils.split_date(aop_pubdate)
         line.append(ahead_publication_date_splited[0])  # year
         line.append(ahead_publication_date_splited[1])  # month
         line.append(ahead_publication_date_splited[2])  # day
