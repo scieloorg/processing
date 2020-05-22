@@ -93,7 +93,10 @@ def eligible_match_keys(document):
         keys.append(document.doi)
     keys += pdf_keys(document.fulltexts())
     keys.extend(website_2018_urls(document))
-    return keys
+
+    # há registros no ratchet cuja chave possui apenas caracteres maiúsculos
+    ci_keys = list(set(keys + [key.upper() for key in keys]))
+    return ci_keys
 
 
 def website_2018_urls(document):
