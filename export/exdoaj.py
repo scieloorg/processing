@@ -54,7 +54,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None, from_date=FROM, 
-        user=None, password=None, api_token=None, corrections_db=None):
+        user=None, password=None, api_token=None, corrections_db=None, validate_schema=False):
 
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
@@ -63,7 +63,8 @@ class Dumper(object):
         self.password = password
         self.issns = issns or [None]
         self.session = self.authenticated_session()
-        self.parse_schema()
+        self.validate_schema = validate_schema
+        self.doaj_schema = self.parse_schema() if self.validate_schema else None
         self.doaj_articles = Articles(usertoken=api_token)
         self.corrections_db = corrections_db
 
@@ -134,7 +135,7 @@ class Dumper(object):
             logger.error('Fail to parse XML')
             return False
 
-        self.doaj_schema = sch
+        return sch
 
     def authenticated_session(self):
         auth_url = 'https://doaj.org/account/login'
@@ -160,7 +161,6 @@ class Dumper(object):
         return session
 
     def xml_is_valid(self, xml):
-
         try:
             xml = StringIO(xml)
             xml_doc = etree.parse(xml)
@@ -234,7 +234,7 @@ class Dumper(object):
                     logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     xml = u''
 
-                if not self.xml_is_valid(xml):
+                if self.validate_schema and not self.xml_is_valid(xml):
                     logger.error('Fail to parse xml document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     continue
 
@@ -387,6 +387,12 @@ def main():
         default='DEBUG',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help='Logggin level'
+    )
+
+    parser.add_argument(
+        '--validate_schema',
+        action='store_true',
+        help='Validate each document against the DOAJ Schema before submitting',
     )
 
     parser.add_argument(
