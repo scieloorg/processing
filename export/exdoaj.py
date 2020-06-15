@@ -315,6 +315,9 @@ class CorrectionsDB(object):
         self._index.update(self._create_index(self._data, _make_issn_getter('pissn')))
 
     def _create_index(self, data, func):
+        """Este índice mapeia cada ISSN a uma posição na lista `data`, de forma
+        que não seja necessário iterar sobre a lista em busca do item desejado.
+        """
         result = {func(item): i for i, item in enumerate(data)}
         try:
             del(result[None])
