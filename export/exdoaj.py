@@ -54,7 +54,7 @@ def _config_logging(logging_level='INFO', logging_file=None):
 class Dumper(object):
 
     def __init__(self, collection, issns=None, output_file=None, from_date=FROM, 
-        user=None, password=None, api_token=None):
+        user=None, password=None, api_token=None, corrections_db=None, validate_schema=False):
 
         self._articlemeta = utils.articlemeta_server()
         self.collection = collection
@@ -63,8 +63,10 @@ class Dumper(object):
         self.password = password
         self.issns = issns or [None]
         self.session = self.authenticated_session()
-        self.parse_schema()
+        self.validate_schema = validate_schema
+        self.doaj_schema = self.parse_schema() if self.validate_schema else None
         self.doaj_articles = Articles(usertoken=api_token)
+        self.corrections_db = corrections_db
 
     def _doaj_id_by_meta(self, issn, publication_year, title):
         ### Query by metadata
@@ -133,7 +135,7 @@ class Dumper(object):
             logger.error('Fail to parse XML')
             return False
 
-        self.doaj_schema = sch
+        return sch
 
     def authenticated_session(self):
         auth_url = 'https://doaj.org/account/login'
@@ -159,7 +161,6 @@ class Dumper(object):
         return session
 
     def xml_is_valid(self, xml):
-
         try:
             xml = StringIO(xml)
             xml_doc = etree.parse(xml)
@@ -233,14 +234,102 @@ class Dumper(object):
                     logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     xml = u''
 
-                if not self.xml_is_valid(xml):
+                if self.validate_schema and not self.xml_is_valid(xml):
                     logger.error('Fail to parse xml document: %s_%s' % (document.publisher_id, document.collection_acronym))
                     continue
 
                 logger.info('Sending document: %s_%s' % (document.publisher_id, document.collection_acronym))
                 filename = '%s_%s.xml' % (document.publisher_id, document.collection_acronym)
 
+                # aplica a correção aos ISSNs.
+                if self.corrections_db is not None:
+                    xml = self._fix_issns(xml)
+
                 self.send_xml(filename, xml)
+
+    def _get_doaj_issns(self, issn):
+        corrected = self.corrections_db.find(issn)
+        result = {}
+        for issn in corrected.get("issns", []):
+            result[issn["type"]] = issn["id"]
+
+        return result
+
+    def _fix_issns(self, xml_data):
+        et = etree.parse(BytesIO(xml_data.encode("utf-8")))
+        issns = [i.text for i in et.xpath("/records/record/issn | /records/record/eissn")]
+        for issn in issns:
+            try:
+                issns_from_doaj = self._get_doaj_issns(issn)
+            except ValueError:
+                logger.info('could not find corrected issns for "%s"', issn)
+                continue
+            else:
+                result = replace_issns(et, pissn=issns_from_doaj.get("pissn"), eissn=issns_from_doaj.get("eissn")) 
+                logger.debug('the xml "%s" was replaced by "%s"', xml_data, result)
+                return result
+        else:
+            return xml_data
+
+
+def replace_issns(et, pissn=None, eissn=None):
+    assert any([pissn, eissn])
+
+    record_node = et.find("record")
+    journalTitle_node = et.xpath("/records/record/journalTitle")[0]
+
+    for node in et.xpath("/records/record/issn | /records/record/eissn"):
+        del(record_node[record_node.index(node)])
+
+    if eissn:
+        new_eissn_node = etree.Element("eissn")
+        new_eissn_node.text = eissn
+        record_node.insert(
+            record_node.index(journalTitle_node) + 1,
+            new_eissn_node
+        )
+
+    if pissn:
+        new_issn_node = etree.Element("issn")
+        new_issn_node.text = pissn
+        record_node.insert(
+            record_node.index(journalTitle_node) + 1,
+            new_issn_node
+        )
+
+    return etree.tostring(et, encoding="unicode", pretty_print=False)
+
+
+class CorrectionsDB(object):
+    def __init__(self, data):
+        self._data = tuple(data)
+        def _make_issn_getter(issn_type):
+            def _issn_getter(item):
+                for issn_data in item.get('issns', []):
+                    if issn_data['type'] == issn_type:
+                        return issn_data['id']
+
+            return _issn_getter
+
+        self._index = self._create_index(self._data, _make_issn_getter('eissn'))
+        self._index.update(self._create_index(self._data, _make_issn_getter('pissn')))
+
+    def _create_index(self, data, func):
+        """Este índice mapeia cada ISSN a uma posição na lista `data`, de forma
+        que não seja necessário iterar sobre a lista em busca do item desejado.
+        """
+        result = {func(item): i for i, item in enumerate(data)}
+        try:
+            del(result[None])
+        except KeyError:
+            pass
+        return result
+
+    def find(self, issn):
+        pos = self._index.get(issn)
+        if pos is None:
+            raise ValueError
+        return self._data[pos]
 
 
 def main():
@@ -303,6 +392,18 @@ def main():
         help='Logggin level'
     )
 
+    parser.add_argument(
+        '--validate_schema',
+        action='store_true',
+        help='Validate each document against the DOAJ Schema before submitting',
+    )
+
+    parser.add_argument(
+        '--corrections_db',
+        help='Path to the corrections database file',
+        type=argparse.FileType("r"),
+    )
+
     args = parser.parse_args()
     _config_logging(args.logging_level, args.logging_file)
     logger.info('Dumping data for: %s' % args.collection)
@@ -321,8 +422,16 @@ def main():
     else:
         issns = issns_from_file if issns_from_file else []
 
+    if args.corrections_db:
+        corrections_data = [json.loads(line) for line in args.corrections_db.readlines()]
+        corrections_db = CorrectionsDB(corrections_data)
+        logger.info('a database of corrections will be used to fix ISSNs before sending the data')
+    else:
+        corrections_db = None
+        logger.info('no database of corrections was given, the processing will proceed anyway')
+
     dumper = Dumper(
         args.collection, issns, from_date=args.from_date, user=args.user,
-        password=args.password)
+        password=args.password, corrections_db=corrections_db)
 
     dumper.run()
