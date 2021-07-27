@@ -12,7 +12,7 @@ pathlib==1.0.1
 picles.plumber==0.11
 ply==3.11
 publicationstatsapi==1.2.1
-requests==2.19.1
+requests==2.20.0
 -e git+https://github.com/scieloorg/scieloh5m5.git@1.9.6#egg=scieloh5m5
 thriftpy==0.3.9
 urllib3==1.23
