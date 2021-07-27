@@ -15,6 +15,6 @@ publicationstatsapi==1.2.1
 requests==2.19.1
 -e git+https://github.com/scieloorg/scieloh5m5.git@1.9.6#egg=scieloh5m5
 thriftpy==0.3.9
-urllib3==1.23
+urllib3==1.26.5
 wsgiref==0.1.2
 xylose==1.35.4
