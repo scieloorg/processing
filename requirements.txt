@@ -4,7 +4,7 @@ certifi==2019.11.28
 chardet==3.0.4
 citedbyapi==1.11.3
 -e git+https://github.com/fabiobatalha/doaj_client@27c2c17dc6d0d9ee3aa12283b20c1ac6170869b6#egg=doaj_client-master
-idna==2.7
+idna==3.7
 legendarium==2.0.2
 lxml==4.5.0
 packtools==2.5.3
