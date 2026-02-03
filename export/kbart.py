@@ -26,6 +26,12 @@ ISSN_URL_REDIRECTS = {
     '1575-0620': '2013-6463',  # Revista española de sanidad penitenciaria (SciELO Spain)
 }
 
+# Pre-compile regex patterns for ISSN redirects for better performance
+_ISSN_REDIRECT_PATTERNS = {
+    old_issn: re.compile(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)')
+    for old_issn in ISSN_URL_REDIRECTS.keys()
+}
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -177,9 +183,9 @@ class Dumper(object):
         # Apply ISSN redirects for journals that changed their ISSN in URLs
         # This is necessary for journals that no longer use their print ISSN
         for old_issn, new_issn in ISSN_URL_REDIRECTS.items():
-            # Use regex to match the ISSN in the pid parameter more precisely
-            # This ensures we only replace the ISSN in the correct context
-            url = re.sub(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)', r'\g<1>' + new_issn + r'\2', url)
+            # Use pre-compiled regex pattern for better performance
+            pattern = _ISSN_REDIRECT_PATTERNS[old_issn]
+            url = pattern.sub(r'\g<1>' + new_issn + r'\2', url)
         
         line.append(url)
         line.append('')  # first_author
