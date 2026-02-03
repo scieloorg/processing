@@ -164,7 +164,15 @@ class Dumper(object):
                 last_document.issue.number or '' if last_document and last_document.issue else '')
         else:
             line += ['', '', '']
-        line.append(data.url().replace('sci_serial', 'sci_issues'))
+        # Generate the URL
+        url = data.url().replace('sci_serial', 'sci_issues')
+        
+        # Special case for "Revista española de sanidad penitenciaria" (SciELO Spain)
+        # This journal no longer uses the print ISSN 1575-0620 and now uses 2013-6463
+        if '1575-0620' in url:
+            url = url.replace('1575-0620', '2013-6463')
+        
+        line.append(url)
         line.append('')  # first_author
         line.append(data.scielo_issn or '')
         line.append('')  # embargo_info
