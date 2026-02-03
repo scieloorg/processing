@@ -2,8 +2,8 @@
 """
 Este processamento gera uma tabulação de periódicos seguindo o formato Kbart.
 
-Formato de saída:
-"Título do Periódico","ISSN impresso","ISSN online","Data do primeiro número","volume","número","Data do último número publicado","volume","número","url issues","ID SciELO"
+Formato de saída (headers em inglês, conforme diretrizes KBART):
+publication_title,print_identifier,online_identifier,date_first_issue_online,num_first_vol_online,num_first_issue_online,date_last_issue_online,num_last_vol_online,num_last_issue_online,title_url,first_author,title_id,embargo_info,coverage_depth,coverage_notes,publisher_name,publication_type,date_monograph_published_print,date_monograph_published_online,monograph_volume,monograph_edition,first_editor,parent_publication_title_id,preceding_publication_title_id,access_type
 """
 import argparse
 import logging
@@ -52,31 +52,31 @@ class Dumper(object):
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         header = [
-            u"Título do Periódico (publication_title)",
-            u"ISSN impresso (print_identifier)",
-            u"ISSN online (online_identifier)",
-            u"Data do primeiro fascículo (date_first_issue_online)",
-            u"volume do primeiro fascículo (num_first_vol_online)",
-            u"número do primeiro fascículo (num_first_issue_online)",
-            u"Data do último fascículo publicado (date_last_issue_online)",
-            u"volume do último fascículo publicado (num_last_vol_online)",
-            u"número do último fascículo publicado (num_last_issue_online)",
-            u"url de fascículos (title_url)",
-            u"primeiro autor (first_author)",
-            u"ID do periódico no SciELO (title_id)",
-            u"informação de embargo (embargo_info)",
-            u"cobertura (coverage_depth)",
-            u"informação sobre cobertura (coverage_notes)",
-            u"nome do publicador (publisher_name)",
-            u"tipo de publicação (publication_type)",
-            u"data de publicação monográfica impressa (date_monograph_published_print)",
-            u"data de publicação monográfica online (date_monograph_published_online)",
-            u"volume de monografia (monograph_volume)",
-            u"edição de monografia (monograph_edition)",
-            u"primeiro editor (first_editor)",
-            u"ID de publicação pai (parent_publication_title_id)",
-            u"ID de publicação prévia (preceding_publication_title_id)",
-            u"tipo de acesso (access_type)"
+            u"publication_title",
+            u"print_identifier",
+            u"online_identifier",
+            u"date_first_issue_online",
+            u"num_first_vol_online",
+            u"num_first_issue_online",
+            u"date_last_issue_online",
+            u"num_last_vol_online",
+            u"num_last_issue_online",
+            u"title_url",
+            u"first_author",
+            u"title_id",
+            u"embargo_info",
+            u"coverage_depth",
+            u"coverage_notes",
+            u"publisher_name",
+            u"publication_type",
+            u"date_monograph_published_print",
+            u"date_monograph_published_online",
+            u"monograph_volume",
+            u"monograph_edition",
+            u"first_editor",
+            u"parent_publication_title_id",
+            u"preceding_publication_title_id",
+            u"access_type"
 
         ]
 
