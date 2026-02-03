@@ -14,10 +14,17 @@ preceding_publication_title_id, access_type
 import argparse
 import logging
 import codecs
+import re
 
 import utils
 
 logger = logging.getLogger(__name__)
+
+# ISSN redirects for journals that changed their ISSN in URLs
+# Maps old ISSN to new ISSN
+ISSN_URL_REDIRECTS = {
+    '1575-0620': '2013-6463',  # Revista española de sanidad penitenciaria (SciELO Spain)
+}
 
 
 def _config_logging(logging_level='INFO', logging_file=None):
@@ -167,10 +174,12 @@ class Dumper(object):
         # Generate the URL
         url = data.url().replace('sci_serial', 'sci_issues')
         
-        # Special case for "Revista española de sanidad penitenciaria" (SciELO Spain)
-        # This journal no longer uses the print ISSN 1575-0620 and now uses 2013-6463
-        if '1575-0620' in url:
-            url = url.replace('1575-0620', '2013-6463')
+        # Apply ISSN redirects for journals that changed their ISSN in URLs
+        # This is necessary for journals that no longer use their print ISSN
+        for old_issn, new_issn in ISSN_URL_REDIRECTS.items():
+            # Use regex to match the ISSN in the pid parameter more precisely
+            # This ensures we only replace the ISSN in the correct context
+            url = re.sub(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)', r'\g<1>' + new_issn + r'\2', url)
         
         line.append(url)
         line.append('')  # first_author
