@@ -14,10 +14,23 @@ preceding_publication_title_id, access_type
 import argparse
 import logging
 import codecs
+import re
 
 import utils
 
 logger = logging.getLogger(__name__)
+
+# ISSN redirects for journals that changed their ISSN in URLs
+# Maps old ISSN to new ISSN
+ISSN_URL_REDIRECTS = {
+    '1575-0620': '2013-6463',  # Revista española de sanidad penitenciaria (SciELO Spain)
+}
+
+# Pre-compile regex patterns for ISSN redirects for better performance
+_ISSN_REDIRECT_PATTERNS = {
+    old_issn: re.compile(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)')
+    for old_issn in ISSN_URL_REDIRECTS.keys()
+}
 
 
 def _config_logging(logging_level='INFO', logging_file=None):
@@ -164,7 +177,17 @@ class Dumper(object):
                 last_document.issue.number or '' if last_document and last_document.issue else '')
         else:
             line += ['', '', '']
-        line.append(data.url().replace('sci_serial', 'sci_issues'))
+        # Generate the URL
+        url = data.url().replace('sci_serial', 'sci_issues')
+        
+        # Apply ISSN redirects for journals that changed their ISSN in URLs
+        # This is necessary for journals that no longer use their print ISSN
+        for old_issn, new_issn in ISSN_URL_REDIRECTS.items():
+            # Use pre-compiled regex pattern for better performance
+            pattern = _ISSN_REDIRECT_PATTERNS[old_issn]
+            url = pattern.sub(r'\g<1>' + new_issn + r'\2', url)
+        
+        line.append(url)
         line.append('')  # first_author
         line.append(data.scielo_issn or '')
         line.append('')  # embargo_info
