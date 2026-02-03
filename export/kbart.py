@@ -118,6 +118,21 @@ class Dumper(object):
         else:
             self.output_file.write('%s\r\n' % line)
 
+    def _generate_journal_url(self, journal, language='en'):
+        """
+        Generate the journal URL, preferring electronic ISSN over print ISSN.
+        This ensures that journals that have transitioned to electronic-only
+        use the correct ISSN in the URL.
+        """
+        issn = journal.any_issn(priority=u'electronic')
+        if journal.scielo_domain and issn:
+            return "http://{0}/scielo.php?script=sci_issues&pid={1}&lng={2}".format(
+                journal.scielo_domain,
+                issn,
+                language
+            )
+        return ''
+
     def run(self):
         for item in self.items():
             self.write(item)
@@ -155,7 +170,7 @@ class Dumper(object):
                 last_document.issue.number or '' if last_document and last_document.issue else '')
         else:
             line += ['', '', '']
-        line.append(data.url().replace('sci_serial', 'sci_issues'))
+        line.append(self._generate_journal_url(data))
         line.append('')  # first_author
         line.append(data.scielo_issn or '')
         line.append('')  # embargo_info
