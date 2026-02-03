@@ -12,6 +12,7 @@ THEMATIC_AREAS = sorted([
 ])
 
 CITABLE_DOCUMENT_TYPES = (
+    'data-article',
     u'article-commentary',
     u'brief-report',
     u'case-report',
