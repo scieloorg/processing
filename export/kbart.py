@@ -161,7 +161,7 @@ class Dumper(object):
         line.append('')  # embargo_info
         line.append('fulltext')  # coverage_depth
         line.append('')  # coverage_notes
-        line.append(' '.join(data.publisher_name) if data.publisher_name else [])  # publisher_name
+        line.append(' '.join(data.publisher_name) if data.publisher_name else '')  # publisher_name
         line.append('Serial')  # publication_type
         line.append('')  # date_monograph_published_print
         line.append('')  # date_monograph_published_online
