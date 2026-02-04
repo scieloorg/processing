@@ -189,7 +189,7 @@ def main():
         '-l',
         default='DEBUG',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logggin level'
+        help='Logging level'
     )
 
     args = parser.parse_args()
