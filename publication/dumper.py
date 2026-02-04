@@ -13,7 +13,8 @@ from publication import (
     documents_languages,
     documents_licenses,
     documents_authors,
-    documents_dates
+    documents_dates,
+    documents_doi
 )
 
 
@@ -62,6 +63,7 @@ class Dumper(object):
         self.documents_licenses = documents_licenses.Dumper(collection, output_file='documents_licenses.csv')
         self.documents_authors = documents_authors.Dumper(collection, output_file='documents_authors.csv')
         self.documents_dates = documents_dates.Dumper(collection, output_file='documents_dates.csv')
+        self.documents_doi = documents_doi.Dumper(collection, output_file='documents_doi.csv')
         if self.home_nationality:
             self.documents_affiliations_nationality = documents_affiliations_nationality.Dumper(home_nationality, collection, output_file='documents_affiliation_nationality.csv')
 
@@ -79,6 +81,8 @@ class Dumper(object):
                 self.documents_licenses.write(self.documents_licenses.fmt_csv(data))
                 self.documents_authors.write(self.documents_authors.fmt_csv(data))
                 self.documents_dates.write(self.documents_dates.fmt_csv(data))
+                for line in self.documents_doi.fmt_csv(data):
+                    self.documents_doi.write(line)
                 if self.home_nationality:
                     self.documents_affiliations_nationality.write(self.documents_affiliations_nationality.fmt_csv(data))
 
