@@ -142,7 +142,7 @@ class Dumper(object):
             if citation.publication_date:
                 try:
                     pub_year = unicode(citation.publication_date[0:4])
-                except:
+                except (TypeError, ValueError, AttributeError):
                     pass
             # Fallback to v64 if publication_date doesn't work
             if not pub_year and 'v64' in citation.data:
@@ -226,7 +226,7 @@ def main():
         '-l',
         default='DEBUG',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logggin level'
+        help='Logging level'
     )
 
     args = parser.parse_args()
