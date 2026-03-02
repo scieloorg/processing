@@ -148,8 +148,13 @@ class Dumper(object):
 
         for issn in self.issns:
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
-                if data.current_status != 'current':
-                    logger.debug('Skipping non-active journal: %s (status: %s)' % (data.scielo_issn, data.current_status))
+                try:
+                    current_status = data.current_status
+                except IndexError:
+                    logger.warning('Journal %s has no status history, skipping.' % data.scielo_issn)
+                    continue
+                if current_status != 'current':
+                    logger.debug('Skipping non-active journal: %s (status: %s)' % (data.scielo_issn, current_status))
                     continue
                 logger.debug('Reading document: %s' % data.scielo_issn)
                 yield self.fmt_csv(data)
