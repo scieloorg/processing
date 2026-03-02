@@ -12,10 +12,11 @@ services:
       DOCKER_ENV: "1"
       WORK_DIR: /app
       LOG_DIR: /var/log/processing
+      TABS_DIR: /var/www/static_scielo_org/tabs
     volumes:
       # Arquivo de configuração com os thrift servers (obrigatório)
       - /etc/scieloapps/processing.ini:/etc/scieloapps/processing.ini:ro
-      # Chave SSH para o SCP copiar os ZIPs para orfeu.scielo.org (obrigatório)
-      - /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      # Diretório de saída dos ZIPs gerados (obrigatório)
+      - /var/www/static_scielo_org/tabs:/var/www/static_scielo_org/tabs
       # Logs persistentes (opcional)
       - /var/log/processing:/var/log/processing

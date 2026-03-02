@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y \
     g++ \
     git \
     curl \
-    openssh-client \
     zip \
     libxml2-dev \
     libxslt-dev \
@@ -19,10 +18,7 @@ COPY . .
 RUN cp config.ini-TEMPLATE config.ini
 
 # Diretórios necessários em tempo de execução
-RUN mkdir -p /var/log/processing /root/.ssh
-
-# Aceita automaticamente novos hosts SSH (evita prompt interativo no SCP)
-RUN echo "StrictHostKeyChecking accept-new" >> /etc/ssh/ssh_config
+RUN mkdir -p /var/log/processing /var/www/static_scielo_org/tabs
 
 # Variáveis de ambiente para modo Docker (sem virtualenv)
 # PROCESSING_SETTINGS_FILE aponta para o template por padrão;
@@ -31,6 +27,7 @@ ENV PROCESSING_SETTINGS_FILE=/app/config.ini
 ENV DOCKER_ENV=1
 ENV WORK_DIR=/app
 ENV LOG_DIR=/var/log/processing
+ENV TABS_DIR=/var/www/static_scielo_org/tabs
 ENV PYTHONPATH=/app
 
 RUN pip install --no-cache-dir pytest

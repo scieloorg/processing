@@ -10,8 +10,8 @@
 # Uso via Docker:
 #   docker run --rm \
 #     -v /etc/scieloapps/processing.ini:/etc/scieloapps/processing.ini:ro \
-#     -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro \
 #     -v /var/log/processing:/var/log/processing \
+#     -v /var/www/static_scielo_org/tabs:/var/www/static_scielo_org/tabs \
 #     scielo-processing "scl-BR arg-AR"
 
 set -euo pipefail
@@ -27,8 +27,7 @@ readonly VENV_DIR="${VENV_DIR:-/var/www/.venvs/processing}"
 readonly WORK_DIR="${WORK_DIR:-/var/www/processing}"
 readonly LOG_DIR="${LOG_DIR:-/var/log/processing}"
 readonly NETWORK_DIR="network"
-readonly REMOTE_SERVER="orfeu.scielo.org"
-readonly REMOTE_PATH="/var/www/static_scielo_org/tabs"
+readonly TABS_DIR="${TABS_DIR:-/var/www/static_scielo_org/tabs}"
 readonly MAX_PARALLEL_JOBS=4
 readonly MAX_RETRIES=3
 readonly RETRY_DELAY=5
@@ -313,11 +312,12 @@ process_collection() {
         return 1
     }
 
-    log_message "Copiando tabs_${acrond}.zip para servidor remoto"
-    if scp -q -o ConnectTimeout=30 "tabs_${acrond}.zip" "${REMOTE_SERVER}:${REMOTE_PATH}/"; then
-        log_success "Arquivo tabs_${acrond}.zip copiado com sucesso"
+    log_message "Copiando tabs_${acrond}.zip para $TABS_DIR"
+    mkdir -p "$TABS_DIR"
+    if cp "tabs_${acrond}.zip" "$TABS_DIR/"; then
+        log_success "Arquivo tabs_${acrond}.zip copiado com sucesso para $TABS_DIR"
     else
-        log_error "Falha ao copiar tabs_${acrond}.zip para servidor remoto"
+        log_error "Falha ao copiar tabs_${acrond}.zip para $TABS_DIR"
     fi
 
     if [[ "$is_network_mode" == "true" ]]; then
@@ -369,11 +369,12 @@ process_network_zip() {
         return 1
     }
 
-    log_message "Copiando tabs_network.zip para servidor remoto"
-    if scp -q -o ConnectTimeout=30 tabs_network.zip "${REMOTE_SERVER}:${REMOTE_PATH}/"; then
-        log_success "Arquivo tabs_network.zip copiado com sucesso"
+    log_message "Copiando tabs_network.zip para $TABS_DIR"
+    mkdir -p "$TABS_DIR"
+    if cp tabs_network.zip "$TABS_DIR/"; then
+        log_success "Arquivo tabs_network.zip copiado com sucesso para $TABS_DIR"
     else
-        log_error "Falha ao copiar tabs_network.zip para servidor remoto"
+        log_error "Falha ao copiar tabs_network.zip para $TABS_DIR"
     fi
 
     cd "$WORK_DIR"
