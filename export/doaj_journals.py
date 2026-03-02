@@ -58,7 +58,7 @@ def request_api(url, timeout=3, attempts=10):
             return None
         try:
             result = requests.get(url, timeout=3)
-        except:
+        except requests.exceptions.RequestException:
             logger.error("Fail to retrieve data from (%s) attempt %d/%d" % (url, attempt, attempts))
             time.sleep(1)
 
@@ -110,7 +110,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 

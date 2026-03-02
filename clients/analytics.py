@@ -55,7 +55,7 @@ class Analytics(object):
 
         try:
             data = response.json()
-        except:
+        except ValueError:
             logger.error('Could not load json for Analytics %s %s' % (url, str(payload)))
             return None
 

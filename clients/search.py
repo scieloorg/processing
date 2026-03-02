@@ -37,7 +37,7 @@ class Search(object):
         try:
             response = requests.get(
                 url, params=params, data=data, headers=headers)
-        except:
+        except requests.exceptions.RequestException:
             return None
 
         if response.status_code == 200:

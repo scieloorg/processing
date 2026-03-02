@@ -201,7 +201,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -267,7 +267,7 @@ class Dumper(object):
         line.append(last_document.issue.volume or u'' if last_document and last_document.issue else u'')
         line.append(last_document.issue.number or u'' if last_document and last_document.issue else u'')
 
-        line.append(unicode(self._number_of_issues_by_year(
+        line.append(str(self._number_of_issues_by_year(
             data.scielo_issn,
             data.collection_acronym,
             years=0
@@ -281,9 +281,9 @@ class Dumper(object):
         )
 
         for issue in issues:
-            line.append(unicode(issue[1]))
+            line.append(str(issue[1]))
 
-        line.append(unicode(self._number_of_issues_by_year(
+        line.append(str(self._number_of_issues_by_year(
             data.scielo_issn,
             data.collection_acronym,
             years=0,
@@ -299,7 +299,7 @@ class Dumper(object):
         )
 
         for issue in regular_issues:
-            line.append(unicode(issue[1]))
+            line.append(str(issue[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
@@ -314,7 +314,7 @@ class Dumper(object):
         )
 
         for document in documents:
-            line.append(unicode(document[1]))
+            line.append(str(document[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
@@ -331,7 +331,7 @@ class Dumper(object):
         )]
 
         for document in documents:
-            line.append(unicode(document))
+            line.append(str(document))
 
         languages = self._documents_languages_by_year(
             data.scielo_issn,
@@ -340,13 +340,13 @@ class Dumper(object):
         )
 
         for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['pt']))
+            line.append(str(values['pt']))
         for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['es']))
+            line.append(str(values['es']))
         for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['en']))
+            line.append(str(values['en']))
         for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['other']))
+            line.append(str(values['other']))
 
         for year in self.years_range:
             h5 = h5m5.get(data.scielo_issn, str(year))

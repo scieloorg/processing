@@ -9,10 +9,7 @@ import string
 
 from thrift import clients
 
-try:
-    from configparser import ConfigParser
-except:
-    from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +26,7 @@ def cleanup_string(text):
     try:
         nfd_form = unicodedata.normalize('NFD', text.strip().lower())
     except TypeError:
-        nfd_form = unicodedata.normalize('NFD', unicode(text.strip().lower()))
+        nfd_form = unicodedata.normalize('NFD', str(text.strip().lower()))
 
     cleaned_str = u''.join(x for x in nfd_form if x in string.ascii_letters or x == ' ')
 
@@ -69,9 +66,9 @@ class SingletonMixin(object):
             return cls._instances[key]
 
         try:
-            new_instance = super(type(cls), cls).__new__(cls, *args, **kwargs)
+            new_instance = super().__new__(cls, *args, **kwargs)
         except TypeError:
-            new_instance = super(type(cls), cls).__new__(cls, **kwargs)
+            new_instance = super().__new__(cls, **kwargs)
 
         cls._instances[key] = new_instance
 
@@ -85,10 +82,7 @@ class Configuration(SingletonMixin):
     def __init__(self, fp, parser_dep=ConfigParser):
         self.conf = parser_dep()
 
-        try:
-            self.conf.read_file(fp)
-        except AttributeError:
-            self.conf.readfp(fp)
+        self.conf.read_file(fp)
 
     @classmethod
     def from_env(cls):
@@ -156,13 +150,13 @@ def is_valid_date(value):
 
     try:
         datetime.datetime.strptime(value, '%Y-%m-%d')
-    except:
+    except ValueError:
         try:
             datetime.datetime.strptime(value, '%Y-%m')
-        except:
+        except ValueError:
             try:
                 datetime.datetime.strptime(value, '%Y')
-            except:
+            except ValueError:
                 return False
 
     return True

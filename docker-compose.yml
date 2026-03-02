@@ -1,0 +1,21 @@
+services:
+  processing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    image: scielo-processing:latest
+    platform: linux/amd64
+    environment:
+      PROCESSING_SETTINGS_FILE: /etc/scieloapps/processing.ini
+      DOCKER_ENV: "1"
+      WORK_DIR: /app
+      LOG_DIR: /var/log/processing
+    volumes:
+      # Arquivo de configuração com os thrift servers (obrigatório)
+      - /etc/scieloapps/processing.ini:/etc/scieloapps/processing.ini:ro
+      # Chave SSH para o SCP copiar os ZIPs para orfeu.scielo.org (obrigatório)
+      - /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      # Logs persistentes (opcional)
+      - /var/log/processing:/var/log/processing

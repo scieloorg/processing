@@ -9,11 +9,7 @@ import codecs
 import requests
 import datetime
 
-# Python 3 and 2 Compatibilility
-try:
-    import urlparse as parse  # Python 2
-except:
-    from urllib import parse  # Python3
+from urllib import parse
 
 import utils
 import choices
@@ -91,7 +87,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -118,16 +114,16 @@ class Dumper(object):
                 continue
 
             if response.status_code == 404:  # fim de paginacao
-                raise StopIteration
+                return
 
             try:
                 data = response.json()
-            except:
+            except ValueError:
                 logger.debug('Invalid JSON data retrieved for %s' % response.url)
                 continue
 
             if data == 'Not Found':
-                raise StopIteration
+                return
 
             for item in data.get('results', []):
                 yield item

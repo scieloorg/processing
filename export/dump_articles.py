@@ -55,7 +55,7 @@ def getschema():
         xsd = requests.get('https://raw.githubusercontent.com/scieloorg/articles_meta/master/tests/xsd/scielo_sci/ThomsonReuters_publishing.xsd').text
         logger.debug('Schema download')
         return xsd
-    except:
+    except requests.exceptions.RequestException:
         logger.error('Schema download fail')
 
 
@@ -91,17 +91,17 @@ class Dumper(object):
                 collection = trans_acronym.get(collection, collection)
                 issn = pid[1:10]
                 xml_file = '{0}/{1}/{2}.xml'.format(collection, issn, pid)
-                thezip.writestr(xml_file, bytes(document.encode('utf-8')))
+                thezip.writestr(xml_file, document.encode('utf-8'))
 
             readmef = open(os.path.dirname(__file__)+'/templates/dumparticle_readme.txt', 'r').read()
             readme = '{0}\r\n* Documents updated at: {1}\r\n'.format(readmef, datetime.datetime.now().isoformat())
 
-            thezip.writestr("README.txt", bytes(readme.encode('utf-8')))
+            thezip.writestr("README.txt", readme.encode('utf-8'))
 
             if self.xml_format == 'xmlwos':
                 xsd = getschema()
                 if xsd:
-                    thezip.writestr("schema/ThomsonReuters_publishing.xsd", bytes(xsd.encode('utf-8')))
+                    thezip.writestr("schema/ThomsonReuters_publishing.xsd", xsd.encode('utf-8'))
 
         logger.info('Zip created: %s', self.zip_name)
         logger.info('Processing finished')

@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'thriftpy',
+    'thriftpy2',
     'packtools<=2.5.3',
     'requests',
     'lxml',
@@ -31,8 +31,13 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
+    python_requires='>=3.8',
     dependency_links=[
         "git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client",
         "git+https://github.com/scieloorg/xylose@1.35.8#egg=xylose",

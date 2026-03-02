@@ -89,7 +89,7 @@ class Dumper(object):
 
         try:
             result = [i for i in self.doaj_articles.search(query)]
-        except:
+        except Exception:
             logger.debug('Fail to query DOAJ API using metadata: %s' % query)
 
         if len(result) == 1:
@@ -102,7 +102,7 @@ class Dumper(object):
         result = []
         try:
             result = [i for i in self.doaj_articles.search(query)]
-        except:
+        except Exception:
             logger.debug('Fail to query DOAJ API using DOI: %s' % query)
 
         if len(result) == 1:

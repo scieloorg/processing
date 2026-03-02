@@ -1,6 +1,6 @@
 # coding: utf-8
 import os
-import thriftpy
+import thriftpy2 as thriftpy
 import json
 import logging
 from datetime import date
@@ -10,7 +10,7 @@ from citedby.client import ThriftClient as CitedByThriftClient
 from accessstats.client import ThriftClient as AccessesThriftClient
 from publicationstats.client import ThriftClient as PublicationThriftClient
 from citedby.custom_query import journal_titles
-from thriftpy.rpc import make_client
+from thriftpy2.rpc import make_client
 from xylose.scielodocument import Article, Journal
 
 import utils

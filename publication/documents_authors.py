@@ -76,12 +76,12 @@ class Dumper(object):
 
     def write(self, lines):
 
-        if isinstance(lines, unicode):
+        if isinstance(lines, str):
             lines = [lines]
 
         for line in lines:
             if not self.output_file:
-                print(line.encode('utf-8'))
+                print(line)
             else:
                 self.output_file.write('%s\r\n' % line)
 

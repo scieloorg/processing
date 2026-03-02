@@ -46,7 +46,7 @@ def pages(first, last):
 
     try:
         pages = int(last)-int(first)
-    except:
+    except (ValueError, TypeError):
         pages = 0
 
     if pages >= 0:
@@ -95,7 +95,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -147,7 +147,7 @@ class Dumper(object):
         line.append(data.publication_date[0:4])
         line.append(data.document_type)
         line.append(u'1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
-        line.append(unicode(tot_authors))
+        line.append(str(tot_authors))
         line.append(u'1' if tot_authors == 0 else u'0')  # total de autores
         line.append(u'1' if tot_authors == 1 else u'0')  # total de autores
         line.append(u'1' if tot_authors == 2 else u'0')  # total de autores
@@ -155,8 +155,8 @@ class Dumper(object):
         line.append(u'1' if tot_authors == 4 else u'0')  # total de autores
         line.append(u'1' if tot_authors == 5 else u'0')  # total de autores
         line.append(u'1' if tot_authors >= 6 else u'0')  # total de autores
-        line.append(unicode(pages(data.start_page, data.end_page))),  # total de páginas
-        line.append(unicode(len(data.citations or [])))  # total de citações
+        line.append(str(pages(data.start_page, data.end_page))),  # total de páginas
+        line.append(str(len(data.citations or [])))  # total de citações
 
         joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
 

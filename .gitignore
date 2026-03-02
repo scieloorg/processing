@@ -59,3 +59,4 @@ target/
 
 # pip source directory
 src/
+config.ini
