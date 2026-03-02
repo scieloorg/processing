@@ -13,6 +13,7 @@ services:
       WORK_DIR: /app
       LOG_DIR: /var/log/processing
       TABS_DIR: /var/www/static_scielo_org/tabs
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
     volumes:
       # Arquivo de configuração com os thrift servers (obrigatório)
       - /etc/scieloapps/processing.ini:/etc/scieloapps/processing.ini:ro

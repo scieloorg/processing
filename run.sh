@@ -33,7 +33,7 @@ readonly MAX_RETRIES=3
 readonly RETRY_DELAY=5
 readonly TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 readonly MASTER_LOG="$LOG_DIR/master_$TIMESTAMP.log"
-readonly SLACK_WEBHOOK_URL="omitido"
+readonly SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
 # Coleções padrão
 readonly DEFAULT_ACRONYMS=(
