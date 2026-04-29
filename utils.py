@@ -17,7 +17,7 @@ ENV_SETTINGS = {
     'ARTICLEMETA_THRIFTSERVER': 'articlemeta_thriftserver',
     'ARTICLEMETA_ADMINTOKEN': 'articlemeta_admintoken',
     'RATCHET_THRIFTSERVER': 'ratchet_thriftserver',
-    'ACCESSSTATS_THRIFTSERVER': 'accessesstats_thriftserver',
+    'ACCESSSTATS_THRIFTSERVER': 'accessstats_thriftserver',
     'CITEDBY_THRIFTSERVER': 'citedby_thriftserver',
     'PUBLICATIONSTATS_THRIFTSERVER': 'publicationstats_thriftserver',
     'SOLR_SEARCH_SCIELO_ORG': 'solr_search_scielo_org',
@@ -150,11 +150,21 @@ def get_metadata_value(obj, attr, default=''):
         return default
 
 
+def get_service_setting(settings, name, aliases=None):
+    aliases = aliases or []
+    app_settings = settings['app:main']
+    for key in [name] + aliases:
+        value = app_settings.get(key)
+        if value:
+            return value
+    raise ValueError('missing required setting: %s' % name)
+
+
 def publicationstats_server():
     from thrift import clients
 
     settings = get_settings()
-    server = settings['app:main'].get('publicationstats_thriftserver', 'publication.scielo.org:11620')
+    server = get_service_setting(settings, 'publicationstats_thriftserver')
     return clients.PublicationStats(server)
 
 
@@ -162,7 +172,7 @@ def citedby_server():
     from thrift import clients
 
     settings = get_settings()
-    server = settings['app:main'].get('citedby_thriftserver', 'citedby.scielo.org:11610')
+    server = get_service_setting(settings, 'citedby_thriftserver')
     return clients.Citedby(domain=server)
 
 
@@ -170,7 +180,7 @@ def ratchet_server():
     from thrift import clients
 
     settings = get_settings()
-    server = settings['app:main'].get('ratchet_thriftserver', 'ratchet.scielo.org:11630').split(':')
+    server = get_service_setting(settings, 'ratchet_thriftserver').split(':')
     host = server[0]
     port = int(server[1])
     return clients.Ratchet(host, port)
@@ -180,7 +190,7 @@ def articlemeta_server():
     from thrift import clients
 
     settings = get_settings()
-    server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11621')
+    server = get_service_setting(settings, 'articlemeta_thriftserver')
     admintoken = settings['app:main'].get('articlemeta_admintoken', None)
     return clients.ArticleMeta(domain=server, admintoken=admintoken)
 
@@ -189,7 +199,11 @@ def accessstats_server():
     from thrift import clients
 
     settings = get_settings()
-    server = settings['app:main'].get('accessesstats_thriftserver', 'ratchet.scielo.org:11660')
+    server = get_service_setting(
+        settings,
+        'accessstats_thriftserver',
+        aliases=['accessesstats_thriftserver']
+    )
     return clients.AccessStats(server)
 
 

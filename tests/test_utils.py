@@ -59,8 +59,9 @@ class UtilsTest(unittest.TestCase):
     def test_get_settings_from_environment(self):
 
         env = {
-            'ARTICLEMETA_THRIFTSERVER': 'articlemeta.scielo.org:11621',
-            'RATCHET_THRIFTSERVER': 'ratchet.scielo.org:11649',
+            'ARTICLEMETA_THRIFTSERVER': 'articlemeta.example.invalid:11621',
+            'RATCHET_THRIFTSERVER': 'ratchet.example.invalid:11649',
+            'ACCESSSTATS_THRIFTSERVER': 'access.example.invalid:11660',
         }
 
         with mock.patch.dict(os.environ, env, clear=True):
@@ -68,11 +69,15 @@ class UtilsTest(unittest.TestCase):
 
         self.assertEqual(
             result['app:main']['articlemeta_thriftserver'],
-            'articlemeta.scielo.org:11621'
+            'articlemeta.example.invalid:11621'
         )
         self.assertEqual(
             result['app:main']['ratchet_thriftserver'],
-            'ratchet.scielo.org:11649'
+            'ratchet.example.invalid:11649'
+        )
+        self.assertEqual(
+            result['app:main']['accessstats_thriftserver'],
+            'access.example.invalid:11660'
         )
 
     def test_get_metadata_value_returns_default_for_incomplete_metadata(self):

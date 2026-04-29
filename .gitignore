@@ -1,4 +1,8 @@
 .DS_Store
+*.swp
+.env
+.env.*
+!.env.example
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

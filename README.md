@@ -15,20 +15,31 @@ Para instalar as dependências e executar a suíte de testes:
 docker compose run --rm tests
 ```
 
-Para executar o processamento via Docker, configure o webhook do Slack e monte
-um arquivo de configuração real, quando necessário:
+Para executar o processamento via Docker, configure as variáveis em um arquivo
+`.env` local, baseado em `.env.example`. O `.env` não deve ser versionado.
 
 ```bash
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/... docker compose run --rm processing "scl-BR"
+cp .env.example .env
 ```
 
-Também é possível configurar os serviços diretamente por variáveis de ambiente,
-sem arquivo `config.ini`:
+Preencha no `.env` os valores equivalentes ao antigo `config.ini`:
+
+```ini
+ARTICLEMETA_THRIFTSERVER=
+ARTICLEMETA_ADMINTOKEN=
+RATCHET_THRIFTSERVER=
+ACCESSSTATS_THRIFTSERVER=
+CITEDBY_THRIFTSERVER=
+PUBLICATIONSTATS_THRIFTSERVER=
+SOLR_SEARCH_SCIELO_ORG=
+SOLR_SEARCH_SCIELO_ORG_INDEX=
+PUBLICATIONSTATS_TIMEOUT_MS=60000
+SLACK_WEBHOOK_URL=
+```
+
+Depois execute:
 
 ```bash
-ARTICLEMETA_THRIFTSERVER=articlemeta.scielo.org:11621 \
-RATCHET_THRIFTSERVER=ratchet.scielo.org:11649 \
-PUBLICATIONSTATS_TIMEOUT_MS=60000 \
 docker compose run --rm processing "scl-BR"
 ```
 
