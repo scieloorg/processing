@@ -70,32 +70,32 @@ class Dumper(object):
 
         if output_format != 'json':
             header = []
-            header.append(u"extraction date")
-            header.append(u"study unit")
-            header.append(u"collection")
-            header.append(u"ISSN SciELO")
-            header.append(u"ISSN\'s")
-            header.append(u"title at SciELO")
-            header.append(u"title thematic areas")
+            header.append("extraction date")
+            header.append("study unit")
+            header.append("collection")
+            header.append("ISSN SciELO")
+            header.append("ISSN\'s")
+            header.append("title at SciELO")
+            header.append("title thematic areas")
             for area in choices.THEMATIC_AREAS:
-                header.append(u"title is %s" % area.lower())
-            header.append(u"title is multidisciplinary")
-            header.append(u"title current status")
-            header.append(u"has optimized queries")
-            header.append(u"publications from (year)")
-            header.append(u"cited publications from (year)")
-            header.append(u"total of citations")
+                header.append("title is %s" % area.lower())
+            header.append("title is multidisciplinary")
+            header.append("title current status")
+            header.append("has optimized queries")
+            header.append("publications from (year)")
+            header.append("cited publications from (year)")
+            header.append("total of citations")
 
-            self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+            self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
         logger.info('Export finished')
 
@@ -135,17 +135,17 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'journal')
+        line.append('journal')
         line.append(data.collection_acronym)
         line.append(data.scielo_issn)
-        line.append(u';'.join(issns))
+        line.append(';'.join(issns))
         line.append(data.title)
-        line.append(u';'.join(data.subject_areas or []))
+        line.append(';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data.subject_areas or []]:
-                line.append(u'1')
+                line.append('1')
             else:
-                line.append(u'0')
+                line.append('0')
         line.append('1' if len(data.subject_areas or []) > 2 else '0')
         line.append(data.current_status)
         line.append('1' if self._citedby.has_optmized_journal_queries(data.scielo_issn) else '0')

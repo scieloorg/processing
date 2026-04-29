@@ -29,7 +29,7 @@ ISSN_URL_REDIRECTS = {
 # Pre-compile regex patterns for ISSN redirects for better performance
 _ISSN_REDIRECT_PATTERNS = {
     old_issn: re.compile(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)')
-    for old_issn in ISSN_URL_REDIRECTS.keys()
+    for old_issn in list(ISSN_URL_REDIRECTS.keys())
 }
 
 
@@ -71,35 +71,35 @@ class Dumper(object):
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         header = [
-            u"publication_title",
-            u"print_identifier",
-            u"online_identifier",
-            u"date_first_issue_online",
-            u"num_first_vol_online",
-            u"num_first_issue_online",
-            u"date_last_issue_online",
-            u"num_last_vol_online",
-            u"num_last_issue_online",
-            u"title_url",
-            u"first_author",
-            u"title_id",
-            u"embargo_info",
-            u"coverage_depth",
-            u"coverage_notes",
-            u"publisher_name",
-            u"publication_type",
-            u"date_monograph_published_print",
-            u"date_monograph_published_online",
-            u"monograph_volume",
-            u"monograph_edition",
-            u"first_editor",
-            u"parent_publication_title_id",
-            u"preceding_publication_title_id",
-            u"access_type"
+            "publication_title",
+            "print_identifier",
+            "online_identifier",
+            "date_first_issue_online",
+            "num_first_vol_online",
+            "num_first_issue_online",
+            "date_last_issue_online",
+            "num_last_vol_online",
+            "num_last_issue_online",
+            "title_url",
+            "first_author",
+            "title_id",
+            "embargo_info",
+            "coverage_depth",
+            "coverage_notes",
+            "publisher_name",
+            "publication_type",
+            "date_monograph_published_print",
+            "date_monograph_published_online",
+            "monograph_volume",
+            "monograph_edition",
+            "first_editor",
+            "parent_publication_title_id",
+            "preceding_publication_title_id",
+            "access_type"
 
         ]
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def _first_included_document_by_journal(self, issn, collection):
 
@@ -133,12 +133,12 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
 
     def items(self):
@@ -182,7 +182,7 @@ class Dumper(object):
         
         # Apply ISSN redirects for journals that changed their ISSN in URLs
         # This is necessary for journals that no longer use their print ISSN
-        for old_issn, new_issn in ISSN_URL_REDIRECTS.items():
+        for old_issn, new_issn in list(ISSN_URL_REDIRECTS.items()):
             # Use pre-compiled regex pattern for better performance
             pattern = _ISSN_REDIRECT_PATTERNS[old_issn]
             url = pattern.sub(r'\g<1>' + new_issn + r'\2', url)

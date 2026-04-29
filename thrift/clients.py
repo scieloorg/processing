@@ -412,7 +412,7 @@ class PublicationStats(PublicationThriftClient):
 
             years[item['key']] = item.get('doc_count', 0)
 
-        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+        return [(k, v) for k, v in sorted(list(years.items()), reverse=True)]
 
     def number_of_articles_by_year(self, issn, collection, document_types=None, years=0):
 
@@ -506,7 +506,7 @@ class PublicationStats(PublicationThriftClient):
                 continue
             years[item['key']] = item.get('issue', {}).get('value', 0)
 
-        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+        return [(k, v) for k, v in sorted(list(years.items()), reverse=True)]
 
     def number_of_issues_by_year(self, issn, collection, years=0, type=None):
         """

@@ -167,7 +167,7 @@ class Dumper(object):
         except Exception as e:
             logger.exception(e)
             logger.error('Fail to read document: %s_%s' % (pid, collection_acronym))
-            xml = u''
+            xml = ''
 
         logger.debug('Reading document: %s' % pid)
 

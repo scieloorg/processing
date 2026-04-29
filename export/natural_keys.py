@@ -59,7 +59,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -165,23 +165,23 @@ class Dumper(object):
 
         if output_fmt == 'csv':
             header = [
-                u"coleção",
-                u"pid",
-                u"título",
+                "coleção",
+                "pid",
+                "título",
                 "acrônimo do título",
-                u"volume",
-                u"número",
-                u"suplemento",
-                u"ano de publicação",
-                u"primeira página",
-                u"primeria página seq"
-                u"última página",
-                u"e-location",
-                u"chave natural",
-                u"url natural"
+                "volume",
+                "número",
+                "suplemento",
+                "ano de publicação",
+                "primeira página",
+                "primeria página seq"
+                "última página",
+                "e-location",
+                "chave natural",
+                "url natural"
             ]
             self.write(
-                u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header])
+                ','.join(['"%s"' % i.replace('"', '""') for i in header])
             )
 
         if output_fmt == 'csv':

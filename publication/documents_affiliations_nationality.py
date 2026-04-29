@@ -52,38 +52,38 @@ class Dumper(object):
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         header = []
-        header.append(u"extraction date")
-        header.append(u"study unit")
-        header.append(u"collection")
-        header.append(u"ISSN SciELO")
-        header.append(u"ISSN\'s")
-        header.append(u"title at SciELO")
-        header.append(u"title thematic areas")
+        header.append("extraction date")
+        header.append("study unit")
+        header.append("collection")
+        header.append("ISSN SciELO")
+        header.append("ISSN\'s")
+        header.append("title at SciELO")
+        header.append("title thematic areas")
         for area in choices.THEMATIC_AREAS:
-            header.append(u"title is %s" % area.lower())
-        header.append(u"title is multidisciplinary")
-        header.append(u"title current status")
-        header.append(u"document publishing ID (PID SciELO)")
-        header.append(u"document publishing year")
-        header.append(u'document is citable')
-        header.append(u"document type")
-        header.append(u"home nationality")
-        header.append(u"total of affiliations")
-        header.append(u"national")
-        header.append(u"foreign")
-        header.append(u"undefined")
-        header.append(u"empty")
+            header.append("title is %s" % area.lower())
+        header.append("title is multidisciplinary")
+        header.append("title current status")
+        header.append("document publishing ID (PID SciELO)")
+        header.append("document publishing year")
+        header.append('document is citable')
+        header.append("document type")
+        header.append("home nationality")
+        header.append("total of affiliations")
+        header.append("national")
+        header.append("foreign")
+        header.append("undefined")
+        header.append("empty")
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
 
     def items(self):
@@ -93,11 +93,11 @@ class Dumper(object):
 
         for issn in self.issns:
             for data in self._articlemeta.documents(collection=self.collection, issn=issn):
-                logger.debug(u'Reading document: %s' % data.publisher_id)
+                logger.debug('Reading document: %s' % data.publisher_id)
                 yield self.fmt_csv(data)
 
     def fmt_csv(self, data):
-        know_languages = set([u'pt', u'es', u'en'])
+        know_languages = set(['pt', 'es', 'en'])
         languages = set(data.languages())
 
         issns = []
@@ -108,22 +108,22 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'document')
+        line.append('document')
         line.append(data.collection_acronym)
         line.append(data.journal.scielo_issn)
-        line.append(u';'.join(issns))
+        line.append(';'.join(issns))
         line.append(data.journal.title)
-        line.append(u';'.join(data.journal.subject_areas or []))
+        line.append(';'.join(data.journal.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data.journal.subject_areas or []]:
-                line.append(u'1')
+                line.append('1')
             else:
-                line.append(u'0')
+                line.append('0')
         line.append('1' if len(data.journal.subject_areas or []) > 2 else '0')
         line.append(data.journal.current_status)
         line.append(data.publisher_id)
         line.append(data.publication_date[0:4])
-        line.append(u'1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
+        line.append('1' if data.document_type.lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
         line.append(data.document_type)
         line.append(self.home_nationality)
         line.append(str(len(data.mixed_affiliations)) if data.mixed_affiliations else '0')
@@ -144,11 +144,11 @@ class Dumper(object):
                     national += 1
                     continue
 
-                if aff_value in choices.ISO_3166.keys() and aff_value != self.home_nationality:
+                if aff_value in list(choices.ISO_3166.keys()) and aff_value != self.home_nationality:
                     foreign += 1
                     continue
 
-                if aff_value not in choices.ISO_3166.keys():
+                if aff_value not in list(choices.ISO_3166.keys()):
                     undefined += 1
                     continue
 

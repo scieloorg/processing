@@ -77,9 +77,9 @@ class Dumper(object):
         self.doaj_journals = Journals()
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
-        header = [u"coleção",u"issn scielo",u"issn impresso",u"issn eletrônico",u"título",u"ID no DOAJ",u"Provider no DOAJ",u"Status no DOAJ"]
+        header = ["coleção","issn scielo","issn impresso","issn eletrônico","título","ID no DOAJ","Provider no DOAJ","Status no DOAJ"]
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def get_doaj_journal(self, issns):
         data = {}
@@ -110,12 +110,12 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
 
     def items(self):

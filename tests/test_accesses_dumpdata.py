@@ -44,8 +44,8 @@ class DumpDataTest(unittest.TestCase):
         result = dumpdata.website_2018_urls(document)
         self.assertEqual(
             result,
-            [u'/article/abcd/2018.v22n3suppl0/e707/',
-                u'/pdf/abcd/2018.v22n3suppl0/e707/']
+            ['/article/abcd/2018.v22n3suppl0/e707/',
+                '/pdf/abcd/2018.v22n3suppl0/e707/']
         )
 
     def test_pdf_keys(self):
@@ -384,7 +384,7 @@ class DumpDataTest(unittest.TestCase):
                 'issns': {'0102-6720'},
                 'document_type': 'research-article',
                 'aff_countries': ['undefined'],
-                'document_title': 'An\u00e1lise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em opera\u00e7\u00f5es anorretais',
+                'document_title': 'An\\u00e1lise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em opera\\u00e7\\u00f5es anorretais',
                 'issue_title': 'ABCD, arq. bras. cir. dig., 2009, v22n3',
                 'access_total': 14,
                 'access_abstract': 3,
@@ -401,10 +401,10 @@ class DumpDataTest(unittest.TestCase):
                 'publication_year': '2009',
                 'publication_date_at_scielo': '2010-05-14',
                 'journal_current_status': 'current',
-                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\u00e3o Paulo)',
+                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\\u00e3o Paulo)',
                 'processing_date': '2010-05-14',
                 'publication_date': '2009-09',
                 'issue': '0102-672020090003'
             }
 
-        self.assertEqual(sorted([k+str(v) for k, v in expected.items()]), sorted([k+str(v) for k, v in result.items()]))
+        self.assertEqual(sorted([k+str(v) for k, v in list(expected.items())]), sorted([k+str(v) for k, v in list(result.items())]))

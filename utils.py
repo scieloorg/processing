@@ -7,12 +7,7 @@ import unicodedata
 import logging
 import string
 
-from thrift import clients
-
-try:
-    from configparser import ConfigParser
-except:
-    from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +21,11 @@ def remove_tags(text):
 
 def cleanup_string(text):
 
-    try:
-        nfd_form = unicodedata.normalize('NFD', text.strip().lower())
-    except TypeError:
-        nfd_form = unicodedata.normalize('NFD', unicode(text.strip().lower()))
+    if not isinstance(text, str):
+        text = str(text)
+    nfd_form = unicodedata.normalize('NFD', text.strip().lower())
 
-    cleaned_str = u''.join(x for x in nfd_form if x in string.ascii_letters or x == ' ')
+    cleaned_str = ''.join(x for x in nfd_form if x in string.ascii_letters or x == ' ')
 
     return remove_tags(cleaned_str).lower()
 
@@ -120,21 +114,30 @@ class Configuration(SingletonMixin):
             section in [section for section in self.conf.sections()]]
 
 
-config = Configuration.from_env()
-settings = dict(config.items())
+def get_settings():
+    return dict(Configuration.from_env().items())
 
 
 def publicationstats_server():
+    from thrift import clients
+
+    settings = get_settings()
     server = settings['app:main'].get('publicationstats_thriftserver', 'publication.scielo.org:11620')
     return clients.PublicationStats(server)
 
 
 def citedby_server():
+    from thrift import clients
+
+    settings = get_settings()
     server = settings['app:main'].get('citedby_thriftserver', 'citedby.scielo.org:11610')
     return clients.Citedby(domain=server)
 
 
 def ratchet_server():
+    from thrift import clients
+
+    settings = get_settings()
     server = settings['app:main'].get('ratchet_thriftserver', 'ratchet.scielo.org:11630').split(':')
     host = server[0]
     port = int(server[1])
@@ -142,12 +145,18 @@ def ratchet_server():
 
 
 def articlemeta_server():
+    from thrift import clients
+
+    settings = get_settings()
     server = settings['app:main'].get('articlemeta_thriftserver', 'articlemeta.scielo.org:11621')
     admintoken = settings['app:main'].get('articlemeta_admintoken', None)
     return clients.ArticleMeta(domain=server, admintoken=admintoken)
 
 
 def accessstats_server():
+    from thrift import clients
+
+    settings = get_settings()
     server = settings['app:main'].get('accessesstats_thriftserver', 'ratchet.scielo.org:11660')
     return clients.AccessStats(server)
 
