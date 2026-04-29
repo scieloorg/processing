@@ -248,7 +248,7 @@ class Dumper(object):
             else:
                 line.append('0')
         line.append('1' if len(data.subject_areas or []) > 2 else '0')
-        line.append(data.current_status)
+        line.append(utils.get_metadata_value(data, 'current_status'))
         line.append(' '.join([data.title or '', data.subtitle or '']))
         line.append(data.abbreviated_title or '')
         line.append(data.abbreviated_iso_title or '')

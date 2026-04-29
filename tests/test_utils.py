@@ -74,3 +74,14 @@ class UtilsTest(unittest.TestCase):
             result['app:main']['ratchet_thriftserver'],
             'ratchet.scielo.org:11649'
         )
+
+    def test_get_metadata_value_returns_default_for_incomplete_metadata(self):
+
+        class Metadata(object):
+            @property
+            def current_status(self):
+                raise IndexError('list index out of range')
+
+        result = utils.get_metadata_value(Metadata(), 'current_status')
+
+        self.assertEqual(result, '')

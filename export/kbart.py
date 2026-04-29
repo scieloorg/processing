@@ -148,8 +148,9 @@ class Dumper(object):
 
         for issn in self.issns:
             for data in self._articlemeta.journals(collection=self.collection, issn=issn):
-                if data.current_status != 'current':
-                    logger.debug('Skipping non-active journal: %s (status: %s)' % (data.scielo_issn, data.current_status))
+                current_status = utils.get_metadata_value(data, 'current_status')
+                if current_status != 'current':
+                    logger.debug('Skipping non-active journal: %s (status: %s)' % (data.scielo_issn, current_status))
                     continue
                 logger.debug('Reading document: %s' % data.scielo_issn)
                 yield self.fmt_csv(data)
@@ -168,7 +169,7 @@ class Dumper(object):
             first_document.issue.volume or '' if first_document and first_document.issue else '')
         line.append(
             first_document.issue.number or '' if first_document and first_document.issue else '')
-        if data.current_status != 'current':
+        if utils.get_metadata_value(data, 'current_status') != 'current':
             line.append(
                 last_document.publication_date or '' if last_document else '')
             line.append(

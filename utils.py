@@ -143,6 +143,13 @@ def get_settings():
     return settings
 
 
+def get_metadata_value(obj, attr, default=''):
+    try:
+        return getattr(obj, attr)
+    except (AttributeError, IndexError, KeyError):
+        return default
+
+
 def publicationstats_server():
     from thrift import clients
 
