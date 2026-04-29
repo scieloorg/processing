@@ -2,16 +2,24 @@ FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PROCESSING_SETTINGS_FILE=/app/config.ini \
+    DOCKER_ENV=1 \
+    WORK_DIR=/app \
+    LOG_DIR=/var/log/processing \
+    TABS_DIR=/var/www/static_scielo_org/tabs \
+    PYTHONPATH=/app
 
 WORKDIR /app
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
+        curl \
         git \
         libxml2-dev \
         libxslt1-dev \
+        zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt setup.py ./
@@ -25,6 +33,8 @@ RUN pip install --upgrade pip setuptools wheel \
         packtools==2.6.4
 
 COPY . .
-RUN pip install --no-deps -e .
+RUN cp config.ini-TEMPLATE config.ini \
+    && mkdir -p /var/log/processing /var/www/static_scielo_org/tabs \
+    && pip install --no-deps -e .
 
-CMD ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+ENTRYPOINT ["/bin/bash", "/app/run.sh"]

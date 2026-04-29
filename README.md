@@ -12,8 +12,18 @@ e também para o envio de dados à parceiros.
 Para instalar as dependências e executar a suíte de testes:
 
 ```bash
-docker compose run --rm processing
+docker compose run --rm tests
 ```
+
+Para executar o processamento via Docker, configure o webhook do Slack e monte
+um arquivo de configuração real, quando necessário:
+
+```bash
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/... docker compose run --rm processing "scl-BR"
+```
+
+Os logs ficam persistidos em `var/log/processing` e os arquivos ZIP gerados em
+`var/tabs`.
 
 
 ## Exportação de dados ao DOAJ
