@@ -19,6 +19,7 @@ readonly NETWORK_DIR="network"
 readonly TABS_DIR="${TABS_DIR:-/var/www/static_scielo_org/tabs}"
 readonly MAX_RETRIES="${MAX_RETRIES:-3}"
 readonly RETRY_DELAY="${RETRY_DELAY:-5}"
+readonly EXIT_ON_FAILURE="${EXIT_ON_FAILURE:-true}"
 readonly TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 readonly MASTER_LOG="$LOG_DIR/master_$TIMESTAMP.log"
 readonly SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
@@ -269,7 +270,9 @@ main() {
         process_collection "$item" "$is_network_mode" "$counter" || failed_collections+=("$item")
     done
 
-    [[ "$is_network_mode" == "true" ]] && process_network_zip
+    if [[ "$is_network_mode" == "true" ]]; then
+        process_network_zip || failed_collections+=("network")
+    fi
 
     end_time=$(date +%s)
     duration=$((end_time - start_time))
@@ -277,7 +280,11 @@ main() {
     if [[ ${#failed_collections[@]} -gt 0 ]]; then
         log_error "Coleções falhadas: ${failed_collections[*]}"
         notify_slack ":x: Processing finalizado com falhas (${#failed_collections[@]}/$counter) em ${duration}s. Coleções: ${failed_collections[*]}. Logs: \`$LOG_DIR\`"
-        exit 1
+        if [[ "$EXIT_ON_FAILURE" == "true" ]]; then
+            exit 1
+        fi
+        log_success "Processing finalizado com falhas reportadas, sem interromper o job"
+        exit 0
     fi
 
     log_success "Processing finalizado em ${duration}s. Arquivos persistidos em $TABS_DIR"

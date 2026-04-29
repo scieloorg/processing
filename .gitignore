@@ -65,6 +65,7 @@ target/
 tmp_*/
 network/
 var/
+k8s/*secret.yaml
 
 # pip source directory
 src/
