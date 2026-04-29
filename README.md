@@ -22,6 +22,15 @@ um arquivo de configuração real, quando necessário:
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/... docker compose run --rm processing "scl-BR"
 ```
 
+Também é possível configurar os serviços diretamente por variáveis de ambiente,
+sem arquivo `config.ini`:
+
+```bash
+ARTICLEMETA_THRIFTSERVER=articlemeta.scielo.org:11621 \
+RATCHET_THRIFTSERVER=ratchet.scielo.org:11649 \
+docker compose run --rm processing "scl-BR"
+```
+
 Os logs ficam persistidos em `var/log/processing` e os arquivos ZIP gerados em
 `var/tabs`.
 

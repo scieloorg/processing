@@ -7,7 +7,11 @@
 set -euo pipefail
 
 readonly DOCKER_ENV="${DOCKER_ENV:-0}"
-readonly PROCESSING_SETTINGS_FILE="${PROCESSING_SETTINGS_FILE:-/etc/scieloapps/processing.ini}"
+if [[ "$DOCKER_ENV" == "1" ]]; then
+    readonly PROCESSING_SETTINGS_FILE="${PROCESSING_SETTINGS_FILE-}"
+else
+    readonly PROCESSING_SETTINGS_FILE="${PROCESSING_SETTINGS_FILE:-/etc/scieloapps/processing.ini}"
+fi
 readonly VENV_DIR="${VENV_DIR:-/var/www/.venvs/processing}"
 readonly WORK_DIR="${WORK_DIR:-/var/www/processing}"
 readonly LOG_DIR="${LOG_DIR:-/var/log/processing}"
@@ -69,7 +73,7 @@ log_success() {
 validate_prerequisites() {
     mkdir -p "$LOG_DIR" "$TABS_DIR"
 
-    if [[ ! -f "$PROCESSING_SETTINGS_FILE" ]]; then
+    if [[ -n "$PROCESSING_SETTINGS_FILE" && ! -f "$PROCESSING_SETTINGS_FILE" ]]; then
         log_error "Arquivo de configuração não encontrado: $PROCESSING_SETTINGS_FILE"
         exit 1
     fi

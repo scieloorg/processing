@@ -13,6 +13,16 @@ logger = logging.getLogger(__name__)
 
 REGEX_ISSN = re.compile(r"^[0-9]{4}-[0-9]{3}[0-9xX]$")
 TAG_RE = re.compile(r'<[^>]+>')
+ENV_SETTINGS = {
+    'ARTICLEMETA_THRIFTSERVER': 'articlemeta_thriftserver',
+    'ARTICLEMETA_ADMINTOKEN': 'articlemeta_admintoken',
+    'RATCHET_THRIFTSERVER': 'ratchet_thriftserver',
+    'ACCESSSTATS_THRIFTSERVER': 'accessesstats_thriftserver',
+    'CITEDBY_THRIFTSERVER': 'citedby_thriftserver',
+    'PUBLICATIONSTATS_THRIFTSERVER': 'publicationstats_thriftserver',
+    'SOLR_SEARCH_SCIELO_ORG': 'solr_search_scielo_org',
+    'SOLR_SEARCH_SCIELO_ORG_INDEX': 'solr_search_scielo_org_index',
+}
 
 
 def remove_tags(text):
@@ -114,7 +124,23 @@ class Configuration(SingletonMixin):
 
 
 def get_settings():
-    return dict(Configuration.from_env().items())
+    settings = {'app:main': {}}
+
+    filepath = os.environ.get('PROCESSING_SETTINGS_FILE')
+    if filepath:
+        settings.update(dict(Configuration.from_file(filepath).items()))
+
+    for env_name, setting_name in ENV_SETTINGS.items():
+        value = os.environ.get(env_name)
+        if value is not None:
+            settings['app:main'][setting_name] = value
+
+    if not settings['app:main']:
+        raise ValueError(
+            'missing PROCESSING_SETTINGS_FILE or service environment variables'
+        )
+
+    return settings
 
 
 def publicationstats_server():

@@ -1,5 +1,7 @@
 # coding: utf-8
+import os
 import unittest
+from unittest import mock
 
 import utils
 
@@ -53,3 +55,22 @@ class UtilsTest(unittest.TestCase):
         result = utils.split_date('')
 
         self.assertEqual(result, ('', '', ''))
+
+    def test_get_settings_from_environment(self):
+
+        env = {
+            'ARTICLEMETA_THRIFTSERVER': 'articlemeta.scielo.org:11621',
+            'RATCHET_THRIFTSERVER': 'ratchet.scielo.org:11649',
+        }
+
+        with mock.patch.dict(os.environ, env, clear=True):
+            result = utils.get_settings()
+
+        self.assertEqual(
+            result['app:main']['articlemeta_thriftserver'],
+            'articlemeta.scielo.org:11621'
+        )
+        self.assertEqual(
+            result['app:main']['ratchet_thriftserver'],
+            'ratchet.scielo.org:11649'
+        )
