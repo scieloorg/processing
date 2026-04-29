@@ -28,6 +28,7 @@ sem arquivo `config.ini`:
 ```bash
 ARTICLEMETA_THRIFTSERVER=articlemeta.scielo.org:11621 \
 RATCHET_THRIFTSERVER=ratchet.scielo.org:11649 \
+PUBLICATIONSTATS_TIMEOUT_MS=60000 \
 docker compose run --rm processing "scl-BR"
 ```
 

@@ -327,6 +327,19 @@ class AccessStats(AccessesThriftClient):
 
 class PublicationStats(PublicationThriftClient):
 
+    def __init__(self, domain=None, timeout=None):
+        super(PublicationStats, self).__init__(domain=domain)
+        self.timeout = int(timeout or os.environ.get('PUBLICATIONSTATS_TIMEOUT_MS', 60000))
+
+    @property
+    def client(self):
+        return make_client(
+            self.PUBLICATIONSTATS_THRIFT.PublicationStats,
+            self._address,
+            self._port,
+            timeout=self.timeout
+        )
+
     def _compute_documents_languages_by_year(self, query_result, years=0):
 
         year = date.today().year
