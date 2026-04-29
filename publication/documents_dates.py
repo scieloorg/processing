@@ -177,7 +177,7 @@ class Dumper(object):
         
         try:
             aop_pubdate = data.ahead_publication_date or ''
-        except xylose.scielodocument.UnavailableMetadataException:
+        except (KeyError, xylose.scielodocument.UnavailableMetadataException):
             aop_pubdate = ''
             
         line.append(aop_pubdate)

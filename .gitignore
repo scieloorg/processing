@@ -57,5 +57,10 @@ docs/_build/
 # PyBuilder
 target/
 
+# Runtime processing workspace
+tmp_*/
+network/
+var/
+
 # pip source directory
 src/
