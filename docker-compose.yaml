@@ -1,0 +1,10 @@
+services:
+  processing:
+    build:
+      context: .
+    image: scielo-processing:python3.14
+    environment:
+      PROCESSING_SETTINGS_FILE: /app/config.ini-TEMPLATE
+    volumes:
+      - .:/app
+    command: python -m unittest discover -s tests -v

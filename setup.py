@@ -2,17 +2,12 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'thriftpy',
-    'packtools<=2.5.3',
+    'thriftpy2',
     'requests',
     'lxml',
-    'doaj_client',
+    'doaj_client @ git+https://github.com/fabiobatalha/doaj_client@0.2',
     'scieloh5m5',
     'xylose',
-    'articlemetaapi<=1.26.5',
-    'publicationstatsapi>=1.2.1',
-    'accessstatsapi>=1.2.1',
-    'citedbyapi>=1.11.3',
     'legendarium>=2.0.2',
 ]
 
@@ -31,11 +26,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 2.7",
-    ],
-    dependency_links=[
-        "git+https://github.com/fabiobatalha/doaj_client@0.2#egg=doaj_client",
-        "git+https://github.com/scieloorg/xylose@1.35.8#egg=xylose",
     ],
     tests_require=tests_require,
     test_suite='tests',

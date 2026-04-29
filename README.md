@@ -5,7 +5,15 @@ e também para o envio de dados à parceiros.
 
 
 ## Requisitos:
-* Python 2.7
+* Python 3.14
+
+## Docker
+
+Para instalar as dependências e executar a suíte de testes:
+
+```bash
+docker compose run --rm processing
+```
 
 
 ## Exportação de dados ao DOAJ

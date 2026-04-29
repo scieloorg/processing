@@ -384,7 +384,7 @@ class DumpDataTest(unittest.TestCase):
                 'issns': {'0102-6720'},
                 'document_type': 'research-article',
                 'aff_countries': ['undefined'],
-                'document_title': 'An\\u00e1lise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em opera\\u00e7\\u00f5es anorretais',
+                'document_title': 'Análise de custos entre a raquianestesia e a anestesia venosa com propofol associada ao bloqueio perianal local em operações anorretais',
                 'issue_title': 'ABCD, arq. bras. cir. dig., 2009, v22n3',
                 'access_total': 14,
                 'access_abstract': 3,
@@ -401,7 +401,7 @@ class DumpDataTest(unittest.TestCase):
                 'publication_year': '2009',
                 'publication_date_at_scielo': '2010-05-14',
                 'journal_current_status': 'current',
-                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (S\\u00e3o Paulo)',
+                'journal_title': 'ABCD. Arquivos Brasileiros de Cirurgia Digestiva (São Paulo)',
                 'processing_date': '2010-05-14',
                 'publication_date': '2009-09',
                 'issue': '0102-672020090003'

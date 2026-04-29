@@ -100,9 +100,8 @@ class Configuration(SingletonMixin):
 
         ``filepath`` is a text string.
         """
-        fp = open(filepath, 'r')
-
-        return cls(fp)
+        with open(filepath, 'r') as fp:
+            return cls(fp)
 
     def __getattr__(self, attr):
         return getattr(self.conf, attr)
