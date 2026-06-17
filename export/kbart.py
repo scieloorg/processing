@@ -3,17 +3,18 @@
 Este processamento gera uma tabulação de periódicos seguindo o formato Kbart.
 
 Formato de saída (headers em inglês, conforme diretrizes KBART):
-publication_title, print_identifier, online_identifier, date_first_issue_online, 
-num_first_vol_online, num_first_issue_online, date_last_issue_online, 
-num_last_vol_online, num_last_issue_online, title_url, first_author, title_id, 
-embargo_info, coverage_depth, coverage_notes, publisher_name, publication_type, 
-date_monograph_published_print, date_monograph_published_online, monograph_volume, 
-monograph_edition, first_editor, parent_publication_title_id, 
+publication_title, print_identifier, online_identifier, date_first_issue_online,
+num_first_vol_online, num_first_issue_online, date_last_issue_online,
+num_last_vol_online, num_last_issue_online, title_url, first_author, title_id,
+embargo_info, coverage_depth, coverage_notes, publisher_name, publication_type,
+date_monograph_published_print, date_monograph_published_online, monograph_volume,
+monograph_edition, first_editor, parent_publication_title_id,
 preceding_publication_title_id, access_type
 """
+
 import argparse
-import logging
 import codecs
+import logging
 import re
 
 import utils
@@ -23,37 +24,39 @@ logger = logging.getLogger(__name__)
 # ISSN redirects for journals that changed their ISSN in URLs
 # Maps old ISSN to new ISSN
 ISSN_URL_REDIRECTS = {
-    '1575-0620': '2013-6463',  # Revista española de sanidad penitenciaria (SciELO Spain)
+    "1575-0620": "2013-6463",  # Revista española de sanidad penitenciaria (SciELO Spain)
 }
 
 # Pre-compile regex patterns for ISSN redirects for better performance
 _ISSN_REDIRECT_PATTERNS = {
-    old_issn: re.compile(r'([?&]pid=)' + re.escape(old_issn) + r'(&|$)')
+    old_issn: re.compile(r"([?&]pid=)" + re.escape(old_issn) + r"(&|$)")
     for old_issn in list(ISSN_URL_REDIRECTS.keys())
 }
 
 
-def _config_logging(logging_level='INFO', logging_file=None):
+def _config_logging(logging_level="INFO", logging_file=None):
 
     allowed_levels = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-        'CRITICAL': logging.CRITICAL
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL,
     }
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
-    logger.setLevel(allowed_levels.get(logging_level, 'INFO'))
+    logger.setLevel(allowed_levels.get(logging_level, "INFO"))
 
     if logging_file:
-        hl = logging.FileHandler(logging_file, mode='a')
+        hl = logging.FileHandler(logging_file, mode="a")
     else:
         hl = logging.StreamHandler()
 
     hl.setFormatter(formatter)
-    hl.setLevel(allowed_levels.get(logging_level, 'INFO'))
+    hl.setLevel(allowed_levels.get(logging_level, "INFO"))
 
     logger.addHandler(hl)
 
@@ -61,7 +64,6 @@ def _config_logging(logging_level='INFO', logging_file=None):
 
 
 class Dumper(object):
-
     def __init__(self, collection, issns=None, output_file=None):
 
         self._ratchet = utils.ratchet_server()
@@ -69,7 +71,11 @@ class Dumper(object):
         self._publicationstats = utils.publicationstats_server()
         self.collection = collection
         self.issns = issns
-        self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
+        self.output_file = (
+            codecs.open(output_file, "w", encoding="utf-8")
+            if output_file
+            else output_file
+        )
         header = [
             "publication_title",
             "print_identifier",
@@ -95,21 +101,21 @@ class Dumper(object):
             "first_editor",
             "parent_publication_title_id",
             "preceding_publication_title_id",
-            "access_type"
-
+            "access_type",
         ]
 
-        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
+        self.write(",".join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def _first_included_document_by_journal(self, issn, collection):
 
         fid = self._publicationstats.first_included_document_by_journal(
-            issn, collection)
+            issn, collection
+        )
 
         if not fid:
             return None
 
-        document = self._articlemeta.document(fid['pid'], fid['collection'])
+        document = self._articlemeta.document(fid["pid"], fid["collection"])
 
         if not document.data:
             return None
@@ -118,13 +124,12 @@ class Dumper(object):
 
     def _last_included_document_by_journal(self, issn, collection):
 
-        lid = self._publicationstats.last_included_document_by_journal(
-            issn, collection)
+        lid = self._publicationstats.last_included_document_by_journal(issn, collection)
 
         if not lid:
             return None
 
-        document = self._articlemeta.document(lid['pid'], lid['collection'])
+        document = self._articlemeta.document(lid["pid"], lid["collection"])
 
         if not document.data:
             return None
@@ -135,7 +140,7 @@ class Dumper(object):
         if not self.output_file:
             print(line)
         else:
-            self.output_file.write('%s\r\n' % line)
+            self.output_file.write("%s\r\n" % line)
 
     def run(self):
         for item in list(self.items()):
@@ -147,65 +152,86 @@ class Dumper(object):
             self.issns = [None]
 
         for issn in self.issns:
-            for data in self._articlemeta.journals(collection=self.collection, issn=issn):
-                current_status = utils.get_metadata_value(data, 'current_status')
-                if current_status != 'current':
-                    logger.debug('Skipping non-active journal: %s (status: %s)' % (data.scielo_issn, current_status))
+            for data in self._articlemeta.journals(
+                collection=self.collection, issn=issn
+            ):
+                current_status = utils.get_metadata_value(data, "current_status")
+                if current_status != "current":
+                    logger.debug(
+                        "Skipping non-active journal: %s (status: %s)"
+                        % (data.scielo_issn, current_status)
+                    )
                     continue
-                logger.debug('Reading document: %s' % data.scielo_issn)
+                logger.debug("Reading document: %s" % data.scielo_issn)
                 yield self.fmt_csv(data)
 
     def fmt_csv(self, data):
         line = []
 
-        first_document = self._first_included_document_by_journal(data.scielo_issn, data.collection_acronym)
-        last_document = self._last_included_document_by_journal(data.scielo_issn, data.collection_acronym)
+        first_document = self._first_included_document_by_journal(
+            data.scielo_issn, data.collection_acronym
+        )
+        last_document = self._last_included_document_by_journal(
+            data.scielo_issn, data.collection_acronym
+        )
         line.append(data.title)
-        line.append(data.print_issn or '')
-        line.append(data.electronic_issn or '')
+        line.append(data.print_issn or "")
+        line.append(data.electronic_issn or "")
+        line.append(first_document.publication_date or "" if first_document else "")
         line.append(
-            first_document.publication_date or '' if first_document else '')
+            first_document.issue.volume or ""
+            if first_document and first_document.issue
+            else ""
+        )
         line.append(
-            first_document.issue.volume or '' if first_document and first_document.issue else '')
-        line.append(
-            first_document.issue.number or '' if first_document and first_document.issue else '')
-        if utils.get_metadata_value(data, 'current_status') != 'current':
+            first_document.issue.number or ""
+            if first_document and first_document.issue
+            else ""
+        )
+        if utils.get_metadata_value(data, "current_status") != "current":
+            line.append(last_document.publication_date or "" if last_document else "")
             line.append(
-                last_document.publication_date or '' if last_document else '')
+                last_document.issue.volume or ""
+                if last_document and last_document.issue
+                else ""
+            )
             line.append(
-                last_document.issue.volume or '' if last_document and last_document.issue else '')
-            line.append(
-                last_document.issue.number or '' if last_document and last_document.issue else '')
+                last_document.issue.number or ""
+                if last_document and last_document.issue
+                else ""
+            )
         else:
-            line += ['', '', '']
+            line += ["", "", ""]
         # Generate the URL
-        url = data.url().replace('sci_serial', 'sci_issues')
-        
+        url = data.url().replace("sci_serial", "sci_issues")
+
         # Apply ISSN redirects for journals that changed their ISSN in URLs
         # This is necessary for journals that no longer use their print ISSN
         for old_issn, new_issn in list(ISSN_URL_REDIRECTS.items()):
             # Use pre-compiled regex pattern for better performance
             pattern = _ISSN_REDIRECT_PATTERNS[old_issn]
-            url = pattern.sub(r'\g<1>' + new_issn + r'\2', url)
-        
-        line.append(url)
-        line.append('')  # first_author
-        line.append(data.scielo_issn or '')
-        line.append('')  # embargo_info
-        line.append('fulltext')  # coverage_depth
-        line.append('')  # coverage_notes
-        line.append(' '.join(data.publisher_name) if data.publisher_name else '')  # publisher_name
-        line.append('Serial')  # publication_type
-        line.append('')  # date_monograph_published_print
-        line.append('')  # date_monograph_published_online
-        line.append('')  # monograph_volume
-        line.append('')  # monograph_edition
-        line.append('')  # first_editor
-        line.append('')  # parent_publication_title_id
-        line.append('')  # preceding_publication_title_id
-        line.append('F')  # access_type
+            url = pattern.sub(r"\g<1>" + new_issn + r"\2", url)
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        line.append(url)
+        line.append("")  # first_author
+        line.append(data.scielo_issn or "")
+        line.append("")  # embargo_info
+        line.append("fulltext")  # coverage_depth
+        line.append("")  # coverage_notes
+        line.append(
+            " ".join(data.publisher_name) if data.publisher_name else ""
+        )  # publisher_name
+        line.append("Serial")  # publication_type
+        line.append("")  # date_monograph_published_print
+        line.append("")  # date_monograph_published_online
+        line.append("")  # monograph_volume
+        line.append("")  # monograph_edition
+        line.append("")  # first_editor
+        line.append("")  # parent_publication_title_id
+        line.append("")  # preceding_publication_title_id
+        line.append("F")  # access_type
+
+        joined_line = ",".join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
 
@@ -213,44 +239,28 @@ class Dumper(object):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Export journals list in Kabart format'
+        description="Export journals list in Kabart format"
     )
 
-    parser.add_argument(
-        'issns',
-        nargs='*',
-        help='ISSN\'s separated by spaces'
-    )
+    parser.add_argument("issns", nargs="*", help="ISSN's separated by spaces")
+
+    parser.add_argument("--collection", "-c", help="Collection Acronym")
+
+    parser.add_argument("--output_file", "-r", help="File to receive the dumped data")
+
+    parser.add_argument("--logging_file", "-o", help="Full path to the log file")
 
     parser.add_argument(
-        '--collection',
-        '-c',
-        help='Collection Acronym'
-    )
-
-    parser.add_argument(
-        '--output_file',
-        '-r',
-        help='File to receive the dumped data'
-    )
-
-    parser.add_argument(
-        '--logging_file',
-        '-o',
-        help='Full path to the log file'
-    )
-
-    parser.add_argument(
-        '--logging_level',
-        '-l',
-        default='DEBUG',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logggin level'
+        "--logging_level",
+        "-l",
+        default="DEBUG",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logggin level",
     )
 
     args = parser.parse_args()
     _config_logging(args.logging_level, args.logging_file)
-    logger.info('Dumping data for: %s' % args.collection)
+    logger.info("Dumping data for: %s" % args.collection)
 
     issns = None
     if len(args.issns) > 0:
