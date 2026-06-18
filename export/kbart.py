@@ -27,12 +27,19 @@ ISSN_URL_REDIRECTS = {
     "1575-0620": "2013-6463",  # Revista española de sanidad penitenciaria (SciELO Spain)
 }
 
+HTTP_ONLY_COLLECTIONS = set(["bol", "col", "per", "cub", "sss", "ury"])
+
 # Pre-compile regex patterns for ISSN redirects for better performance
 _ISSN_REDIRECT_PATTERNS = {
     old_issn: re.compile(r"([?&]pid=)" + re.escape(old_issn) + r"(&|$)")
     for old_issn in list(ISSN_URL_REDIRECTS.keys())
 }
 
+
+def title_url_for_collection(url, collection):
+    if collection not in HTTP_ONLY_COLLECTIONS and url.startswith("http://"):
+        return "https://" + url[len("http://"):]
+    return url
 
 def _config_logging(logging_level="INFO", logging_file=None):
 
@@ -211,6 +218,8 @@ class Dumper(object):
             # Use pre-compiled regex pattern for better performance
             pattern = _ISSN_REDIRECT_PATTERNS[old_issn]
             url = pattern.sub(r"\g<1>" + new_issn + r"\2", url)
+
+        url = title_url_for_collection(url, self.collection)
 
         line.append(url)
         line.append("")  # first_author
