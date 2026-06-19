@@ -4,4 +4,4 @@ lxml>=6.0.0
 requests>=2.32.0
 scieloh5m5 @ git+https://github.com/scieloorg/scieloh5m5.git@1.9.6
 thriftpy2>=0.5.2
-xylose @ git+https://github.com/scieloorg/xylose.git@1.35.13
+xylose @ git+https://github.com/scieloorg/xylose.git@1.35.14
