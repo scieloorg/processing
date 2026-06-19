@@ -21,6 +21,7 @@ readonly MAX_RETRIES="${MAX_RETRIES:-3}"
 readonly RETRY_DELAY="${RETRY_DELAY:-5}"
 readonly EXIT_ON_FAILURE="${EXIT_ON_FAILURE:-true}"
 readonly TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+readonly REPORT_DATE="$(date +%F)"
 readonly MASTER_LOG="$LOG_DIR/master_$TIMESTAMP.log"
 readonly SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
@@ -41,8 +42,12 @@ readonly CSV_FILES=(
     "documents_licenses"
     "journals"
     "journals_status_changes"
-    "journals_kbart"
 )
+
+kbart_csv_file() {
+    local acronym=$1
+    echo "SciELO_${acronym}_AllTitles_${REPORT_DATE}.csv"
+}
 
 notify_slack() {
     local message=$1
@@ -149,7 +154,7 @@ process_collection() {
     local item=$1
     local is_network_mode=$2
     local counter=$3
-    local acron nationality acrond tail_head=1
+    local acron nationality acrond kbart_file tail_head=1
 
     validate_acronym "$item" || return 1
 
@@ -157,6 +162,7 @@ process_collection() {
     nationality=$(echo "$item" | cut -f2 -d- -s)
     acrond="$acron"
     [[ "$acron" == "scl" ]] && acrond="bra"
+    kbart_file=$(kbart_csv_file "$acrond")
     [[ $counter -gt 1 ]] && tail_head=2
 
     log_message "Processando coleção: $item"
@@ -182,7 +188,7 @@ process_collection() {
         has_errors=1
         critical_errors=1
     }
-    run_processing_command "export_kbart" "$acron" "$acrond" "" "journals_kbart.csv" || {
+    run_processing_command "export_kbart" "$acron" "$acrond" "" "$kbart_file" || {
         has_errors=1
         critical_errors=1
     }
@@ -200,6 +206,7 @@ process_collection() {
     for csv in "${CSV_FILES[@]}"; do
         [[ -f "${csv}.csv" ]] && zip_files+=("${csv}.csv")
     done
+    [[ -f "$kbart_file" ]] && zip_files+=("$kbart_file")
 
     if [[ ${#zip_files[@]} -eq 0 ]]; then
         log_error "Nenhum arquivo CSV encontrado para $acron"
@@ -216,6 +223,7 @@ process_collection() {
         for csv in "${CSV_FILES[@]}"; do
             [[ -f "${csv}.csv" ]] && tail -n +"$tail_head" "${csv}.csv" >> "$WORK_DIR/$NETWORK_DIR/${csv}.csv"
         done
+        [[ -f "$kbart_file" ]] && tail -n +"$tail_head" "$kbart_file" >> "$WORK_DIR/$NETWORK_DIR/$(kbart_csv_file network)"
     fi
 
     cd "$WORK_DIR"
@@ -230,6 +238,9 @@ process_network_zip() {
     for csv in "${CSV_FILES[@]}"; do
         [[ -f "${csv}.csv" ]] && network_files+=("${csv}.csv")
     done
+    local network_kbart_file
+    network_kbart_file=$(kbart_csv_file network)
+    [[ -f "$network_kbart_file" ]] && network_files+=("$network_kbart_file")
 
     if [[ ${#network_files[@]} -eq 0 ]]; then
         log_error "Nenhum arquivo encontrado para criar tabs_network.zip"
