@@ -1,5 +1,7 @@
 # coding: utf-8
+import os
 import unittest
+from unittest import mock
 
 import utils
 
@@ -53,3 +55,38 @@ class UtilsTest(unittest.TestCase):
         result = utils.split_date('')
 
         self.assertEqual(result, ('', '', ''))
+
+    def test_get_settings_from_environment(self):
+
+        env = {
+            'ARTICLEMETA_THRIFTSERVER': 'articlemeta.example.invalid:11621',
+            'RATCHET_THRIFTSERVER': 'ratchet.example.invalid:11649',
+            'ACCESSSTATS_THRIFTSERVER': 'access.example.invalid:11660',
+        }
+
+        with mock.patch.dict(os.environ, env, clear=True):
+            result = utils.get_settings()
+
+        self.assertEqual(
+            result['app:main']['articlemeta_thriftserver'],
+            'articlemeta.example.invalid:11621'
+        )
+        self.assertEqual(
+            result['app:main']['ratchet_thriftserver'],
+            'ratchet.example.invalid:11649'
+        )
+        self.assertEqual(
+            result['app:main']['accessstats_thriftserver'],
+            'access.example.invalid:11660'
+        )
+
+    def test_get_metadata_value_returns_default_for_incomplete_metadata(self):
+
+        class Metadata(object):
+            @property
+            def current_status(self):
+                raise IndexError('list index out of range')
+
+        result = utils.get_metadata_value(Metadata(), 'current_status')
+
+        self.assertEqual(result, '')

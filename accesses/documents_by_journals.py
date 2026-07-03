@@ -51,35 +51,35 @@ class Dumper(object):
         self.issns = issns
         self.output_file = codecs.open(output_file, 'w', encoding='utf-8') if output_file else output_file
         header = []
-        header.append(u"extraction date")
-        header.append(u"study unit")
-        header.append(u"collection")
-        header.append(u"ISSN SciELO")
-        header.append(u"ISSN\'s")
-        header.append(u"title at SciELO")
-        header.append(u"title thematic areas")
+        header.append("extraction date")
+        header.append("study unit")
+        header.append("collection")
+        header.append("ISSN SciELO")
+        header.append("ISSN\'s")
+        header.append("title at SciELO")
+        header.append("title thematic areas")
         for area in choices.THEMATIC_AREAS:
-            header.append(u"title is %s" % area.lower())
-        header.append(u"title is multidisciplinary")
-        header.append(u"title current status")
-        header.append(u"publishing year")
-        header.append(u"accesses year")
-        header.append(u"accesses to html")
-        header.append(u"accesses to abstract")
-        header.append(u"accesses to pdf")
-        header.append(u"accesses to epdf")
-        header.append(u"total accesses")
+            header.append("title is %s" % area.lower())
+        header.append("title is multidisciplinary")
+        header.append("title current status")
+        header.append("publishing year")
+        header.append("accesses year")
+        header.append("accesses to html")
+        header.append("accesses to abstract")
+        header.append("accesses to pdf")
+        header.append("accesses to epdf")
+        header.append("total accesses")
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
         logger.info('Export finished')
 
@@ -103,17 +103,17 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'journal')
+        line.append('journal')
         line.append(data.collection_acronym)
         line.append(data.scielo_issn)
-        line.append(u';'.join(issns))
+        line.append(';'.join(issns))
         line.append(data.title)
-        line.append(u';'.join(data.subject_areas or []))
+        line.append(';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data.subject_areas or []]:
-                line.append(u'1')
+                line.append('1')
             else:
-                line.append(u'0')
+                line.append('0')
         line.append('1' if len(data.subject_areas or []) > 2 else '0')
         line.append(data.current_status)
 

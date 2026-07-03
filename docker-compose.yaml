@@ -1,0 +1,34 @@
+services:
+  processing:
+    build:
+      context: .
+    image: scielo-processing:python3.14
+    environment:
+      PROCESSING_SETTINGS_FILE: ${PROCESSING_SETTINGS_FILE:-}
+      ARTICLEMETA_THRIFTSERVER: ${ARTICLEMETA_THRIFTSERVER:-}
+      ARTICLEMETA_ADMINTOKEN: ${ARTICLEMETA_ADMINTOKEN:-}
+      RATCHET_THRIFTSERVER: ${RATCHET_THRIFTSERVER:-}
+      ACCESSSTATS_THRIFTSERVER: ${ACCESSSTATS_THRIFTSERVER:-}
+      CITEDBY_THRIFTSERVER: ${CITEDBY_THRIFTSERVER:-}
+      PUBLICATIONSTATS_THRIFTSERVER: ${PUBLICATIONSTATS_THRIFTSERVER:-}
+      SOLR_SEARCH_SCIELO_ORG: ${SOLR_SEARCH_SCIELO_ORG:-}
+      SOLR_SEARCH_SCIELO_ORG_INDEX: ${SOLR_SEARCH_SCIELO_ORG_INDEX:-}
+      PUBLICATIONSTATS_TIMEOUT_MS: ${PUBLICATIONSTATS_TIMEOUT_MS:-60000}
+      EXIT_ON_FAILURE: ${EXIT_ON_FAILURE:-true}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      LOG_DIR: /var/log/processing
+      TABS_DIR: /var/www/static_scielo_org/tabs
+    volumes:
+      - .:/app
+      - ./var/log/processing:/var/log/processing
+      - ./var/tabs:/var/www/static_scielo_org/tabs
+
+  tests:
+    image: scielo-processing:python3.14
+    build:
+      context: .
+    entrypoint: ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+    environment:
+      PROCESSING_SETTINGS_FILE: /app/config.ini-TEMPLATE
+    volumes:
+      - .:/app

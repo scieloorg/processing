@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: processing-tabs
+spec:
+  schedule: "0 3 1,8,15,22 1-12 *"
+  timezone: America/Sao_Paulo
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  workflowSpec:
+    entrypoint: processing-tabs
+    templates:
+      - name: processing-tabs
+        container:
+          image: scielo-processing:python3.14
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              if [ -n "${PROCESSING_COLLECTIONS:-}" ]; then
+                /app/run.sh "$PROCESSING_COLLECTIONS"
+              else
+                /app/run.sh
+              fi
+          envFrom:
+            - secretRef:
+                name: processing-env
+          env:
+            - name: DOCKER_ENV
+              value: "1"
+            - name: WORK_DIR
+              value: /app
+            - name: LOG_DIR
+              value: /var/log/processing
+            - name: TABS_DIR
+              value: /var/www/static_scielo_org/tabs
+            - name: EXIT_ON_FAILURE
+              value: "false"
+            - name: PUBLICATIONSTATS_TIMEOUT_MS
+              value: "120000"
+          volumeMounts:
+            - name: processing-data
+              mountPath: /var/www/static_scielo_org/tabs
+            - name: processing-logs
+              mountPath: /var/log/processing
+        volumes:
+          - name: processing-data
+            persistentVolumeClaim:
+              claimName: processing-data
+          - name: processing-logs
+            persistentVolumeClaim:
+              claimName: processing-logs
+        retryStrategy:
+          limit: "0"

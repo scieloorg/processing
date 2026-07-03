@@ -75,56 +75,56 @@ class Dumper(object):
         now = datetime.date.today().year
         self.years_range = [i for i in range(now, now-self._years, -1)]
         header = []
-        header.append(u"extraction date")
-        header.append(u"study unit")
-        header.append(u"collection")
-        header.append(u"ISSN SciELO")
-        header.append(u"ISSN\'s")
-        header.append(u"title at SciELO")
-        header.append(u"title thematic areas")
+        header.append("extraction date")
+        header.append("study unit")
+        header.append("collection")
+        header.append("ISSN SciELO")
+        header.append("ISSN\'s")
+        header.append("title at SciELO")
+        header.append("title thematic areas")
         for area in choices.THEMATIC_AREAS:
-            header.append(u"title is %s" % area.lower())
-        header.append(u"title is multidisciplinary")
-        header.append(u"title current status")
-        header.append(u"title + subtitle SciELO")
-        header.append(u"short title SciELO")
-        header.append(u"short title ISO")
-        header.append(u"title PubMed")
-        header.append(u"publisher name")
-        header.append(u"use license")
-        header.append(u"alpha frequency")
-        header.append(u"numeric frequency (in months)")
-        header.append(u"inclusion year at SciELO")
-        header.append(u"stopping year at SciELO")
-        header.append(u"stopping reason")
-        header.append(u"date of the first document")
-        header.append(u"volume of the first document")
-        header.append(u"issue of the first document")
-        header.append(u"date of the last document")
-        header.append(u"volume of the last document")
-        header.append(u"issue of the last document")
-        header.append(u"total of issues")
-        header += [u"issues at %s" % str(i) for i in self.years_range]
-        header.append(u"total of regular issues")
-        header += [u"regular issues at %s" % str(i) for i in self.years_range]
-        header.append(u"total of documents")
-        header += [u"documents at %s" % str(i) for i in self.years_range]
-        header.append(u"citable documents")
-        header += [u"citable documents at %s" % str(i) for i in self.years_range]
+            header.append("title is %s" % area.lower())
+        header.append("title is multidisciplinary")
+        header.append("title current status")
+        header.append("title + subtitle SciELO")
+        header.append("short title SciELO")
+        header.append("short title ISO")
+        header.append("title PubMed")
+        header.append("publisher name")
+        header.append("use license")
+        header.append("alpha frequency")
+        header.append("numeric frequency (in months)")
+        header.append("inclusion year at SciELO")
+        header.append("stopping year at SciELO")
+        header.append("stopping reason")
+        header.append("date of the first document")
+        header.append("volume of the first document")
+        header.append("issue of the first document")
+        header.append("date of the last document")
+        header.append("volume of the last document")
+        header.append("issue of the last document")
+        header.append("total of issues")
+        header += ["issues at %s" % str(i) for i in self.years_range]
+        header.append("total of regular issues")
+        header += ["regular issues at %s" % str(i) for i in self.years_range]
+        header.append("total of documents")
+        header += ["documents at %s" % str(i) for i in self.years_range]
+        header.append("citable documents")
+        header += ["citable documents at %s" % str(i) for i in self.years_range]
         for year in self.years_range:
-            header.append(u'portuguese documents at %s ' % year)
+            header.append('portuguese documents at %s ' % year)
         for year in self.years_range:
-            header.append(u'spanish documents at %s ' % year)
+            header.append('spanish documents at %s ' % year)
         for year in self.years_range:
-            header.append(u'english documents at %s ' % year)
+            header.append('english documents at %s ' % year)
         for year in self.years_range:
-            header.append(u'other language documents at %s ' % year)
+            header.append('other language documents at %s ' % year)
         for year in self.years_range:
-            header.append(u'google scholar h5 %s ' % year)
+            header.append('google scholar h5 %s ' % year)
         for year in self.years_range:
-            header.append(u'google scholar m5 %s ' % year)
+            header.append('google scholar m5 %s ' % year)
 
-        self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+        self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def _documents_languages_by_year(self, issn, collection, years=None):
 
@@ -201,12 +201,12 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
     def run(self):
-        for item in self.items():
+        for item in list(self.items()):
             self.write(item)
         logger.info('Export finished')
 
@@ -236,38 +236,38 @@ class Dumper(object):
 
         line = []
         line.append(datetime.datetime.now().isoformat()[0:10])
-        line.append(u'journal')
+        line.append('journal')
         line.append(data.collection_acronym)
         line.append(data.scielo_issn)
-        line.append(u';'.join(issns))
+        line.append(';'.join(issns))
         line.append(data.title)
-        line.append(u';'.join(data.subject_areas or []))
+        line.append(';'.join(data.subject_areas or []))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data.subject_areas or []]:
-                line.append(u'1')
+                line.append('1')
             else:
-                line.append(u'0')
+                line.append('0')
         line.append('1' if len(data.subject_areas or []) > 2 else '0')
-        line.append(data.current_status)
-        line.append(u' '.join([data.title or u'', data.subtitle or u'']))
-        line.append(data.abbreviated_title or u'')
-        line.append(data.abbreviated_iso_title or u'')
-        line.append(data.title_nlm or u'')
-        line.append(u'; '.join(data.publisher_name or []))
-        line.append(data.permissions.get('id', u'') if data.permissions else u'')
-        line.append(data.periodicity[1] or u'')
-        line.append(data.periodicity_in_months or u'')
+        line.append(utils.get_metadata_value(data, 'current_status'))
+        line.append(' '.join([data.title or '', data.subtitle or '']))
+        line.append(data.abbreviated_title or '')
+        line.append(data.abbreviated_iso_title or '')
+        line.append(data.title_nlm or '')
+        line.append('; '.join(data.publisher_name or []))
+        line.append(data.permissions.get('id', '') if data.permissions else '')
+        line.append(data.periodicity[1] or '')
+        line.append(data.periodicity_in_months or '')
         line.append(data.creation_date[:4])
-        line.append(interruption[0][:4] if interruption else u'')
-        line.append(interruption[2][:4] if interruption else u'')
-        line.append(first_document.publication_date or u'' if first_document else u'')
-        line.append(first_document.issue.volume or u'' if first_document and first_document.issue else u'')
-        line.append(first_document.issue.number or u'' if first_document and first_document.issue else u'')
-        line.append(last_document.publication_date or u'' if last_document else u'')
-        line.append(last_document.issue.volume or u'' if last_document and last_document.issue else u'')
-        line.append(last_document.issue.number or u'' if last_document and last_document.issue else u'')
+        line.append(interruption[0][:4] if interruption else '')
+        line.append(interruption[2][:4] if interruption else '')
+        line.append(first_document.publication_date or '' if first_document else '')
+        line.append(first_document.issue.volume or '' if first_document and first_document.issue else '')
+        line.append(first_document.issue.number or '' if first_document and first_document.issue else '')
+        line.append(last_document.publication_date or '' if last_document else '')
+        line.append(last_document.issue.volume or '' if last_document and last_document.issue else '')
+        line.append(last_document.issue.number or '' if last_document and last_document.issue else '')
 
-        line.append(unicode(self._number_of_issues_by_year(
+        line.append(str(self._number_of_issues_by_year(
             data.scielo_issn,
             data.collection_acronym,
             years=0
@@ -281,9 +281,9 @@ class Dumper(object):
         )
 
         for issue in issues:
-            line.append(unicode(issue[1]))
+            line.append(str(issue[1]))
 
-        line.append(unicode(self._number_of_issues_by_year(
+        line.append(str(self._number_of_issues_by_year(
             data.scielo_issn,
             data.collection_acronym,
             years=0,
@@ -299,7 +299,7 @@ class Dumper(object):
         )
 
         for issue in regular_issues:
-            line.append(unicode(issue[1]))
+            line.append(str(issue[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
@@ -314,7 +314,7 @@ class Dumper(object):
         )
 
         for document in documents:
-            line.append(unicode(document[1]))
+            line.append(str(document[1]))
 
         line.append(str(self._number_of_articles_by_year(
             data.scielo_issn,
@@ -331,7 +331,7 @@ class Dumper(object):
         )]
 
         for document in documents:
-            line.append(unicode(document))
+            line.append(str(document))
 
         languages = self._documents_languages_by_year(
             data.scielo_issn,
@@ -339,14 +339,14 @@ class Dumper(object):
             years=self._years
         )
 
-        for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['pt']))
-        for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['es']))
-        for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['en']))
-        for years, values in sorted(languages.items(), reverse=True):
-            line.append(unicode(values['other']))
+        for years, values in sorted(list(languages.items()), reverse=True):
+            line.append(str(values['pt']))
+        for years, values in sorted(list(languages.items()), reverse=True):
+            line.append(str(values['es']))
+        for years, values in sorted(list(languages.items()), reverse=True):
+            line.append(str(values['en']))
+        for years, values in sorted(list(languages.items()), reverse=True):
+            line.append(str(values['other']))
 
         for year in self.years_range:
             h5 = h5m5.get(data.scielo_issn, str(year))
@@ -358,7 +358,7 @@ class Dumper(object):
             m5 = m5.get('m5', None) if m5 else None
             line.append(m5 or '')
 
-        joined_line = u','.join([u'"%s"' % i.replace(u'"', u'""') for i in line])
+        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
 
         return joined_line
 

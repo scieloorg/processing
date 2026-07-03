@@ -5,7 +5,76 @@ e também para o envio de dados à parceiros.
 
 
 ## Requisitos:
-* Python 2.7
+* Python 3.14
+
+## Docker
+
+Para instalar as dependências e executar a suíte de testes:
+
+```bash
+docker compose run --rm tests
+```
+
+Para executar o processamento via Docker, configure as variáveis em um arquivo
+`.env` local, baseado em `.env.example`. O `.env` não deve ser versionado.
+
+```bash
+cp .env.example .env
+```
+
+Preencha no `.env` os valores equivalentes ao antigo `config.ini`:
+
+```ini
+ARTICLEMETA_THRIFTSERVER=
+ARTICLEMETA_ADMINTOKEN=
+RATCHET_THRIFTSERVER=
+ACCESSSTATS_THRIFTSERVER=
+CITEDBY_THRIFTSERVER=
+PUBLICATIONSTATS_THRIFTSERVER=
+SOLR_SEARCH_SCIELO_ORG=
+SOLR_SEARCH_SCIELO_ORG_INDEX=
+PUBLICATIONSTATS_TIMEOUT_MS=60000
+SLACK_WEBHOOK_URL=
+```
+
+Depois execute:
+
+```bash
+docker compose run --rm processing "scl-BR"
+```
+
+Os logs ficam persistidos em `var/log/processing` e os arquivos ZIP gerados em
+`var/tabs`.
+
+## Kubernetes / Argo
+
+O agendamento para Argo Workflows está em `k8s/argo-cronworkflow.yaml` com o cron:
+
+```text
+0 3 1,8,15,22 1-12 *
+```
+
+O workflow executa as coleções sequencialmente. Quando uma coleção falha, o
+script envia a notificação de erro e continua para a próxima; ao final, o job
+termina com sucesso para não interromper as próximas execuções agendadas.
+
+Os valores sensíveis devem ser criados em um Secret do Kubernetes chamado
+`processing-env`, baseado em `k8s/processing-env.secret.example.yaml`. Não
+versione o Secret real.
+
+Volumes esperados:
+
+```text
+processing-data -> /var/www/static_scielo_org/tabs
+processing-logs -> /var/log/processing
+```
+
+Aplicação:
+
+```bash
+kubectl apply -f k8s/processing-env.secret.yaml
+kubectl apply -f k8s/argo-cronworkflow.yaml
+```
 
 
 ## Exportação de dados ao DOAJ

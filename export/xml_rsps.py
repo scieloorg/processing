@@ -12,12 +12,17 @@ import multiprocessing
 from io import StringIO
 import itertools
 
-import packtools
-from packtools.catalogs import XML_CATALOG
+try:
+    import packtools
+    from packtools.catalogs import XML_CATALOG
+except ImportError:
+    packtools = None
+    XML_CATALOG = None
 from lxml.etree import XMLSyntaxError
 import utils
 
-os.environ['XML_CATALOG_FILES'] = XML_CATALOG
+if XML_CATALOG:
+    os.environ['XML_CATALOG_FILES'] = XML_CATALOG
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +92,8 @@ def summarize(validator):
 def analyze_xml(xml):
     """Analyzes `file` against packtools' XMLValidator.
     """
+    if packtools is None:
+        raise RuntimeError('packtools is required to validate XML RSPS files')
 
     f = StringIO(xml)
 
@@ -167,7 +174,7 @@ class Dumper(object):
         except Exception as e:
             logger.exception(e)
             logger.error('Fail to read document: %s_%s' % (pid, collection_acronym))
-            xml = u''
+            xml = ''
 
         logger.debug('Reading document: %s' % pid)
 

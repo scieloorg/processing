@@ -1,6 +1,5 @@
 # coding: utf-8
 import os
-import thriftpy
 import json
 import logging
 from datetime import date
@@ -10,10 +9,16 @@ from citedby.client import ThriftClient as CitedByThriftClient
 from accessstats.client import ThriftClient as AccessesThriftClient
 from publicationstats.client import ThriftClient as PublicationThriftClient
 from citedby.custom_query import journal_titles
-from thriftpy.rpc import make_client
 from xylose.scielodocument import Article, Journal
 
 import utils
+
+try:
+    import thriftpy2 as thriftpy
+    from thriftpy2.rpc import make_client
+except ImportError:
+    import thriftpy
+    from thriftpy.rpc import make_client
 
 LIMIT = 1000
 
@@ -322,6 +327,19 @@ class AccessStats(AccessesThriftClient):
 
 class PublicationStats(PublicationThriftClient):
 
+    def __init__(self, domain=None, timeout=None):
+        super(PublicationStats, self).__init__(domain=domain)
+        self.timeout = int(timeout or os.environ.get('PUBLICATIONSTATS_TIMEOUT_MS', 60000))
+
+    @property
+    def client(self):
+        return make_client(
+            self.PUBLICATIONSTATS_THRIFT.PublicationStats,
+            self._address,
+            self._port,
+            timeout=self.timeout
+        )
+
     def _compute_documents_languages_by_year(self, query_result, years=0):
 
         year = date.today().year
@@ -412,7 +430,7 @@ class PublicationStats(PublicationThriftClient):
 
             years[item['key']] = item.get('doc_count', 0)
 
-        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+        return [(k, v) for k, v in sorted(list(years.items()), reverse=True)]
 
     def number_of_articles_by_year(self, issn, collection, document_types=None, years=0):
 
@@ -506,7 +524,7 @@ class PublicationStats(PublicationThriftClient):
                 continue
             years[item['key']] = item.get('issue', {}).get('value', 0)
 
-        return [(k, v) for k, v in sorted(years.items(), reverse=True)]
+        return [(k, v) for k, v in sorted(list(years.items()), reverse=True)]
 
     def number_of_issues_by_year(self, issn, collection, years=0, type=None):
         """

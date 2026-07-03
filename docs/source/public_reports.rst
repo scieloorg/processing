@@ -208,7 +208,7 @@ Os formatos de saída disponíveis para este relatório são: CSV.
 Relatório de periódicos em formato Kbart
 ========================================
 
-**nome do arquivo:** journals_kbart.csv
+**nome do arquivo:** SciELO_<país>_AllTitles_YYYY-MM-DD.csv
 
 **finalidade:** Relatório de periódicos no formato Kbart.
 

@@ -52,13 +52,13 @@ class Dumper(object):
 
     def run(self):
 
-        header = [u"coleção", u"PID", u"ano de publicação", u"tipo de documento",u"título", u"número", u"normalizado", u"id de afiliação", u"instituição original", u"paises original", u"instituição normalizada", u"país normalizado ISO-3661", u"código de país normalizado ISO-3166", u"estado normalizado ISO-3166", u"código de estado normalizado ISO-3166"]
+        header = ["coleção", "PID", "ano de publicação", "tipo de documento","título", "número", "normalizado", "id de afiliação", "instituição original", "paises original", "instituição normalizada", "país normalizado ISO-3661", "código de país normalizado ISO-3166", "estado normalizado ISO-3166", "código de estado normalizado ISO-3166"]
 
         if not self.issns:
             self.issns = [None]
 
         if not self.output_file:
-            print('%s\r\n' % ','.join(header))
+            print(('%s\r\n' % ','.join(header)))
             for issn in self.issns:
                 for data in self.get_data(issn=issn):
                     for item in self.fmt_csv(data):

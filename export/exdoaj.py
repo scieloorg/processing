@@ -75,7 +75,7 @@ class Dumper(object):
 
         for char in title:
             if char in ['+','-','&','|','!','(',')','{','}','[',']','^','"','~','*','?',':','\\']:
-                escaped_title += u'\\'+char
+                escaped_title += '\\'+char
                 continue
             escaped_title += char
 
@@ -152,7 +152,7 @@ class Dumper(object):
             logger.debug('Authentication attempt done')
             return None
 
-        if u'Incorrect' in request.text:
+        if 'Incorrect' in request.text:
             logger.debug('Incorrect username or password')
             return None
 
@@ -192,7 +192,7 @@ class Dumper(object):
             logger.debug('Fail to send document to DOAJ')
             return False
 
-        if u'File uploaded and waiting to be processed' in response.text:
+        if 'File uploaded and waiting to be processed' in response.text:
             logger.info('Document Sent')
             return True
         else:
@@ -232,7 +232,7 @@ class Dumper(object):
                 except Exception as e:
                     logger.exception(e)
                     logger.error('Fail to read document: %s_%s' % (document.publisher_id, document.collection_acronym))
-                    xml = u''
+                    xml = ''
 
                 if self.validate_schema and not self.xml_is_valid(xml):
                     logger.error('Fail to parse xml document: %s_%s' % (document.publisher_id, document.collection_acronym))

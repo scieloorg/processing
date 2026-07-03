@@ -61,7 +61,7 @@ def pdf_keys(fulltexts):
     if not 'pdf' in fulltexts:
         return keys
 
-    for language, url in fulltexts['pdf'].items():
+    for language, url in list(fulltexts['pdf'].items()):
         path = REGEX_PDF_PATH.search(url)
         if path:
             keys.append(path.group())
@@ -166,7 +166,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     if document.original_title():
         data['document_title'] = document.original_title()
     elif document.translated_titles():
-        for language, title in document.translated_titles().items():
+        for language, title in list(document.translated_titles().items()):
             if title:
                 data['document_title'] = title
                 break
@@ -192,7 +192,7 @@ def join_metadata_with_accesses(document, accesses_date, accesses):
     data['access_html'] = accesses.get('html', 0)
     data['access_pdf'] = accesses.get('pdf', 0)
     data['access_epdf'] = accesses.get('readcube', 0)
-    data['access_total'] = sum([v for i, v in accesses.items()])
+    data['access_total'] = sum([v for i, v in list(accesses.items())])
 
     return data
 
@@ -216,7 +216,7 @@ def join_accesses(unique_id, accesses, from_date, until_date, dayly_granularity)
         if 'total' in data:
             del(data['total'])
 
-        for year, months in data.items():
+        for year, months in list(data.items()):
             del(months['total'])
             for month in months:
 
@@ -234,9 +234,9 @@ def join_accesses(unique_id, accesses, from_date, until_date, dayly_granularity)
         if 'total' in data:
             del(data['total'])
 
-        for year, months in data.items():
+        for year, months in list(data.items()):
             del(months['total'])
-            for month, days in months.items():
+            for month, days in list(months.items()):
                 del(days['total'])
                 for day in days:
                     dt = '%s-%s-%s' % (year[1:], month[1:], day[1:])
@@ -253,7 +253,7 @@ def join_accesses(unique_id, accesses, from_date, until_date, dayly_granularity)
         joining = joining_dayly
 
     for data in accesses:
-        for key, value in data.items():
+        for key, value in list(data.items()):
             if not key in ['abstract', 'html', 'pdf', 'readcube']:
                 continue
             joined_data = joining(joined_data, key, value)
@@ -280,37 +280,37 @@ class Dumper(object):
         else:
             self.fmt = self.fmt_csv
             header = []
-            header.append(u"extraction date")
-            header.append(u"study unit")
-            header.append(u"collection")
-            header.append(u"ISSN SciELO")
-            header.append(u"ISSN\'s")
-            header.append(u"title at SciELO")
-            header.append(u"title thematic areas")
+            header.append("extraction date")
+            header.append("study unit")
+            header.append("collection")
+            header.append("ISSN SciELO")
+            header.append("ISSN\'s")
+            header.append("title at SciELO")
+            header.append("title thematic areas")
             for area in choices.THEMATIC_AREAS:
-                header.append(u"title is %s" % area.lower())
-            header.append(u"title is multidisciplinary")
-            header.append(u"title current status")
-            header.append(u"document publishing ID (PID SciELO)")
-            header.append(u"document publishing year")
-            header.append(u"document type")
-            header.append(u'document is citable')
-            header.append(u"issue")
-            header.append(u"issue title")
-            header.append(u"document title")
-            header.append(u"processing date")
-            header.append(u"publication date at SciELO")
-            header.append(u"publication date")
-            header.append(u"access date")
-            header.append(u"access year")
-            header.append(u"access month")
-            header.append(u"access to abstract")
-            header.append(u"access to html")
-            header.append(u"access to pdf")
-            header.append(u"access to epdf")
-            header.append(u"access total")
+                header.append("title is %s" % area.lower())
+            header.append("title is multidisciplinary")
+            header.append("title current status")
+            header.append("document publishing ID (PID SciELO)")
+            header.append("document publishing year")
+            header.append("document type")
+            header.append('document is citable')
+            header.append("issue")
+            header.append("issue title")
+            header.append("document title")
+            header.append("processing date")
+            header.append("publication date at SciELO")
+            header.append("publication date")
+            header.append("access date")
+            header.append("access year")
+            header.append("access month")
+            header.append("access to abstract")
+            header.append("access to html")
+            header.append("access to pdf")
+            header.append("access to epdf")
+            header.append("access total")
 
-            self.write(u','.join([u'"%s"' % i.replace(u'"', u'""') for i in header]))
+            self.write(','.join(['"%s"' % i.replace('"', '""') for i in header]))
 
     def get_accesses(self, issn):
         for document in self._articlemeta.documents(collection=self.collection, issn=issn):
@@ -333,7 +333,7 @@ class Dumper(object):
                 accesses, self.from_date, self.until_date,
                 self.dayly_granularity)
 
-            for adate, adata in joined_accesses.items():
+            for adate, adata in list(joined_accesses.items()):
                 try:
                     yield join_metadata_with_accesses(document, adate, adata)
                 except Exception as e:
@@ -341,7 +341,7 @@ class Dumper(object):
 
     def write(self, line):
         if not self.output_file:
-            print(line.encode('utf-8'))
+            print(line)
         else:
             self.output_file.write('%s\r\n' % line)
 
@@ -358,20 +358,20 @@ class Dumper(object):
         line.append('document')
         line.append(data['collection'])
         line.append(data['issn'])
-        line.append(u';'.join(data['issns']))
+        line.append(';'.join(data['issns']))
         line.append(data['journal_title'])
         line.append(', '.join(data['subject_areas']))
         for area in choices.THEMATIC_AREAS:
             if area.lower() in [i.lower() for i in data['subject_areas'] or []]:
-                line.append(u'1')
+                line.append('1')
             else:
-                line.append(u'0')
+                line.append('0')
         line.append('1' if len(data['subject_areas'] or []) > 2 else '0')
         line.append(data['journal_current_status'])
         line.append(data['pid'])
         line.append(data['publication_year'])
         line.append(data['document_type'])
-        line.append(u'1' if data['document_type'].lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
+        line.append('1' if data['document_type'].lower() in choices.CITABLE_DOCUMENT_TYPES else '0')
         line.append(data['issue'])
         line.append(data['issue_title'])
         line.append(data['document_title'])
@@ -397,7 +397,7 @@ class Dumper(object):
         if not self.output_file:
             for issn in self.issns:
                 for data in self.get_accesses(issn=issn):
-                    print(self.fmt(data))
+                    print((self.fmt(data)))
             exit()
 
         for issn in self.issns:
