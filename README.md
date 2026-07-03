@@ -69,6 +69,12 @@ processing-data -> /var/www/static_scielo_org/tabs
 processing-logs -> /var/log/processing
 ```
 
+Quando uma coleção falha, o `run.sh` registra o acrônimo em
+`/var/log/processing/failed_collections.queue` por padrão. Na próxima execução,
+essa fila é carregada antes da lista normal de coleções; coleções processadas
+com sucesso são removidas da fila. O caminho pode ser alterado com
+`FAILED_COLLECTIONS_FILE`.
+
 Aplicação:
 
 ```bash
