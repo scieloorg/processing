@@ -24,6 +24,7 @@ readonly TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 readonly REPORT_DATE="$(date +%F)"
 readonly MASTER_LOG="$LOG_DIR/master_$TIMESTAMP.log"
 readonly SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
+readonly FAILED_COLLECTIONS_FILE="${FAILED_COLLECTIONS_FILE:-$LOG_DIR/failed_collections.queue}"
 
 readonly DEFAULT_ACRONYMS=(
     "scl-BR" "arg-AR" "bol-BO" "chl-CL" "cub-CU" "col-CO"
@@ -74,6 +75,37 @@ log_error() {
 
 log_success() {
     log_message "$1" "SUCCESS"
+}
+
+normalize_collection_list() {
+    awk 'NF && !seen[$0]++ { print $0 }'
+}
+
+load_failed_collections() {
+    [[ -f "$FAILED_COLLECTIONS_FILE" ]] || return 0
+    normalize_collection_list < "$FAILED_COLLECTIONS_FILE"
+}
+
+record_failed_collection() {
+    local item=$1
+    mkdir -p "$(dirname "$FAILED_COLLECTIONS_FILE")"
+    {
+        [[ -f "$FAILED_COLLECTIONS_FILE" ]] && cat "$FAILED_COLLECTIONS_FILE"
+        echo "$item"
+    } | normalize_collection_list > "${FAILED_COLLECTIONS_FILE}.tmp"
+    mv "${FAILED_COLLECTIONS_FILE}.tmp" "$FAILED_COLLECTIONS_FILE"
+}
+
+clear_failed_collection() {
+    local item=$1
+    [[ -f "$FAILED_COLLECTIONS_FILE" ]] || return 0
+
+    grep -Fxv "$item" "$FAILED_COLLECTIONS_FILE" > "${FAILED_COLLECTIONS_FILE}.tmp" || true
+    if [[ -s "${FAILED_COLLECTIONS_FILE}.tmp" ]]; then
+        mv "${FAILED_COLLECTIONS_FILE}.tmp" "$FAILED_COLLECTIONS_FILE"
+    else
+        rm -f "${FAILED_COLLECTIONS_FILE}.tmp" "$FAILED_COLLECTIONS_FILE"
+    fi
 }
 
 validate_prerequisites() {
@@ -273,16 +305,34 @@ main() {
         IFS=' ' read -ra acronyms_to_process <<< "$1"
     fi
 
+    local pending_failed_collections=()
+    while IFS= read -r item; do
+        pending_failed_collections+=("$item")
+    done < <(load_failed_collections)
+
+    if [[ ${#pending_failed_collections[@]} -gt 0 ]]; then
+        log_message "Reprocessando coleções pendentes de falha anterior: ${pending_failed_collections[*]}"
+        acronyms_to_process=("${pending_failed_collections[@]}" "${acronyms_to_process[@]}")
+        mapfile -t acronyms_to_process < <(printf '%s\n' "${acronyms_to_process[@]}" | normalize_collection_list)
+    fi
+
     local counter=0
     local failed_collections=()
 
     for item in "${acronyms_to_process[@]}"; do
         counter=$((counter + 1))
-        process_collection "$item" "$is_network_mode" "$counter" || failed_collections+=("$item")
+        if process_collection "$item" "$is_network_mode" "$counter"; then
+            clear_failed_collection "$item"
+        else
+            record_failed_collection "$item"
+            failed_collections+=("$item")
+        fi
     done
 
     if [[ "$is_network_mode" == "true" ]]; then
-        process_network_zip || failed_collections+=("network")
+        if ! process_network_zip; then
+            failed_collections+=("network")
+        fi
     fi
 
     end_time=$(date +%s)
