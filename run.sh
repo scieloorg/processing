@@ -196,7 +196,6 @@ run_processing_command() {
 process_collection() {
     local item=$1
     local is_network_mode=$2
-    local counter=$3
     local acron nationality acrond kbart_file
 
     validate_acronym "$item" || return 1
@@ -339,7 +338,7 @@ main() {
 
     for item in "${acronyms_to_process[@]}"; do
         counter=$((counter + 1))
-        if process_collection "$item" "$is_network_mode" "$counter"; then
+        if process_collection "$item" "$is_network_mode"; then
             clear_failed_collection "$item"
         else
             record_failed_collection "$item"
