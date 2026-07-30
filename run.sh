@@ -147,6 +147,17 @@ prepare_network_directory() {
     mkdir -p "$WORK_DIR/$NETWORK_DIR"
 }
 
+append_to_network_file() {
+    local source_file=$1
+    local destination_file=$2
+
+    if [[ -s "$destination_file" ]]; then
+        tail -n +2 -- "$source_file" >> "$destination_file"
+    else
+        cat -- "$source_file" > "$destination_file"
+    fi
+}
+
 run_processing_command() {
     local cmd=$1
     local acron=$2
@@ -186,7 +197,7 @@ process_collection() {
     local item=$1
     local is_network_mode=$2
     local counter=$3
-    local acron nationality acrond kbart_file tail_head=1
+    local acron nationality acrond kbart_file
 
     validate_acronym "$item" || return 1
 
@@ -195,7 +206,6 @@ process_collection() {
     acrond="$acron"
     [[ "$acron" == "scl" ]] && acrond="bra"
     kbart_file=$(kbart_csv_file "$acrond")
-    [[ $counter -gt 1 ]] && tail_head=2
 
     log_message "Processando coleção: $item"
 
@@ -253,9 +263,17 @@ process_collection() {
 
     if [[ "$is_network_mode" == "true" ]]; then
         for csv in "${CSV_FILES[@]}"; do
-            [[ -f "${csv}.csv" ]] && tail -n +"$tail_head" "${csv}.csv" >> "$WORK_DIR/$NETWORK_DIR/${csv}.csv"
+            if [[ -f "${csv}.csv" ]]; then
+                append_to_network_file \
+                    "${csv}.csv" \
+                    "$WORK_DIR/$NETWORK_DIR/${csv}.csv"
+            fi
         done
-        [[ -f "$kbart_file" ]] && tail -n +"$tail_head" "$kbart_file" >> "$WORK_DIR/$NETWORK_DIR/$(kbart_csv_file network)"
+        if [[ -f "$kbart_file" ]]; then
+            append_to_network_file \
+                "$kbart_file" \
+                "$WORK_DIR/$NETWORK_DIR/$(kbart_csv_file network)"
+        fi
     fi
 
     cd "$WORK_DIR"
