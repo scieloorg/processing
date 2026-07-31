@@ -37,4 +37,4 @@ RUN cp config.ini-TEMPLATE config.ini \
     && mkdir -p /var/log/processing /var/www/static_scielo_org/tabs \
     && pip install --no-deps -e .
 
-ENTRYPOINT ["/bin/bash", "/app/run.sh"]
+ENTRYPOINT ["processing_tabs"]
