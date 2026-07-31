@@ -55,8 +55,9 @@ O agendamento para Argo Workflows está em `k8s/argo-cronworkflow.yaml` com o cr
 ```
 
 O workflow executa as coleções sequencialmente. Quando uma coleção falha, o
-script envia a notificação de erro e continua para a próxima; ao final, o job
-termina com sucesso para não interromper as próximas execuções agendadas.
+script envia a notificação de erro e continua para a próxima. Ao final, o job
+termina com falha, mantém os checkpoints para retomada e preserva o ZIP de rede
+completo publicado anteriormente.
 
 Os valores sensíveis devem ser criados em um Secret do Kubernetes chamado
 `processing-env`, baseado em `k8s/processing-env.secret.example.yaml`. Não
@@ -69,11 +70,24 @@ processing-data -> /var/www/static_scielo_org/tabs
 processing-logs -> /var/log/processing
 ```
 
-Quando uma coleção falha, o `run.sh` registra o acrônimo em
+O processamento é orquestrado pelo comando `processing_tabs`. Os logs informam
+coleção, etapa, tentativa, duração, comando executado e arquivos produzidos.
+
+Quando uma coleção falha, o runner registra o acrônimo em
 `/var/log/processing/failed_collections.queue` por padrão. Na próxima execução,
-essa fila é carregada antes da lista normal de coleções; coleções processadas
-com sucesso são removidas da fila. O caminho pode ser alterado com
-`FAILED_COLLECTIONS_FILE`.
+essa fila é carregada antes da lista normal de coleções. Cada etapa concluída
+também é salva em um checkpoint; assim, somente etapas incompletas são
+executadas novamente. Por padrão, os checkpoints ficam em
+`$TABS_DIR/.processing-checkpoints`, no mesmo volume persistente dos arquivos
+gerados. Os caminhos podem ser alterados com `FAILED_COLLECTIONS_FILE` e
+`CHECKPOINT_DIR`. Checkpoints de uma data anterior são descartados para evitar
+que arquivos de períodos diferentes sejam combinados.
+
+As etapas de documentos, periódicos e KBART somente são concluídas quando os
+arquivos essenciais possuem pelo menos um registro além do cabeçalho. O arquivo
+de mudanças de status pode conter somente o cabeçalho. Quando essa validação
+falha, o pacote da coleção não é publicado e o último pacote completo da rede é
+preservado.
 
 Aplicação:
 

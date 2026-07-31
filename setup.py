@@ -15,7 +15,7 @@ tests_require = []
 
 setup(
     name="processing",
-    version="1.32.7",
+    version="1.33.0",
     description="SciELO processing modules for analytics, access statistics, etc",
     author="SciELO",
     author_email="scielo-dev@googlegroups.com",
@@ -32,6 +32,7 @@ setup(
     install_requires=install_requires,
     entry_points="""
     [console_scripts]
+    processing_tabs=tabulations.cli:main
     processing_accesses_dumpdata=accesses.dumpdata:main
     processing_accesses_documents_by_journals=accesses.documents_by_journals:main
     processing_publication_documents_languages=publication.documents_languages:main
