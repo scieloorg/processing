@@ -19,9 +19,9 @@ spec:
           args:
             - |
               if [ -n "${PROCESSING_COLLECTIONS:-}" ]; then
-                /app/run.sh "$PROCESSING_COLLECTIONS"
+                processing_tabs "$PROCESSING_COLLECTIONS"
               else
-                /app/run.sh
+                processing_tabs
               fi
           envFrom:
             - secretRef:
@@ -36,7 +36,7 @@ spec:
             - name: TABS_DIR
               value: /var/www/static_scielo_org/tabs
             - name: EXIT_ON_FAILURE
-              value: "false"
+              value: "true"
             - name: PUBLICATIONSTATS_TIMEOUT_MS
               value: "120000"
           volumeMounts:
