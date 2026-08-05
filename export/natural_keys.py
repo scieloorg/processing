@@ -149,7 +149,7 @@ class Dumper(object):
         line.append(natural_key)
         line.append(natural_url)
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

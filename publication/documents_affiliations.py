@@ -102,7 +102,7 @@ class Dumper(object):
                     yield item
 
     def join_line(self, line):
-        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        return ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
     def fmt_csv(self, data):
         issns = []

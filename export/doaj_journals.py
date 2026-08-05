@@ -147,7 +147,7 @@ class Dumper(object):
             in_doaj.get('active', "")
         ]
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

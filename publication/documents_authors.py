@@ -103,7 +103,7 @@ class Dumper(object):
 
     def join_line(self, line):
 
-        return ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        return ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
     def fmt_csv(self, data):
         countries = set()
