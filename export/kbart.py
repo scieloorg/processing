@@ -181,7 +181,7 @@ class Dumper(object):
         last_document = self._last_included_document_by_journal(
             data.scielo_issn, data.collection_acronym
         )
-        line.append(data.title)
+        line.append(data.title or "")
         line.append(data.print_issn or "")
         line.append(data.electronic_issn or "")
         line.append(first_document.publication_date or "" if first_document else "")
@@ -210,7 +210,7 @@ class Dumper(object):
         else:
             line += ["", "", ""]
         # Generate the URL
-        url = data.url().replace("sci_serial", "sci_issues")
+        url = (data.url() or "").replace("sci_serial", "sci_issues")
 
         # Apply ISSN redirects for journals that changed their ISSN in URLs
         # This is necessary for journals that no longer use their print ISSN
@@ -240,7 +240,7 @@ class Dumper(object):
         line.append("")  # preceding_publication_title_id
         line.append("F")  # access_type
 
-        joined_line = ",".join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ",".join(['"%s"' % (i or "").replace('"', '""') for i in line])
 
         return joined_line
 

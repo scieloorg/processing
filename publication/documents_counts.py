@@ -158,7 +158,7 @@ class Dumper(object):
         line.append(str(pages(data.start_page, data.end_page))),  # total de páginas
         line.append(str(len(data.citations or [])))  # total de citações
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

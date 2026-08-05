@@ -203,7 +203,7 @@ class Dumper(object):
         line.append(update_splited[0])  # year
         line.append(update_splited[1])  # month
         line.append(update_splited[2])  # day
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

@@ -1,8 +1,7 @@
-# coding: utf-8
 import unittest
+from unittest.mock import MagicMock, patch
 
-from publication import documents_dates
-from publication import journals
+from publication import documents_dates, journals, journals_status_changes
 
 
 class PublicationTest(unittest.TestCase):
@@ -88,3 +87,52 @@ class PublicationTest(unittest.TestCase):
         result = dumper.fmt_csv(data)
 
         self.assertIn('"S0000-00002020000100001"', result)
+
+    def test_journals_fmt_csv_handles_none_creation_date_and_title(self):
+        with patch.object(journals.utils, "articlemeta_server"), \
+             patch.object(journals.utils, "publicationstats_server"), \
+             patch.object(journals, "Analytics"):
+            dumper = journals.Dumper.__new__(journals.Dumper)
+            dumper._years = 6
+            dumper.years_range = [2026, 2025, 2024, 2023, 2022, 2021]
+            dumper._first_included_document_by_journal = MagicMock(return_value=None)
+            dumper._last_included_document_by_journal = MagicMock(return_value=None)
+            dumper._number_of_issues_by_year = MagicMock(return_value=[(2026, 0)] * 6)
+            dumper._number_of_articles_by_year = MagicMock(return_value=[(2026, 0)] * 6)
+            dumper._documents_languages_by_year = MagicMock(return_value={2026: {'pt': 0, 'es': 0, 'en': 0, 'other': 0}})
+
+            mock_journal = MagicMock()
+            mock_journal.title = None
+            mock_journal.subtitle = None
+            mock_journal.creation_date = None
+            mock_journal.print_issn = "0000-0000"
+            mock_journal.electronic_issn = None
+            mock_journal.scielo_issn = "0000-0000"
+            mock_journal.collection_acronym = "rvt"
+            mock_journal.subject_areas = None
+            mock_journal.publisher_name = None
+            mock_journal.permissions = None
+            mock_journal.periodicity = (1, "Annual")
+            mock_journal.periodicity_in_months = "12"
+            mock_journal.status_history = [("2020-01", "suspended", None)]
+
+            result = dumper.fmt_csv(mock_journal)
+            self.assertIn('"0000-0000"', result)
+            self.assertIn('""', result)
+
+    def test_journals_status_changes_fmt_csv_handles_none_reason(self):
+        dumper = journals_status_changes.Dumper.__new__(journals_status_changes.Dumper)
+        mock_journal = MagicMock()
+        mock_journal.title = "Journal"
+        mock_journal.print_issn = "0000-0000"
+        mock_journal.electronic_issn = None
+        mock_journal.scielo_issn = "0000-0000"
+        mock_journal.collection_acronym = "rvt"
+        mock_journal.subject_areas = None
+        mock_journal.current_status = "suspended"
+
+        history = ("2020-01-01", "suspended", None)
+
+        result = dumper.fmt_csv(mock_journal, history)
+        self.assertIn('"suspended"', result)
+        self.assertIn('""', result)

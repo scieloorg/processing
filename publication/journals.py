@@ -257,9 +257,9 @@ class Dumper(object):
         line.append(data.permissions.get('id', '') if data.permissions else '')
         line.append(data.periodicity[1] or '')
         line.append(data.periodicity_in_months or '')
-        line.append(data.creation_date[:4])
-        line.append(interruption[0][:4] if interruption else '')
-        line.append(interruption[2][:4] if interruption else '')
+        line.append(str(data.creation_date or '')[:4])
+        line.append((interruption[0] or '')[:4] if interruption else '')
+        line.append((interruption[2] or '')[:4] if interruption else '')
         line.append(first_document.publication_date or '' if first_document else '')
         line.append(first_document.issue.volume or '' if first_document and first_document.issue else '')
         line.append(first_document.issue.number or '' if first_document and first_document.issue else '')
@@ -358,7 +358,7 @@ class Dumper(object):
             m5 = m5.get('m5', None) if m5 else None
             line.append(m5 or '')
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

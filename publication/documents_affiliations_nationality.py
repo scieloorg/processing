@@ -157,7 +157,7 @@ class Dumper(object):
         line.append(str(undefined))
         line.append(str(empty))
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 

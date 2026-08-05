@@ -129,7 +129,7 @@ class Dumper(object):
         line.append('1' if 'en' in languages else '0')  # EN
         line.append('1' if len(languages.difference(know_languages)) > 0 else '0')  # OTHER
 
-        joined_line = ','.join(['"%s"' % i.replace('"', '""') for i in line])
+        joined_line = ','.join(['"%s"' % (i or '').replace('"', '""') for i in line])
 
         return joined_line
 
