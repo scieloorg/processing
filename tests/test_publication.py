@@ -114,7 +114,7 @@ class PublicationTest(unittest.TestCase):
             mock_journal.permissions = None
             mock_journal.periodicity = (1, "Annual")
             mock_journal.periodicity_in_months = "12"
-            mock_journal.status_history = None
+            mock_journal.status_history = [("2020-01", "suspended", None)]
 
             result = dumper.fmt_csv(mock_journal)
             self.assertIn('"0000-0000"', result)
