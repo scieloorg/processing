@@ -793,6 +793,7 @@ Os tipo de documentos citáveis são:
     * article-commentary
     * brief-report
     * case-report
+    * data-article
     * rapid-communication
     * research-article
     * review-article
