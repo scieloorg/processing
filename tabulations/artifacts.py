@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from tabulations.constants import CSV_FILES, KBART_TEMPLATE
+from tabulations.constants import CSV_FILES, KBART_LEGACY_FILENAME, KBART_TEMPLATE
 
 
 class ArtifactPublisher:
@@ -34,7 +34,7 @@ class ArtifactPublisher:
             raise RuntimeError(f"arquivos obrigatórios ausentes: {names}")
 
         archive = work_dir / f"tabs_{destination}.zip"
-        self._write_archive(paths, archive)
+        self._write_archive(paths, archive, kbart_file)
         self._publish_archive(archive)
 
         if network_mode:
@@ -60,7 +60,7 @@ class ArtifactPublisher:
             raise RuntimeError("nenhum arquivo disponível para tabs_network.zip")
 
         archive = self._network_dir / "tabs_network.zip"
-        self._write_archive(paths, archive)
+        self._write_archive(paths, archive, network_kbart)
         self._publish_archive(archive)
         self.logger.info("ARQUIVO rede=%s", archive)
 
@@ -71,7 +71,7 @@ class ArtifactPublisher:
         if self._network_dir.exists():
             shutil.rmtree(self._network_dir)
 
-    def _write_archive(self, paths, archive):
+    def _write_archive(self, paths, archive, kbart_file):
         archive.parent.mkdir(parents=True, exist_ok=True)
         temporary = archive.with_suffix(".zip.tmp")
 
@@ -79,6 +79,8 @@ class ArtifactPublisher:
             with ZipFile(temporary, "w", ZIP_DEFLATED) as zip_file:
                 for path in paths:
                     zip_file.write(path, arcname=path.name)
+                    if path.name == kbart_file:
+                        zip_file.write(path, arcname=KBART_LEGACY_FILENAME)
 
             temporary.replace(archive)
         finally:

@@ -6,7 +6,7 @@ from unittest.mock import Mock
 from zipfile import ZipFile
 
 from tabulations.artifacts import ArtifactPublisher
-from tabulations.constants import CSV_FILES, KBART_TEMPLATE
+from tabulations.constants import CSV_FILES, KBART_LEGACY_FILENAME, KBART_TEMPLATE
 
 
 class ArtifactPublisherTest(unittest.TestCase):
@@ -66,7 +66,11 @@ class ArtifactPublisherTest(unittest.TestCase):
         with ZipFile(archive) as zip_file:
             self.assertEqual(
                 zip_file.namelist(),
-                [*CSV_FILES, kbart_file],
+                [*CSV_FILES, kbart_file, KBART_LEGACY_FILENAME],
+            )
+            self.assertEqual(
+                zip_file.read(KBART_LEGACY_FILENAME),
+                zip_file.read(kbart_file),
             )
 
     def test_collection_archive_is_copied_to_tabs_directory(self):
@@ -99,7 +103,11 @@ class ArtifactPublisherTest(unittest.TestCase):
         with ZipFile(archive) as zip_file:
             self.assertEqual(
                 zip_file.namelist(),
-                [*CSV_FILES, network_kbart],
+                [*CSV_FILES, network_kbart, KBART_LEGACY_FILENAME],
+            )
+            self.assertEqual(
+                zip_file.read(KBART_LEGACY_FILENAME),
+                zip_file.read(network_kbart),
             )
 
             for name in zip_file.namelist():
