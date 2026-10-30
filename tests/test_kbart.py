@@ -1,3 +1,4 @@
+import csv
 import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -32,6 +33,33 @@ class KbartJournalInclusionTest(unittest.TestCase):
         self.dumper._articlemeta.journals.assert_called_once_with(
             collection="ven", issn=None,
         )
+
+    def test_last_publication_fields_follow_journal_status(self):
+        journal = SimpleNamespace(
+            scielo_issn="1234-5678", collection_acronym="ven", title="Periódico",
+            print_issn="1234-5678", electronic_issn=None, publisher_name=[],
+            url=lambda: "https://ve.scielo.org/scielo.php?script=sci_serial",
+        )
+        first = SimpleNamespace(
+            publication_date="2000-01-01", issue=SimpleNamespace(volume="1", number="1"),
+        )
+        last = SimpleNamespace(
+            publication_date="2020-12-01", issue=SimpleNamespace(volume="21", number="4"),
+        )
+        self.dumper._first_included_document_by_journal = MagicMock(return_value=first)
+        self.dumper._last_included_document_by_journal = MagicMock(return_value=last)
+
+        for status in ("current", "suspended", "deceased", "other", None):
+            with self.subTest(status=status):
+                journal.current_status = status
+
+                row = next(csv.reader([self.dumper.fmt_csv(journal)]))
+
+                self.assertEqual(row[3:6], ["2000-01-01", "1", "1"])
+                self.assertEqual(
+                    row[6:9],
+                    ["", "", ""] if status == "current" else ["2020-12-01", "21", "4"],
+                )
 
 class KbartTest(unittest.TestCase):
 

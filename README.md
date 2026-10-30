@@ -73,6 +73,10 @@ processing-logs -> /var/log/processing
 O processamento é orquestrado pelo comando `processing_tabs`. Os logs informam
 coleção, etapa, tentativa, duração, comando executado e arquivos produzidos.
 
+A exportação KBART inclui todos os periódicos da coleção, correntes e não
+correntes. Para os correntes, os campos de última publicação ficam vazios;
+para os demais, são preenchidos com os dados disponíveis.
+
 Quando uma coleção falha, o runner registra o acrônimo em
 `/var/log/processing/failed_collections.queue` por padrão. Na próxima execução,
 essa fila é carregada antes da lista normal de coleções. Cada etapa concluída
