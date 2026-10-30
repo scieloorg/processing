@@ -1,8 +1,65 @@
+import csv
 import unittest
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from export import kbart
 
+
+class KbartJournalInclusionTest(unittest.TestCase):
+    def setUp(self):
+        for service in ("ratchet_server", "articlemeta_server", "publicationstats_server"):
+            mocked_service = patch.object(kbart.utils, service)
+            mocked_service.start()
+            self.addCleanup(mocked_service.stop)
+
+        with patch.object(kbart.Dumper, "write"):
+            self.dumper = kbart.Dumper(collection="ven")
+
+    def test_includes_journals_regardless_of_status(self):
+        journals = [
+            SimpleNamespace(scielo_issn=str(index), current_status=status)
+            for index, status in enumerate(
+                ("current", "suspended", "deceased", "other", None)
+            )
+        ]
+        journals.append(SimpleNamespace(scielo_issn="missing-status"))
+        self.dumper._articlemeta.journals.return_value = journals
+        self.dumper.fmt_csv = MagicMock(side_effect=lambda journal: journal.scielo_issn)
+
+        rows = list(self.dumper.items())
+
+        self.assertEqual(rows, [journal.scielo_issn for journal in journals])
+        self.dumper._articlemeta.journals.assert_called_once_with(
+            collection="ven", issn=None,
+        )
+
+    def test_last_publication_fields_follow_journal_status(self):
+        journal = SimpleNamespace(
+            scielo_issn="1234-5678", collection_acronym="ven", title="Periódico",
+            print_issn="1234-5678", electronic_issn=None, publisher_name=[],
+            url=lambda: "https://ve.scielo.org/scielo.php?script=sci_serial",
+        )
+        first = SimpleNamespace(
+            publication_date="2000-01-01", issue=SimpleNamespace(volume="1", number="1"),
+        )
+        last = SimpleNamespace(
+            publication_date="2020-12-01", issue=SimpleNamespace(volume="21", number="4"),
+        )
+        self.dumper._first_included_document_by_journal = MagicMock(return_value=first)
+        self.dumper._last_included_document_by_journal = MagicMock(return_value=last)
+
+        for status in ("current", "suspended", "deceased", "other", None):
+            with self.subTest(status=status):
+                journal.current_status = status
+
+                row = next(csv.reader([self.dumper.fmt_csv(journal)]))
+
+                self.assertEqual(row[3:6], ["2000-01-01", "1", "1"])
+                self.assertEqual(
+                    row[6:9],
+                    ["", "", ""] if status == "current" else ["2020-12-01", "21", "4"],
+                )
 
 class KbartTest(unittest.TestCase):
 
