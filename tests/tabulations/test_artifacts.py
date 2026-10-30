@@ -103,7 +103,11 @@ class ArtifactPublisherTest(unittest.TestCase):
         with ZipFile(archive) as zip_file:
             self.assertEqual(
                 zip_file.namelist(),
-                [*CSV_FILES, network_kbart],
+                [*CSV_FILES, network_kbart, KBART_LEGACY_FILENAME],
+            )
+            self.assertEqual(
+                zip_file.read(KBART_LEGACY_FILENAME),
+                zip_file.read(network_kbart),
             )
 
             for name in zip_file.namelist():

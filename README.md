@@ -89,6 +89,11 @@ de mudanças de status pode conter somente o cabeçalho. Quando essa validação
 falha, o pacote da coleção não é publicado e o último pacote completo da rede é
 preservado.
 
+Os ZIPs das coleções e o consolidado da rede incluem o KBART com dois nomes:
+`SciELO_<coleção>_AllTitles_<data>.csv` e `journals_kbart.csv`. Ambos possuem
+conteúdo idêntico, preservando a compatibilidade com as coletas que usam o nome
+antigo.
+
 Aplicação:
 
 ```bash

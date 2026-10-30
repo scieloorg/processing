@@ -60,7 +60,7 @@ class ArtifactPublisher:
             raise RuntimeError("nenhum arquivo disponível para tabs_network.zip")
 
         archive = self._network_dir / "tabs_network.zip"
-        self._write_archive(paths, archive)
+        self._write_archive(paths, archive, network_kbart)
         self._publish_archive(archive)
         self.logger.info("ARQUIVO rede=%s", archive)
 
@@ -71,7 +71,7 @@ class ArtifactPublisher:
         if self._network_dir.exists():
             shutil.rmtree(self._network_dir)
 
-    def _write_archive(self, paths, archive, kbart_file=None):
+    def _write_archive(self, paths, archive, kbart_file):
         archive.parent.mkdir(parents=True, exist_ok=True)
         temporary = archive.with_suffix(".zip.tmp")
 
