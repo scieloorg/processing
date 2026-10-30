@@ -37,4 +37,5 @@ CSV_FILES = (
     "journals_status_changes.csv",
 )
 KBART_TEMPLATE = "SciELO_{acronym}_AllTitles_{date}.csv"
+KBART_LEGACY_FILENAME = "journals_kbart.csv"
 ACRONYM_PATTERN = re.compile(r"^[a-z]{3}(?:-[A-Z]{2}|-)?$")
